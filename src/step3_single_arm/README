@@ -1,0 +1,52 @@
+
+=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+                ____  _     ___ ____  _       _     
+               | __ )| |   |_ _/ ___|| | __ _| |__  
+               |  _ \| |    | |\___ \| |/ _` | '_ \ 
+               | |_) | |___ | | ___) | | (_| | |_) |
+               |____/|_____|___|____/|_|\__,_|_.__/ 
+
+=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
+BLISlab: A Sandbox for Optimizing GEMM
+
+.
+├── README
+├── sourceme.sh
+├── makefile
+├── sgemm
+│   ├── my_sgemm.c
+│   ├── bl_sgemm_ref.c
+│   └── bl_sgemm_util.c
+├── include
+│   ├── avx_types.h
+│   ├── bl_config.h
+│   ├── bl_sgemm.h
+│   ├── bl_sgemm_kernel.h
+│   └── bl_sgemm_ref.h
+├── kernels
+│   ├── bl_sgemm_ukr.c
+│   ├── bl_sgemm_asm_8x4.c
+│   ├── bl_sgemm_int_8x4.c
+│   ├── bl_gemm_asm_12x4.c
+│   ├── bl_gemm_asm_8x6.c
+├── lib
+├── make.inc.files
+│   ├── make.gnu.inc
+│   ├── make.inc
+│   └── make.intel.inc
+└── test
+    ├── makefile
+    ├── run_bl_sgemm.sh
+    ├── tacc_run_bl_sgemm.sh
+    └── test_bl_sgemm.c
+
+How to compile and execute the code:
+1. Change the options in sourceme.sh and set the environment variables.
+$ source sourceme.sh
+2. Compile the code, generate the library and test executables.
+$ make
+3. Execute the test driver.
+$ cd test
+$ ./run_bl_sgemm.sh
+
