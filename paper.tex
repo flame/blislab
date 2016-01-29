@@ -1,0 +1,75 @@
+\documentclass{article}
+
+\setlength{\textheight}{8.75in}
+\setlength{\textwidth}{6.5in}
+\setlength{\oddsidemargin}{0in}
+\setlength{\evensidemargin}{0in}
+\setlength{\topmargin}{-0.75in}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+% \usepackage{graphicx}
+\usepackage{program}
+\usepackage{ifthen}
+\usepackage{epsfig}
+\usepackage{array}
+\usepackage{epic}
+\usepackage{color}
+%\usepackage[margin=1in]{geometry}
+\usepackage{hyperref}
+
+\input{flatex}
+\input{macros}
+
+\newcommand{\xeon}{Intel Xeon E5-2680}
+\newcommand{\ixeon}{Intel Xeon E5-2680}
+\newcommand{\Jc}{{\cal J}_c}
+\newcommand{\Pc}{{\cal P}_c}
+\newcommand{\Ic}{{\cal I}_c}
+\newcommand{\Jr}{{\cal J}_r}
+\renewcommand{\Pr}{{\cal P}_r}
+\newcommand{\Ir}{{\cal I}_r}
+\newcommand{\Ap}{A_{p}}
+\newcommand{\Bp}{B_{p}}
+\newcommand{\Cp}{C_{p}}
+\newcommand{\Chp}{\hat{C}_{p}}
+\newcommand{\Ccp}{\check{C}_{p}}
+
+\begin{document}
+
+\title{
+An Exercise in Optimizing Matrix-Matrix Multiplication
+}
+
+\author{
+Jianyu Huang
+\and
+Robert A. van de Geijn
+}
+
+\date{Draft \\ \today}
+
+\maketitle 
+
+\begin{abstract}
+Abstract.
+\end{abstract}
+
+
+\input{body}
+
+
+\subsection*{Acknowledgements}
+We thank the other members of the FLAME team for their support.
+This research was partially sponsored by NSF grant CCF--***.
+
+{\em Any opinions, findings and conclusions or recommendations
+expressed in this material are those of the author(s) and do not
+necessarily reflect the views of the National Science Foundation
+(NSF).}
+
+
+\bibliographystyle{plain} 
+\bibliography{biblio}
+
+\end{document}

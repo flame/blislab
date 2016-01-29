@@ -1,0 +1,16 @@
+TODO:
+
+Final Check lists:
+TODO
+/frame
+/test
+/include
+makefile
+make.inc
+make.intel.inc
+make.gnu.inc
+
+BUGS:
+
+
+performance BUGS for MKL dgemm routine...

@@ -1,0 +1,1085 @@
+\newcolumntype{I}{!{\vrule width 1.5pt}}
+\newlength\savedwidth
+\newcommand\whline{\noalign{\global\savedwidth\arrayrulewidth
+                            \global\arrayrulewidth 1.5pt}%
+           \hline
+           \noalign{\global\arrayrulewidth\savedwidth}}
+
+
+% 
+% A FLAME algorithm is bracketed by
+%
+%  \begin{FlameAlg}
+%    <statements>
+%  \end{FlameAlg}
+
+\newenvironment{FlameAlg}{
+\begin{tabbing}
+in \= in \= in  \= in  \= in  \= \kill
+}
+{
+\end{tabbing}
+}
+
+\newboolean{IsWide}
+\setboolean{IsWide}{true}
+
+\newenvironment{FlameAlgNarrow}{
+\setboolean{IsWide}{false}
+\begin{tabbing}
+in \= in \= in  \= in  \= in  \= \kill
+}
+{
+\end{tabbing}
+\setboolean{IsWide}{true}
+}
+
+%
+% A loop in a FLAME algorithm is bracketed by
+%
+% \FlaDoUntil{ <condition> }
+%   Body of the loop
+% \FlaEndDo
+%
+% The body is indented
+
+\newcommand{\FlaDoUntil}[1]{
+{ \bf do until #1 } \+ 
+}
+
+\newcommand{\FlaDoWhile}[1]{{\bf while #1 do} \+ 
+}
+
+% Note: because of the \kill, it is important
+% to have a \\ before the \FlaEndDo
+% since otherwise the last line before the
+% \FlaEndDo will not show
+
+\newcommand{\FlaEndDo}{\- \kill
+{\bf endwhile }
+}
+
+% In math mode, 
+% \FlaTwoByTwo{A}{B}
+%             {C}{D}
+% creates the picture
+%   / A || B \
+%   | ==  == |
+%   \ C || D /
+
+\newcommand{\FlaTwoByTwo}[4]{
+\left( 
+\begin{array}{c I c}
+#1 & #2 \\ \whline
+#3 & #4 
+\end{array} 
+\right)
+}
+
+\newcommand{\FlaTwoByTwoNoPar}[4]{
+\begin{array}{c I c}
+#1 & #2 \\ \whline
+#3 & #4 
+\end{array} 
+}
+
+\newcommand{\FlaTwoByTwoSingleLineNoPar}[4]{
+\begin{array}{c | c}
+#1 & #2 \\ \hline
+#3 & #4 
+\end{array} 
+}
+
+\newcommand{\FlaTwoByTwoSingleLine}[4]{
+\left(  
+\begin{array}{c | c}
+#1 & #2 \\ \hline
+#3 & #4 
+\end{array} 
+\right)
+}
+
+
+\newcommand{\FlaTwoByTwoNoLine}[4]{
+\left(  
+\begin{array}{c  c}
+#1 & #2 \\ 
+#3 & #4 
+\end{array} 
+\right)
+}
+
+% In math mode, 
+% \FlaTwoByOne{A}
+%             {C}
+% creates the picture
+%   / A  \
+%   | == |
+%   \ C  /
+
+\newcommand{\FlaTwoByOne}[2]{
+\left( 
+\begin{array}{c}
+#1 \\ \whline
+#2 
+\end{array} 
+\right)
+}
+
+\newcommand{\FlaTwoByOneNoPar}[2]{
+\begin{array}{c}
+#1 \\ \whline
+#2 
+\end{array} 
+}
+
+% In math mode, 
+% \FlaTwoByOneSingleLine{A}
+%                       {C}
+% creates the picture
+%   / A  \
+%   | -- |
+%   \ C  /
+
+\newcommand{\FlaTwoByOneSingleLine}[2]{
+\left( 
+\begin{array}{c}
+#1 \\ \hline
+#2 
+\end{array} 
+\right)
+}
+
+
+\newcommand{\FlaTwoByOneNoLine}[2]{
+\left( 
+\begin{array}{c}
+#1 \\ \hline
+#2 
+\end{array} 
+\right)
+}
+
+% In math mode, 
+% \FlaOneByTwo{A}{B}
+% creates the picture
+%   ( A || B )
+
+\newcommand{\FlaOneByTwo}[2]{
+\left( 
+\begin{array}{c I c}
+#1 & #2 
+\end{array} 
+\right)
+}
+
+\newcommand{\FlaOneByTwoNoPar}[2]{
+\begin{array}{c I c}
+#1 & #2 
+\end{array} 
+}
+
+\newcommand{\FlaOneByTwoSingleLine}[2]{
+\left( 
+\begin{array}{c | c}
+#1 & #2
+\end{array} 
+\right)
+}
+
+\newcommand{\FlaOneByTwoNoLine}[2]{
+\left( 
+\begin{array}{c | c}
+#1 & #2
+\end{array} 
+\right)
+}
+
+% In math mode, 
+% \FlaThreeByThreeTL{A}{B}{C}
+%                   {D}{E}{F}
+%                   {G}{H}{I}
+% creates the picture
+%   / A | B || C \
+%   | -- ---  -- |
+%   | D | E || F |
+%   | ==  ==  == |
+%   \ G | H || I /
+% Notice: the TL means that the
+% center block (E) is part of the
+% TL quadrant, where quadrants are
+% partitioned by the double lines.
+
+\newcommand{\FlaThreeByThreeTL}[9]{
+\left( 
+\begin{array}{c | c I c}
+#1 & #2 & #3 \\ \hline
+#4 & #5 & #6 \\ \whline
+#7 & #8 & #9
+\end{array} 
+\right) 
+}
+
+% In math mode, 
+% \FlaThreeByThreeBR{A}{B}{C}
+%                   {D}{E}{F}
+%                   {G}{H}{I}
+% creates the picture
+%   / A || B | C \
+%   | ==  ==  == |
+%   | D || E | F |
+%   | -- ---  -- |
+%   \ G || H | I /
+% Notice: the BR means that the
+% center block (E) is part of the
+% BR quadrant, where quadrants are
+% partitioned by the double lines.
+
+\newcommand{\FlaThreeByThreeBR}[9]{
+\left( 
+\begin{array}{c I c | c}
+#1 & #2 & #3 \\ \whline
+#4 & #5 & #6 \\ \hline
+#7 & #8 & #9
+\end{array} 
+\right)
+}
+
+\newcommand{\FlaThreeByThreeBRSingleLine}[9]{
+\left( 
+\begin{array}{c | c | c}
+#1 & #2 & #3 \\ \hline
+#4 & #5 & #6 \\ \hline
+#7 & #8 & #9
+\end{array} 
+\right)
+}
+
+% In math mode, 
+% \FlaThreeByThreeTR{A}{B}{C}
+%                   {D}{E}{F}
+%                   {G}{H}{I}
+% creates the picture
+%   / A || B | C \
+%   | -- ---  -- |
+%   | D || E | F |
+%   | ==  ==  == |
+%   \ G || H | I /
+% Notice: the TR means that the
+% center block (E) is part of the
+% TR quadrant, where quadrants are
+% partitioned by the double lines.
+
+\newcommand{\FlaThreeByThreeTR}[9]{
+\left( 
+\begin{array}{c I c | c}
+#1 & #2 & #3 \\ \hline
+#4 & #5 & #6 \\ \whline
+#7 & #8 & #9
+\end{array} 
+\right)
+}
+
+
+% In math mode, 
+% \FlaThreeByThreeBL{A}{B}{C}
+%                   {D}{E}{F}
+%                   {G}{H}{I}
+% creates the picture
+%   / A | B || C \
+%   | ==  ==  == |
+%   | D | E || F |
+%   | -- ---  -- |
+%   \ G | H || I /
+% Notice: the BL means that the
+% center block (E) is part of the
+% BL quadrant, where quadrants are
+% partitioned by the double lines.
+
+\newcommand{\FlaThreeByThreeBL}[9]{
+\left( 
+\begin{array}{c | c I c}
+#1 & #2 & #3 \\ \whline
+#4 & #5 & #6 \\ \hline 
+#7 & #8 & #9
+\end{array} 
+\right)
+}
+
+% In math mode, 
+% \FlaOneByThreeR{A}{B}{C}
+% creates the picture
+%   ( A || B | C )
+% Notice: the R means that the
+% center block (B) is part of the
+% R(ight) submatrix, where 
+% submatrices are % partitioned 
+% by the double lines.
+
+\newcommand{\FlaOneByThreeR}[3]{
+\left( 
+\begin{array}{c I c | c}
+#1 & #2 & #3 
+\end{array} 
+\right)
+}
+
+% In math mode, 
+% \FlaOneByThreeL{A}{B}{C}
+% creates the picture
+%   ( A | B || C )
+% Notice: the R means that the
+% center block (B) is part of the
+% R(ight) submatrix, where 
+% submatrices are % partitioned 
+% by the double lines.
+
+\newcommand{\FlaOneByThreeL}[3]{
+\left( 
+\begin{array}{c | c I c}
+#1 & #2 & #3 
+\end{array} 
+\right)
+}
+
+% In math mode, 
+% \FlaThreeByOneT{A}
+%                {D}
+%                {G}
+% creates the picture
+%   / A  \
+%   | == |
+%   | B  |
+%   | -- |
+%   \ C  /
+% Notice: the T means that the
+% center block (C) is part of the
+% T(op) submatrix where submatrices
+% are % partitioned by the double 
+% lines.
+
+\newcommand{\FlaThreeByOneT}[3]{
+\left( 
+\begin{array}{c}
+#1 \\ \hline
+#2 \\ \whline
+#3 
+\end{array} 
+\right) 
+}
+
+\newcommand{\FlaThreeByOneTNoPar}[3]{
+\begin{array}{c}
+#1 \\ \hline
+#2 \\ \whline
+#3 
+\end{array} 
+}
+
+% In math mode, 
+% \FlaThreeByOneB{A}
+%                {D}
+%                {G}
+% creates the picture
+%   / A  \
+%   | -- |
+%   | B  |
+%   | == |
+%   \ C  /
+% Notice: the B means that the
+% center block (C) is part of the
+% T(op) submatrix where submatrices
+% are % partitioned by the double 
+% lines.
+
+\newcommand{\FlaThreeByOneB}[3]{
+\left( 
+\begin{array}{c}
+#1 \\ \whline
+#2 \\ \hline
+#3 
+\end{array} 
+\right) 
+}
+
+\newcommand{\FlaThreeByOneBNoPar}[3]{
+\begin{array}{c}
+#1 \\ \whline
+#2 \\ \hline
+#3 
+\end{array} 
+}
+
+
+% Various key words
+
+% The following is a typical use of 
+% \FlaPartition:
+% 
+% \FlaPartition {
+%    $ A \rightarrow \FlaTwoByTwo{ A_{TL} }{ A_{TR} }
+%                                { A_{BL} }{ A_{BR} } $ 
+% }
+% {
+%    where $ A_{TL} $ is $ 0 \times 0 $
+% }
+% 
+% Creates something like
+% Partition A -> / A_TL || A_TR \
+%                | =====  ===== |
+%                \ A_BL || A_BR /
+% where A_TL is 0 x 0
+%
+
+\newcommand{\FlaPartition}[2]{
+\ifthenelse{\boolean{IsWide}}{{\bf partition } \hspace{-1em} #1 \hspace{-1em} #2}
+{{\bf partition } \+ \\ #1 \+ \\ #2 \- \-}
+}
+
+% The following is a typical use of 
+% \FlaRepartition:
+% 
+% \FlaRepartition{
+% $ 
+% \FlaTwoByTwo{ A_{TL} }{ A_{TR} }
+%             { A_{BL} }{ A_{BR} } \rightarrow
+% \FlaThreeByThreeBR{ A_{00} }{ A_{01} }{ A_{02} }
+%                   { A_{10} }{ A_{11} }{ A_{12} }
+%                   { A_{20} }{ A_{21} }{ A_{22} } 
+% $ 
+% }
+% {
+%    \FlaWhere{$ A_{11} $ is $ b \times b $}
+%  }
+% 
+% Creates something like
+% Repartition  
+%   / A_TL || A_TR \    / A_00 || A_01 | A_02 \
+%   | =====  ===== | -> | =====  ====== ===== |
+%   \ A_BL || A_BR /    | A_10 || A_11 | A_12 |
+%                       | -----  ------ ----- |
+%                       \ A_20 || A_21 | A_22 /
+% where A_11 is b x b
+%
+
+\newcommand{\FlaRepartition}[2]{
+\ifthenelse{\boolean{IsWide}}{{\bf repartition } \hspace{-1em} #1 \hspace{-1em} #2}
+{{\bf repartition } \+ \\ #1 \+ \\ #2 \- \-}
+}
+
+% The following is a typical use of 
+% \FlaContinue:
+% 
+% \FlaContinue{
+% $ 
+%    \FlaTwoByTwo{ A_{TL} }{ A_{TR} }
+%                { A_{BL} }{ A_{BR} } \leftarrow
+%    \FlaThreeByThreeTL{ A_{00} }{ A_{01} }{ A_{02} }
+%                      { A_{10} }{ A_{11} }{ A_{12} }
+%                      { A_{20} }{ A_{21} }{ A_{22} } 
+% $ 
+% }
+% 
+% Creates something like
+% Continue with
+%   / A_TL || A_TR \    / A_00 | A_01 || A_02 \
+%   | =====  ===== | <- | ----- ------  ----- |
+%   \ A_BL || A_BR /    | A_10 | A_11 || A_12 |
+%                       | ===== ======  ===== |
+%                       \ A_20 | A_21 || A_22 /
+
+\newcommand{\FlaContinue}[1]{
+\ifthenelse{\boolean{IsWide}}{{\bf continue with } #1
+}
+{{\bf continue with } \+ \\ #1 \-
+}
+}
+\newcommand{\FlaWhere}[1]{
+\hspace{-1em} { \bf where #1 } 
+}
+
+\newcommand{\undetermined}{ \star }
+
+\newcommand{\FlaStartCompute}{%
+\setlength{\unitlength}{1.60in}%
+\begin{picture}(2,0.01)
+\put(0,0){\line(1,0){2}}
+\put(0,0.01){\line(1,0){2}}
+\end{picture}%
+}
+
+\newcommand{\FlaEndCompute}{%
+\noindent%
+\setlength{\unitlength}{1.60in}%
+\begin{picture}(2,0.01)
+\put(0,0){\line(1,0){2}} 
+\put(0,0.01){\line(1,0){2}} 
+\end{picture}%
+}
+
+\newcommand{\FlaStartComputeShort}{
+\setlength{\unitlength}{1.30in}
+\begin{picture}(3,0.01)
+\put(0,0){\line(1,0){3}}
+\put(0,0.01){\line(1,0){3}}
+\end{picture} 
+}
+
+\newcommand{\FlaStartComputeShorter}{
+\setlength{\unitlength}{0.5in}
+\begin{picture}(3,0.01)
+\put(0,0){\line(1,0){4}}
+\put(0,0.01){\line(1,0){4}}
+\end{picture} 
+}
+
+\newcommand{\FlaEndComputeShort}{
+\setlength{\unitlength}{1.30in}
+\begin{picture}(3,0.01)
+\put(0,0){\line(1,0){3}} 
+\put(0,0.01){\line(1,0){3}} 
+\end{picture} 
+}
+
+\newcommand{\FlaEndComputeShorter}{
+\setlength{\unitlength}{0.5in}
+\begin{picture}(3,0.01)
+\put(0,0){\line(1,0){4}} 
+\put(0,0.01){\line(1,0){4}} 
+\end{picture} 
+}
+
+\newcommand{\FlaUpLo}[2]{
+{#1} \backslash {#2}
+}
+
+\newcommand{\FlaInverse}[1]{
+{ #1 }^{-1}
+}
+
+\newcommand{\Square}{ \mbox{Square} }
+\newcommand{\SameSize}{ \mbox{SameSize} }
+\newcommand{\RowDim}{\mbox{RowDim}}
+\newcommand{\ColDim}{\mbox{ColDim}}
+\newcommand{\LowTr}{\mbox{LowTr}}
+\newcommand{\UpTr}{\mbox{UpTr}}
+\newcommand{\UpperTr}{\mbox{UpTr}}
+\newcommand{\UppTr}{\mbox{UpTr}}
+\newcommand{\operation}{ [ D, E, F, \ldots ] \becomes {\rm op}( A, B, C, D, \ldots ) }
+\newcommand{\routinename}{ [ D, E, F, \ldots ] \becomes {\rm op}( A, B, C, D, \ldots ) }
+\newcommand{\routinecost}{ X }
+\newcommand{\precondition}{ Q }
+\newcommand{\postcondition}{ R }
+\newcommand{\invariant}{ P }
+\newcommand{\costinv}{ \  }
+\newcommand{\costbefore}{ \  }
+\newcommand{\costafter}{ \  }
+\newcommand{\updatecost}{ \  }
+\newcommand{\guard}{ R }
+\newcommand{\partitionings}{
+\begin{minipage}{2in}
+$ S_I $
+\end{minipage}
+}
+\newcommand{\partitionsizes}{ \hspace{ 1.25in} }
+
+\newcommand{\blocksize}{1}
+
+\newcommand{\repartitionings}{
+\begin{minipage}[t]{2in}
+\ \\
+\ \\
+\ \\
+\end{minipage}
+}
+
+\newcommand{\repartitionsizes}{ \hspace{ 1.25in} }
+\newcommand{\moveboundaries}{
+\begin{minipage}[t]{2in}
+\ \\
+\ \\
+\ \\
+\end{minipage}
+}
+\newcommand{\beforeupdate}{
+$ \QBefore $
+}
+\newcommand{\afterupdate}{
+$ \QAfter $
+}
+\newcommand{\update}{%
+\begin{minipage}[t]{4in}
+$ S_U $
+\end{minipage}
+}
+
+\newcommand{\resetsteps}{
+\renewcommand{\blocksize}{1}
+\renewcommand{\operation}{ [ D, E, F, \ldots ] \becomes {\rm op}( A, B, C, D, \ldots ) }
+\renewcommand{\routinename}{ [ D, E, F, \ldots ] \becomes {\rm op}( A, B, C, D, \ldots ) }
+\renewcommand{\routinecost}{ 0 }
+\renewcommand{\precondition}{ \PPre }
+\renewcommand{\postcondition}{ \PPost }
+\renewcommand{\invariant}{ \PInv }
+\renewcommand{\costinv}{ \  }
+\renewcommand{\guard}{ G }
+\renewcommand{\partitionings}{ %
+\begin{minipage}[t]{2in}
+\ \\
+\end{minipage}
+}
+\renewcommand{\partitionsizes}{ \hspace{ 2.25in} }
+\renewcommand{\repartitionings}{%
+\begin{minipage}[t]{2in}
+\ \\
+\end{minipage}
+}
+\renewcommand{\repartitionsizes}{ \hspace{ 1.25in} }
+\renewcommand{\moveboundaries}{%
+\begin{minipage}[t]{2in}
+\ \\
+\end{minipage}
+}
+\renewcommand{\beforeupdate}{
+\QBefore
+}
+\renewcommand{\afterupdate}{
+\QAfter
+}
+\renewcommand{\update}{
+$ S_U $
+}
+}
+
+\newenvironment{FlaBox}{ 
+\footnotesize
+\begin{framebox}
+}
+{
+\end{framebox}
+}
+
+\newcommand{\WSoperation}{ 
+$ \operation $
+}
+
+\newcommand{\WSprecondition}{
+$ \left\{ \precondition \right\} $
+}
+
+\newcommand{\WSpostcondition}{
+$ \left\{ \postcondition \right\} $
+}
+
+\newcommand{\WSinvariant}{
+$ \left\{ \invariant \right\} $
+}
+
+\newcommand{\WScostinv}{
+$ \Csf = \costinv $ flops
+}
+
+\newcommand{\WScostzero}{
+$ \Csf = 0 $ flops
+}
+
+\newcommand{\WScostbu}{
+$ \Csf = \costbefore $ flops
+}
+
+\newcommand{\WScostau}{
+$ \Csf = \costafter $ flops
+}
+
+\newcommand{\WSupdatecost}{
+{\bf Cost:} $ \updatecost $ flops
+}
+
+\newcommand{\WStopofloop}{
+$ \left\{ \left( \invariant \right) \wedge \left( \guard \right) \right\} $
+}
+
+\newcommand{\WStopofloopnarrow}{
+$ \left\{ \invariant \wedge \guard \right\} $
+}
+
+\newcommand{\WSafterloop}{
+$ \left\{ \left( \invariant \right) \wedge \neg \left( \guard \right) \right\} $
+}
+
+\newcommand{\WSafterloopnarrow}{
+$ 
+\left\{ \invariant \wedge \neg \left( \guard \right) \right\} 
+$
+}
+
+
+\newcommand{\WSguard}{
+$ \guard $
+}
+
+
+\newcommand{\WSpartition}{
+\begin{minipage}[t]{2in}
+\begin{tabbing}
+ind \= ind \= \kill
+{\bf Partition} 
+\partitionings \+ \\
+{\bf where } \hspace*{-2ex} \partitionsizes 
+\end{tabbing}
+\end{minipage}
+}
+
+\newcommand{\WSpartitionNarrow}{
+\begin{minipage}[t]{2.2in}
+\begin{tabbing}
+ind \= ind \= \kill
+{\bf Partition} 
+\partitionings \+ \\
+{\bf where } \hspace*{-2ex} \partitionsizes 
+\end{tabbing}
+\end{minipage}
+}
+
+\newcommand{\WSrepartition}{
+\begin{minipage}[t]{2in}
+\ifthenelse{ \equal{\blocksize}{1} }{}
+{%
+\ifthenelse{ \equal{\blocksize}{2} }{~}
+{\bf Determine block size $ \blocksize $} \\
+}
+{\bf Repartition}
+\begin{tabbing}
+in \= in \= \+ \kill
+\repartitionings \+ \\
+{\bf where } \hspace*{-2ex} \repartitionsizes 
+\end{tabbing}
+\end{minipage}
+}
+
+\newcommand{\WSrepartitionNarrow}{
+\begin{minipage}[t]{2.15in}
+\ifthenelse{ \equal{\blocksize}{1} }{}
+{%
+\ifthenelse{ \equal{\blocksize}{blank} }{~}
+{\bf Determine block size $ \blocksize $} \\
+}
+{\bf Repartition}
+\begin{tabbing}
+i \= i \= \+ \kill
+\repartitionings \+ \\
+{\bf where } \hspace*{-2ex} \repartitionsizes 
+\end{tabbing}
+\end{minipage}
+}
+
+\newcommand{\WSmoveboundary}{
+\begin{minipage}[t]{2in}
+{\bf Continue with}
+\begin{tabbing}
+ind \= \+ \kill
+\moveboundaries 
+\end{tabbing}
+\end{minipage}
+}
+
+\newcommand{\WSmoveboundaryNarrow}{
+\begin{minipage}[t]{2.15in}
+{\bf Continue with}
+\begin{tabbing}
+i \= \+ \kill
+\moveboundaries 
+\end{tabbing}
+\end{minipage}
+}
+
+\newcommand{\WSbeforeupdate}{
+$ \left\{ \beforeupdate \right\} $
+}
+
+\newcommand{\WSafterupdate}{
+$ \left\{ \afterupdate \right\} $
+}
+
+\newcommand{\WSupdate}{
+\update
+}
+
+\newcommand{\worksheet}{
+\begin{center}
+\begin{tabular}{| c I l |} \hline
+\footnotesize {\bf Step} & 
+{\bf Annotated Algorithm:} $\operation$ 
+\\ \whline 
+\rowcolor[gray]{0.93}
+1a & 
+\WSprecondition \\ \hline
+4 & 
+\WSpartition \\ \hline
+\rowcolor[gray]{0.93}
+2 & 
+\WSinvariant \\ \hline
+3 & 
+{\bf while} \WSguard { \bf do} \\ \hline
+\rowcolor[gray]{0.93}
+2,3 &
+\ \hspace{0.15in} \WStopofloop \\ \hline
+5a & 
+\ \hspace{0.15in} 
+\WSrepartition
+\\ \hline
+\rowcolor[gray]{0.93}
+6 &
+\ \hspace{0.15in} \WSbeforeupdate \\ \hline
+8 & \ \hspace{0.15in} \WSupdate \\ \hline
+5b &
+\ \hspace{0.15in} 
+\WSmoveboundary
+\\ \hline
+\rowcolor[gray]{0.93}
+7 &
+\ \hspace{0.15in} \WSafterupdate \\ \hline 
+\rowcolor[gray]{0.93}
+2 &
+\ \hspace{0.15in} \WSinvariant \\ \hline
+& {\bf endwhile} \\ \hline
+\rowcolor[gray]{0.93}
+2,3 &
+\WSafterloop \\ \hline
+\rowcolor[gray]{0.93}
+1b &
+\WSpostcondition \\ \hline
+\end{tabular}
+\end{center}
+}
+
+\newcommand{\worksheetnarrow}{
+\begin{center}
+\begin{tabular}{| c I l |} \hline
+\footnotesize {\bf Step} & 
+{\bf Annotated Algorithm:} $\routinename$ 
+\\ \whline
+\rowcolor[gray]{0.93}
+1a & 
+\WSprecondition \\ \hline
+4 & 
+\WSpartition \\ \hline
+\rowcolor[gray]{0.93}
+2 & 
+\WSinvariant \\ \hline
+3 & 
+{\bf while} \WSguard { \bf do} \\ \hline
+\rowcolor[gray]{0.93}
+2,3 &
+\ \hspace{0.15in} \WStopofloopnarrow \\ \hline
+5a & 
+\ \hspace{0.15in} 
+\WSrepartition
+\\ \hline
+\rowcolor[gray]{0.93}
+6 &
+\ \hspace{0.15in} \WSbeforeupdate \\ \hline
+8 & \ \hspace{0.15in} \WSupdate \\ \hline
+5b &
+\ \hspace{0.15in} 
+\WSmoveboundary
+\\ \hline
+\rowcolor[gray]{0.93}
+7 &
+\ \hspace{0.15in} \WSafterupdate \\ \hline 
+\rowcolor[gray]{0.93}
+2 &
+\ \hspace{0.15in} \WSinvariant \\ \hline
+& {\bf endwhile} \\ \hline
+\rowcolor[gray]{0.93}
+2,3 &
+\WSafterloopnarrow \\ \hline
+\rowcolor[gray]{0.93}
+1b &
+\WSpostcondition \\ \hline
+\end{tabular}
+\end{center}
+}
+
+\newcommand{\worksheetwithcost}{
+\begin{center}
+\begin{tabular}{| c I l  r | } \hline
+\footnotesize {\bf Step} & 
+\multicolumn{2}{l|}
+{{\bf Cost Analysis:} $\routinename$} 
+\\ \whline
+\rowcolor[gray]{0.93}
+1a & 
+% \WSprecondition 
+& \WScostzero \\ \hline
+4 & \multicolumn{2}{l|}{
+\WSpartition} \\ \hline
+\rowcolor[gray]{0.93}
+2 & 
+% \WSinvariant 
+& \WScostinv \\ \hline
+3 & \multicolumn{2}{l|}{
+{\bf while} \WSguard { \bf do} }\\ \hline
+\rowcolor[gray]{0.93}
+2,3 &
+% \ \hspace{0.15in} \WStopofloop 
+& \WScostinv \\ \hline
+5a & \multicolumn{2}{l|}{
+\ \hspace{0.15in} 
+\WSrepartition}
+\\ \hline
+\rowcolor[gray]{0.93}
+6 &
+% \ \hspace{0.15in} \WSbeforeupdate
+& 
+\WScostbu
+\\ \hline
+8 & 
+\hspace{0.15in} \WSupdate
+&
+\WSupdatecost \\ \hline
+5b &\multicolumn{2}{l|}{
+\ \hspace{0.15in} 
+\WSmoveboundary}
+\\ \hline
+\rowcolor[gray]{0.93}
+7 &
+% \ \hspace{0.15in} \WSafterupdate 
+& 
+\WScostau
+\\ \hline 
+\rowcolor[gray]{0.93}
+2 &
+% \ \hspace{0.15in} \WSinvariant
+&
+\WScostinv \\ \hline
+& \multicolumn{2}{l|}{{\bf endwhile}} \\ \hline
+\rowcolor[gray]{0.93}
+2,3 &
+% \WSafterloop
+&
+\WScostinv
+\\ \hline
+\rowcolor[gray]{0.93}
+1b &
+% \WSpostcondition
+\multicolumn{2}{r|}
+{{\bf Total Cost:} $ \routinecost $ flops}
+\\ \hline
+\end{tabular}
+\end{center}
+}
+
+\newcommand{\worksheetnosteps}{
+\begin{center}
+\begin{tabular}{| l |} \hline
+Annotated Algorithm: \WSoperation \\ \whline
+\rowcolor[gray]{0.93}
+\WSprecondition \\ \hline
+\WSpartition \\ \hline
+\rowcolor[gray]{0.93}
+\WSinvariant \\ \hline
+{\bf while} \WSguard { \bf do} \\ \hline
+\rowcolor[gray]{0.93}
+\ \hspace{0.15in} \WStopofloop \\ \hline
+\ \hspace{0.15in} 
+\WSrepartition
+\\ \hline
+\rowcolor[gray]{0.93}
+\ \hspace{0.15in} \WSbeforeupdate \\ \hline
+\hspace{0.15in} \WSupdate \\ \hline
+\ \hspace{0.15in} 
+\WSmoveboundary
+\\ \hline
+\rowcolor[gray]{0.93}
+\ \hspace{0.15in} \WSafterupdate \\ \hline 
+\rowcolor[gray]{0.93}
+\ \hspace{0.15in} \WSinvariant \\ \hline
+{\bf endwhile} \\ \hline
+\rowcolor[gray]{0.93}
+\WSafterloop \\ \hline
+\rowcolor[gray]{0.93}
+\WSpostcondition \\ \hline
+\end{tabular}
+\end{center}
+}
+
+\newcommand{\worksheetupdate}{
+\begin{center}
+\begin{tabular}{| c I l |} \hline
+\footnotesize Step & Annotated Algorithm: \WSoperation \\ \whline
+3 & 
+{\bf while} \WSguard { \bf do} \\ \hline
+2,3 &
+\ \hspace{0.15in} \WStopofloop \\ \hline
+5a & 
+\ \hspace{0.15in} 
+\WSrepartition
+\\ \hline
+6 &
+\ \hspace{0.15in} \WSbeforeupdate \\ \hline
+8 & \hspace{0.15in} \WSupdate \\ \hline
+5b &
+\ \hspace{0.15in} 
+\WSmoveboundary
+\\ \hline
+7 &
+\ \hspace{0.15in} \WSafterupdate \\ \hline 
+2 &
+\ \hspace{0.15in} \WSinvariant \\ \hline
+& {\bf endwhile} \\ \hline
+\end{tabular}
+\end{center}
+}
+
+\newcommand{\FlaAlgorithm}{
+\begin{center}
+\begin{tabular}{|l |} \hline
+{\bf Algorithm:} $\routinename$ 
+\\ \whline
+{\WSpartition} \\[0.3in]
+{\bf while} \WSguard { \bf do} \\
+\ \hspace{0.15in} \WSrepartition \\
+{\hspace{0.15in} \FlaStartComputeShort} \\
+{\hspace{0.15in} \WSupdate} \\
+{\hspace{0.15in} \FlaEndComputeShort} \\
+{\ \hspace{0.15in} \WSmoveboundary} \\
+{{\bf endwhile}} \\ \hline
+\end{tabular}
+\end{center}
+}
+
+
+\newcommand{\FlaAlgorithmNarrow}{
+\begin{center}
+\begin{tabular}{|l |} \hline
+{\bf Algorithm:} $\routinename$ 
+\\ \whline
+{\WSpartitionNarrow} \\
+{\bf while} \WSguard { \bf do} \\
+\ \hspace{0.0in} \WSrepartitionNarrow \\
+{\hspace{0.0in} \FlaStartComputeShorter} \\
+{\hspace{0.0in} \WSupdate} \\
+{\hspace{0.0in} \FlaEndComputeShorter} \\
+{\ \hspace{0.0in} \WSmoveboundaryNarrow} \\
+{{\bf endwhile}} \\ \hline
+\end{tabular}
+\end{center}
+}
+
+
+\newcommand{ \PPre }{ P_{\it pre} }
+\newcommand{ \PPost }{ P_{\it post} }
+\newcommand{ \PInv }{ P_{\it inv} }
+\newcommand{ \PInvone }{ P_{\it inv-1} }
+\newcommand{ \PInvtwo }{ P_{\it inv-2} }
+\newcommand{ \becomes }{:=}
+\newcommand{ \QBefore }{ P_{\it before} }
+\newcommand{ \QAfter }{ P_{\it after} }
+\newcommand{ \Qbefore }{ P_{\it before} }
+\newcommand{ \Qafter }{ P_{\it after} }
+\newcommand{ \PCons }{ P_{\it cons} }
+\newcommand{ \PCost }{ P_{\it cost} }
+\newcommand{ \PStr }{ P_{\it struct} }
+\newcommand{ \Csf }{ C_{\it sf} }
+

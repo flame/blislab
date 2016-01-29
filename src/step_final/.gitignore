@@ -1,0 +1,10 @@
+*~
+*.swp
+*.x
+*.o
+*.a
+*.so
+*.log
+*.pyc
+build
+.DS_Store
