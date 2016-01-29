@@ -1,0 +1,5 @@
+#Naive 3-loop approach for DGEMM.
+
+source set_env.sh
+make
+test/run_blis_dgemm.sh

@@ -6,7 +6,7 @@ ARCHFLAGS = cr
 RANLIB = ranlib
 
 ifeq ($(BLISGEMM_USE_BLAS),true)
-CFLAGS = -O3 -fopenmp -mavx -fPIC -DUSE_BLAS
+CFLAGS = -O3 -fopenmp -mavx -fPIC -DUSE_BLAS -g
 LDLIBS = $(LIBBLISGEMM) -lpthread -lm -openmp -mkl=parallel -Werror -Wall -pedantic
 #LDLIBS = $(LIBBLISGEMM) -lpthread -lm -openmp -mkl=sequential -Werror -Wall -pedantic
 else

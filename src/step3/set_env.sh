@@ -5,7 +5,7 @@ echo "BLISGEMM_DIR = $BLISGEMM_DIR"
 
 # Manually set the target architecture.
 export BLISGEMM_ARCH_MAJOR=x86_64
-export BLISGEMM_ARCH_MINOR=sandybridge
+export BLISGEMM_ARCH_MINOR=reference
 export BLISGEMM_ARCH=$BLISGEMM_ARCH_MAJOR/$BLISGEMM_ARCH_MINOR
 echo "BLISGEMM_ARCH = $BLISGEMM_ARCH"
 
@@ -18,7 +18,7 @@ export BLISGEMM_USE_INTEL=true
 echo "BLISGEMM_USE_INTEL = $BLISGEMM_USE_INTEL"
 
 # Whether use BLAS or not?
-export BLISGEMM_USE_BLAS=true
+export BLISGEMM_USE_BLAS=false
 echo "BLISGEMM_USE_BLAS = $BLISGEMM_USE_BLAS"
 
 # Manually set the mkl path

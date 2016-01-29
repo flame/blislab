@@ -53,9 +53,9 @@ void (*blis_micro_kernel) (
     aux_t  *aux
     ) = {
   //sq2nrm_asm_d8x4
-  //bli_dgemm_ukr_ref
+  bli_dgemm_ukr_ref
   //bli_dgemm_asm_8x4
-  bli_dgemm_int_8x4
+  //bli_dgemm_int_8x4
 };
 
 #endif // define __RNN_KERNEL_H__

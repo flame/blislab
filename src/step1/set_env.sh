@@ -18,7 +18,7 @@ export BLISGEMM_USE_INTEL=true
 echo "BLISGEMM_USE_INTEL = $BLISGEMM_USE_INTEL"
 
 # Whether use BLAS or not?
-export BLISGEMM_USE_BLAS=true
+export BLISGEMM_USE_BLAS=false
 echo "BLISGEMM_USE_BLAS = $BLISGEMM_USE_BLAS"
 
 # Manually set the mkl path
@@ -28,7 +28,7 @@ echo "BLISGEMM_MKL_DIR = $BLISGEMM_MKL_DIR"
 
 # Parallel options
 export KMP_AFFINITY=compact,verbose
-export OMP_NUM_THREADS=10
-export BLISGEMM_IC_NT=10
-#export OMP_NUM_THREADS=1
-#export BLISGEMM_IC_NT=1
+#export OMP_NUM_THREADS=10
+#export BLISGEMM_IC_NT=10
+export OMP_NUM_THREADS=1
+export BLISGEMM_IC_NT=1

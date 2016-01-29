@@ -4,8 +4,6 @@ else
 include $(BLISGEMM_DIR)/make.gnu.inc
 endif
 
-$(info * Using CFLAGS=${CFLAGS})
-$(info * Using LDFLAGS=${LDFLAGS})
 
 FRAME_CC_SRC=  \
 							 frame/blis_dgemm.c \
@@ -15,15 +13,8 @@ FRAME_CC_SRC=  \
 FRAME_CPP_SRC= \
 
 KERNEL_SRC=    \
-			                 kernels/$(BLISGEMM_ARCH)/sq2nrm_asm_d8x4.c \
-							 kernels/$(BLISGEMM_ARCH)/bli_dgemm_int_d8x4.c \
-							 kernels/$(BLISGEMM_ARCH)/bli_dgemm_asm_d8x4.c \
-							 #kernels/$(BLISGEMM_ARCH)/bli_dgemm_ukr.c \
-							 #kernels/$(BLISGEMM_ARCH)/bli_dgemm_ukr.c \
 
 OTHER_DEP = \
-			                 include/blis_dgemm.h \
-			                 include/blis_dgemm_kernel.h \
 
 BLISGEMM_OBJ=$(FRAME_CC_SRC:.c=.o) $(FRAME_CPP_SRC:.cpp=.o) $(KERNEL_SRC:.c=.o) $(FRAME_CC_SRC_S:.c=.os) $(KERNEL_SRC_S:.c=.os)
 

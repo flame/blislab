@@ -6,3 +6,6 @@
 *.bbl
 *.out
 *.blg
+*backup*
+*.so
+*.a
