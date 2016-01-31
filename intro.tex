@@ -2,8 +2,31 @@ In this exercise, we are going to optimize \Gemm{} (General Matrix-Matrix
 Multiplication) on modern computer architectures.
 Specifically, we consider the simple case:
 $$C:=C+A*B$$
-where $A$, $B$, and $C$ are $n\times n$ matrices. \Gemm{} can be performed using
-$2n^3$ floating point operations, as illustrated in the following pseudocode:
+where $A$, $B$, and $C$ are $m\times k$, $k\times n$, $m\times n$  matrices,
+respectively. \Gemm{} can be performed using $2mkn$ floating point operations, as illustrated in the following pseudocode:
+%\begin{algorithm}[!htp]
+%\begin{algorithmic}
+%  \FOR {$i=0:1:m-1$}
+%    \FOR {$j=0:1:n-1$}
+%      \FOR {$p=0:1:k-1$}
+%        \STATE {$C(i,j) += C(i,j) + A(i,k)*B(k,j)$;}
+%      \ENDFOR
+%    \ENDFOR
+%  \ENDFOR
+%\end{algorithmic}
+%\caption{Naive \GEMM{} Approach} 
+%\label{a:3loops}
+%\end{algorithm}
 
+
+\begin{tabular}{l@{}}
+{\bf for} $j\!=\! 0:n\!-\!1$ {\bf steps of} $1$ \\
+ \hspace{2ex}  {\bf for} $p \!=\! 0:k\!-\!1$ {\bf steps of} $1$ \\
+ \hspace{4ex}           {\bf for} $i \!=\! 0:m\!-\!1$ {\bf steps of} $1$ \\
+\hspace{6ex}             \textcolor{black}{$C(i,j)$}~$\mathrel{\!+\!}=$~\textcolor{black}{$A(i,p)$}~\textcolor{black}{$B(p,j)$} \\
+\hspace{4ex} {\bf endfor}\\
+\hspace{2ex} {\bf endfor}\\ 
+{\bf endfor}\\ 
+\end{tabular}
 
 
