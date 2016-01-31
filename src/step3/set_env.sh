@@ -18,7 +18,7 @@ export BLISGEMM_USE_INTEL=true
 echo "BLISGEMM_USE_INTEL = $BLISGEMM_USE_INTEL"
 
 # Whether use BLAS or not?
-export BLISGEMM_USE_BLAS=false
+export BLISGEMM_USE_BLAS=true
 echo "BLISGEMM_USE_BLAS = $BLISGEMM_USE_BLAS"
 
 # Manually set the mkl path

@@ -106,7 +106,7 @@ void test_blis_dgemm(
       }
     }
   }
-  printf("blis_dgemm_rectime: %lf\n", blis_dgemm_rectime);
+  //printf("blis_dgemm_rectime: %lf\n", blis_dgemm_rectime);
 
   for ( i = 0; i < nrepeats; i ++ ) {
     ref_beg = omp_get_wtime();
@@ -133,7 +133,7 @@ void test_blis_dgemm(
     }
   }
 
-  printf("ref_rectime: %lf\n", ref_rectime);
+  //printf("ref_rectime: %lf\n", ref_rectime);
 
   computeError(
       ldc,
@@ -147,7 +147,7 @@ void test_blis_dgemm(
   // Compute overall floating point operations.
   flops = ( m * n / ( 1000.0 * 1000.0 * 1000.0 ) ) * ( 2 * k );
 
-  printf( "%5d, %5d, %5d, %5.2lf GFLOPS, %5.2lf GFLOPS;\n", 
+  printf( "%5d\t %5d\t %5d\t %5.2lf\t %5.2lf\n", 
       m, n, k, flops / blis_dgemm_rectime, flops / ref_rectime );
 
   free( XA     );

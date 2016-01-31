@@ -83,14 +83,14 @@ void blis_dgemm_ref(
   beg = omp_get_wtime();
 
 #ifdef USE_BLAS
-//
-////  int len = k*m;
-////  double alpha2 = 1.0;
-////  int incx = 1;
-////  int incy = 1;
-////  daxpy( &len, &alpha2, As, &incx, As, &incy );
-//  dgemm( "T", "N", &m, &n, &k, &alpha,
-//        As, &k, Bs, &k, &beta, Cs, &m );
+
+//  int len = k*m;
+//  double alpha2 = 1.0;
+//  int incx = 1;
+//  int incy = 1;
+//  daxpy( &len, &alpha2, As, &incx, As, &incy );
+  dgemm( "T", "N", &m, &n, &k, &alpha,
+        As, &k, Bs, &k, &beta, Cs, &m );
 #else
   #pragma omp parallel for private( i, p )
   for ( j = 0; j < n; j ++ ) {
@@ -104,14 +104,12 @@ void blis_dgemm_ref(
 #endif
 
   time_dgemm = omp_get_wtime() - beg;
-  printf("time_dgemm: %lf\n", time_dgemm);
-
-  printf("%lf GFLOPS\n", 2.0*m*n*k/time_dgemm/1000.0/1000.0/1000.0);
-
-  if ( n <= 32 && m <= 32 ) {
-    printf("refC:\n");
-    blisgemm_printmatrix( Cs, m, m, n );
-  }
+  //printf("time_dgemm: %lf\n", time_dgemm);
+  //printf("%lf GFLOPS\n", 2.0*m*n*k/time_dgemm/1000.0/1000.0/1000.0);
+  //if ( n <= 32 && m <= 32 ) {
+  //  printf("refC:\n");
+  //  blisgemm_printmatrix( Cs, m, m, n );
+  //}
 
   // Free  buffers
 //  free( As );
