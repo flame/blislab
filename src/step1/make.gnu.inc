@@ -6,10 +6,10 @@ ARCHFLAGS = cr
 RANLIB = ranlib
 
 ifeq ($(BLISGEMM_USE_BLAS),true)
-CFLAGS = -O3 -fopenmp -mavx -fPIC -DUSE_BLAS
+CFLAGS = -O2 -fopenmp -mavx -fPIC -DUSE_BLAS
 LDLIBS = $(LIBBLISGEMM) -lpthread -lm -fopenmp -lblas
 else
-CFLAGS = -O3 -fopenmp -mavx -fPIC
+CFLAGS = -O2 -fopenmp -mavx -fPIC
 LDLIBS = $(LIBBLISGEMM) -lpthread -lm -fopenmp
 endif
 
