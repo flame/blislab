@@ -9,3 +9,7 @@
 *backup*
 *.so
 *.a
+*.x
+*.txt
+*.pyc
+.DS_Store

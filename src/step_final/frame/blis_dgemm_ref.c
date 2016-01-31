@@ -104,14 +104,12 @@ void blis_dgemm_ref(
 #endif
 
   time_dgemm = omp_get_wtime() - beg;
-  printf("time_dgemm: %lf\n", time_dgemm);
-
-  printf("%lf GFLOPS\n", 2.0*m*n*k/time_dgemm/1000.0/1000.0/1000.0);
-
-  if ( n <= 32 && m <= 32 ) {
-    printf("refC:\n");
-    blisgemm_printmatrix( Cs, m, m, n );
-  }
+  //printf("time_dgemm: %lf\n", time_dgemm);
+  //printf("%lf GFLOPS\n", 2.0*m*n*k/time_dgemm/1000.0/1000.0/1000.0);
+  //if ( n <= 32 && m <= 32 ) {
+  //  printf("refC:\n");
+  //  blisgemm_printmatrix( Cs, m, m, n );
+  //}
 
   // Free  buffers
 //  free( As );
