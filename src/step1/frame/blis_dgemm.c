@@ -69,11 +69,11 @@ void blis_dgemm(
 
       for ( i = 0; i < m; i ++ ) {              // 1-th loop
 
-          C[ j * ldc + i ] += A[ i * k + p ] * B[ j * k + p ];
+          C[ j * ldc + i ] += A[ p * m + i ] * B[ j * k + p ];
 
-      }                                           // End 1.th loop
-    }                                             // End 2.th loop
-  }                                               // End 3.th loop
+      }                                         // End 1.th loop
+    }                                           // End 2.th loop
+  }                                             // End 3.th loop
 }
 
 

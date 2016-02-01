@@ -73,8 +73,6 @@ void blis_dgemm_ref(
   if ( m == 0 || n == 0 || k == 0 ) return;
 
   // Allocate buffers.
-//  As = (double*)malloc( sizeof(double) * m * k );
-//  Bs = (double*)malloc( sizeof(double) * n * k );
   As = XA;
   Bs = XB;
   Cs = XC;
@@ -84,20 +82,15 @@ void blis_dgemm_ref(
 
 #ifdef USE_BLAS
 
-//  int len = k*m;
-//  double alpha2 = 1.0;
-//  int incx = 1;
-//  int incy = 1;
-//  daxpy( &len, &alpha2, As, &incx, As, &incy );
-  dgemm( "T", "N", &m, &n, &k, &alpha,
-        As, &k, Bs, &k, &beta, Cs, &m );
+  dgemm( "N", "N", &m, &n, &k, &alpha,
+        As, &m, Bs, &k, &beta, Cs, &m );
 #else
   #pragma omp parallel for private( i, p )
   for ( j = 0; j < n; j ++ ) {
     for ( i = 0; i < m; i ++ ) {
       //Cs[ j * m + i ] = 0.0;
       for ( p = 0; p < k; p ++ ) {
-        Cs[ j * m + i ] += As[ i * k + p ] * Bs[ j * k + p ];
+        Cs[ j * m + i ] += As[ p * m + i ] * Bs[ j * k + p ];
       }
     }
   }
@@ -112,7 +105,5 @@ void blis_dgemm_ref(
   //}
 
   // Free  buffers
-//  free( As );
-//  free( Bs );
 
 }
