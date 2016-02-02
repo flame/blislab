@@ -44,14 +44,17 @@ void test_blis_dgemm(
     double tmp, error, flops;
     double ref_beg, ref_time, blis_dgemm_beg, blis_dgemm_time;
     int    nrepeats;
-    int    ldc;
+    int    lda, ldb, ldc, ldc_ref;
     double ref_rectime, blis_dgemm_rectime;
 
     XA    = (double*)malloc( sizeof(double) * k * m );
     XB    = (double*)malloc( sizeof(double) * k * n );
 
 
+    lda = k;
+    ldb = k;
     ldc = ( ( m - 1 ) / DGEMM_MR + 1 ) * DGEMM_MR;
+    ldc_ref = m;
     XC     = blis_malloc_aligned( ldc, n + 4, sizeof(double) );
     XC_ref = (double*)malloc( sizeof(double) * m * n );
 
@@ -61,23 +64,29 @@ void test_blis_dgemm(
     for ( i = 0; i < m; i ++ ) {
         for ( p = 0; p < k; p ++ ) {
             //XA[ i * k + p ] = (double)( rand() % 1000000 ) / 1000000.0;	
-            XA[ i * k + p ] = (double)( i * k + p );	
+            XA[ i * lda + p ] = (double)( i * k + p );	
         }
     }
     for ( i = 0; i < n; i ++ ) {
         for ( p = 0; p < k; p ++ ) {
             //XB[ i * k + p ] = (double)( rand() % 1000000 ) / 1000000.0;	
-            XB[ i * k + p ] = (double)( 1.0 );	
+            XB[ i * ldb + p ] = (double)( 1.0 );	
         }
     }
 
-    for ( i = 0; i < m; i ++ ) {
+    for ( i = 0; i < ldc_ref; i ++ ) {
         for ( p = 0; p < n; p ++ ) {
-            //XB[ i * k + p ] = (double)( rand() % 1000000 ) / 1000000.0;	
-            XC[ i + p * m ] = (double)( 0.0 );	
-            XC_ref[ i + p * m ] = (double)( 0.0 );	
+            XC_ref[ i + p * ldc_ref ] = (double)( 0.0 );	
         }
     }
+
+
+    for ( i = 0; i < ldc; i ++ ) {
+        for ( p = 0; p < n; p ++ ) {
+            XC[ i + p * ldc ] = (double)( 0.0 );	
+        }
+    }
+
 
     // Use the same coordinate table
     //XB  = XA;
@@ -90,7 +99,9 @@ void test_blis_dgemm(
                     n,
                     k,
                     XA,
+                    lda,
                     XB,
+                    ldb,
                     XC,
                     ldc
                     );
@@ -116,7 +127,9 @@ void test_blis_dgemm(
                     n,
                     k,
                     XA,
+                    lda,
                     XB,
+                    ldb,
                     XC_ref,
                     m
                     );

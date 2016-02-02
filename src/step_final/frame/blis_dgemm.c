@@ -164,7 +164,9 @@ void blis_dgemm(
         int    n,
         int    k,
         double *XA,
+        int    lda,
         double *XB,
+        int    ldb,
         double *C,        // must be aligned
         int    ldc        // ldc must also be aligned
         )
