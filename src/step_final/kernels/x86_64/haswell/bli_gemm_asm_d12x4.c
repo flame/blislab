@@ -65,12 +65,24 @@ void bli_dgemm_asm_12x4(
                          double* restrict   a,
                          double* restrict   b,
                          double* restrict   beta,
-                         double* restrict   c, inc_t rs_c, inc_t cs_c,
+                         double* restrict   c,
+                         //inc_t rs_c, inc_t cs_c,
+                         inc_t              ldc,
                          auxinfo_t*         data
                        )
 {
 	//void*   a_next = bli_auxinfo_next_a( data );
 	//void*   b_next = bli_auxinfo_next_b( data );
+
+    const inc_t cs_c = ldc;
+    const inc_t rs_c = 1;
+    double alpha_val = 1.0, beta_val = 1.0;
+    double *alpha, *beta;
+
+    alpha = &alpha_val;
+    beta  = &beta_val;
+
+
 
 	dim_t   k_iter = k / 4;
 	dim_t   k_left = k % 4;

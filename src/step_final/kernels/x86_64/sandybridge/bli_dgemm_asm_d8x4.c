@@ -45,7 +45,7 @@
 //#define dim_t int
 
 void bli_dgemm_asm_8x4(
-                        dim_t              k,
+                        dim_t    k,
                         double*  a,
                         double*  b,
                         double*  c,
