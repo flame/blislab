@@ -42,38 +42,38 @@
 typedef unsigned long long dim_t;
 
 struct aux_s {
-  double *b_next;
-  float  *b_next_s;
-  int    ldr;
-  char   *flag;
-  int    pc;
-  int    m;
-  int    n;
+    double *b_next;
+    float  *b_next_s;
+    int    ldr;
+    char   *flag;
+    int    pc;
+    int    m;
+    int    n;
 };
 typedef struct aux_s aux_t;
 
 void blis_dgemm(
-    int    m,
-    int    n,
-    int    k,
-    double *XA,
-    double *XB,
-    double *XC,
-    int    ldc
-    );
+        int    m,
+        int    n,
+        int    k,
+        double *XA,
+        double *XB,
+        double *XC,
+        int    ldc
+        );
 
 double *blis_malloc_aligned(
-    int    m,
-    int    n,
-    int    size
-    );
+        int    m,
+        int    n,
+        int    size
+        );
 
 void blis_printmatrix(
-    double *A,
-    int    lda,
-    int    m,
-    int    n
-    );
+        double *A,
+        int    lda,
+        int    m,
+        int    n
+        );
 
 
 
