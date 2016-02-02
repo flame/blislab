@@ -47,72 +47,59 @@
  *
  */ 
 void dgemm(char*, char*, int*, int*, int*, double*, double*, 
-    int*, double*, int*, double*, double*, int*);
+        int*, double*, int*, double*, double*, int*);
 void sgemm(char*, char*, int*, int*, int*, float*, float*, 
-    int*, float*, int*, float*, float*, int*);
+        int*, float*, int*, float*, float*, int*);
 void daxpy(int*, double*, double*, int*, double*, int*); 
 #endif
 
 void blis_dgemm_ref(
-    int    m,
-    int    n,
-    int    k,
-    double *XA,
-    double *XB,
-    double *XC,
-    int    ldc
-    )
+        int    m,
+        int    n,
+        int    k,
+        double *XA,
+        double *XB,
+        double *XC,
+        int    ldc
+        )
 {
-  // Local variables.
-  int    i, j, p;
-  double beg, time_collect, time_dgemm, time_square;
-  double *As, *Bs, *Cs;
-  double alpha = 1.0, beta = 1.0;
+    // Local variables.
+    int    i, j, p;
+    double beg, time_collect, time_dgemm, time_square;
+    double *As, *Bs, *Cs;
+    double alpha = 1.0, beta = 1.0;
 
-  // Sanity check for early return.
-  if ( m == 0 || n == 0 || k == 0 ) return;
+    // Sanity check for early return.
+    if ( m == 0 || n == 0 || k == 0 ) return;
 
-  // Allocate buffers.
-//  As = (double*)malloc( sizeof(double) * m * k );
-//  Bs = (double*)malloc( sizeof(double) * n * k );
-  As = XA;
-  Bs = XB;
-  Cs = XC;
+    As = XA;
+    Bs = XB;
+    Cs = XC;
 
-  // Compute the inner-product term.
-  beg = omp_get_wtime();
+    // Compute the inner-product term.
+    beg = omp_get_wtime();
 
 #ifdef USE_BLAS
-
-//  int len = k*m;
-//  double alpha2 = 1.0;
-//  int incx = 1;
-//  int incy = 1;
-//  daxpy( &len, &alpha2, As, &incx, As, &incy );
-  dgemm( "T", "N", &m, &n, &k, &alpha,
-        As, &k, Bs, &k, &beta, Cs, &m );
+    dgemm( "T", "N", &m, &n, &k, &alpha,
+            As, &k, Bs, &k, &beta, Cs, &m );
 #else
-  #pragma omp parallel for private( i, p )
-  for ( j = 0; j < n; j ++ ) {
-    for ( i = 0; i < m; i ++ ) {
-      //Cs[ j * m + i ] = 0.0;
-      for ( p = 0; p < k; p ++ ) {
-        Cs[ j * m + i ] += As[ i * k + p ] * Bs[ j * k + p ];
-      }
+    #pragma omp parallel for private( i, p )
+    for ( j = 0; j < n; j ++ ) {
+        for ( i = 0; i < m; i ++ ) {
+            //Cs[ j * m + i ] = 0.0;
+            for ( p = 0; p < k; p ++ ) {
+                Cs[ j * m + i ] += As[ i * k + p ] * Bs[ j * k + p ];
+            }
+        }
     }
-  }
 #endif
 
-  time_dgemm = omp_get_wtime() - beg;
-  //printf("time_dgemm: %lf\n", time_dgemm);
-  //printf("%lf GFLOPS\n", 2.0*m*n*k/time_dgemm/1000.0/1000.0/1000.0);
-  //if ( n <= 32 && m <= 32 ) {
-  //  printf("refC:\n");
-  //  blisgemm_printmatrix( Cs, m, m, n );
-  //}
-
-  // Free  buffers
-//  free( As );
-//  free( Bs );
+    time_dgemm = omp_get_wtime() - beg;
+    //printf("time_dgemm: %lf\n", time_dgemm);
+    //printf("%lf GFLOPS\n", 2.0*m*n*k/time_dgemm/1000.0/1000.0/1000.0);
+    //if ( n <= 32 && m <= 32 ) {
+    //  printf("refC:\n");
+    //  blisgemm_printmatrix( Cs, m, m, n );
+    //}
 
 }

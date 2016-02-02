@@ -47,22 +47,22 @@
  *
  */ 
 double *blis_malloc_aligned(
-    int    m,
-    int    n,
-    int    size
-    )
+        int    m,
+        int    n,
+        int    size
+        )
 {
-  double *ptr;
-  int    err;
+    double *ptr;
+    int    err;
 
-  err = posix_memalign( (void**)&ptr, (size_t)GEMM_SIMD_ALIGN_SIZE, size * m * n );
+    err = posix_memalign( (void**)&ptr, (size_t)GEMM_SIMD_ALIGN_SIZE, size * m * n );
 
-  if ( err ) {
-    printf( "blis_malloc_aligned(): posix_memalign() failures" );
-    exit( 1 );    
-  }
+    if ( err ) {
+        printf( "blis_malloc_aligned(): posix_memalign() failures" );
+        exit( 1 );    
+    }
 
-  return ptr;
+    return ptr;
 }
 
 
@@ -72,19 +72,19 @@ double *blis_malloc_aligned(
  *
  */
 void blisgemm_printmatrix(
-    double *A,
-    int    lda,
-    int    m,
-    int    n
-    )
+        double *A,
+        int    lda,
+        int    m,
+        int    n
+        )
 {
-  int    i, j;
-  for ( i = 0; i < m; i ++ ) {
-    for ( j = 0; j < n; j ++ ) {
-      printf("%lf\t", A[j * lda + i]);
+    int    i, j;
+    for ( i = 0; i < m; i ++ ) {
+        for ( j = 0; j < n; j ++ ) {
+            printf("%lf\t", A[j * lda + i]);
+        }
+        printf("\n");
     }
-    printf("\n");
-  }
 }
 
 

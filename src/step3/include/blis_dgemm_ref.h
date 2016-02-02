@@ -36,12 +36,12 @@
 
 
 void dblisgemm_ref(
-    int    m,
-    int    n,
-    int    k,
-    double *XA,
-    double *XB,
-    double *XC,
-    int    ldc
-    );
+        int    m,
+        int    n,
+        int    k,
+        double *XA,
+        double *XB,
+        double *XC,
+        int    ldc
+        );
 
