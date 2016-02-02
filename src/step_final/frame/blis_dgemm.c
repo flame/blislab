@@ -126,15 +126,17 @@ void blis_macro_kernel(
     //    pc, lastiter, ldc, m, n , k );
 
 
-    // sequential is the default situation
-    blis_ic_nt = 1;
-    // check the environment variable
-    str = getenv( "BLISGEMM_IC_NT" );
-    if ( str != NULL ) {
-        blis_ic_nt = (int)strtol( str, NULL, 10 );
-    }
+    //// sequential is the default situation
+    //blis_ic_nt = 1;
+    //// check the environment variable
+    //str = getenv( "BLISGEMM_IC_NT" );
+    //if ( str != NULL ) {
+    //    blis_ic_nt = (int)strtol( str, NULL, 10 );
+    //}
 
 
+    // We can also parallelize with OMP here.
+    //#pragma omp parallel for num_threads( blis_ic_nt ) private( j, i, aux )
     for ( j = 0; j < n; j += DGEMM_NR ) {                      // 2-th loop around micro-kernel
         aux.n  = min( n - j, DGEMM_NR );
         for ( i = 0; i < m; i += DGEMM_MR ) {                    // 1-th loop around micro-kernel
