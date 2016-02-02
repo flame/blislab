@@ -42,7 +42,7 @@
 #include <avx_types.h>
 
 #define inc_t unsigned long long 
-#define dim_t int
+//#define dim_t int
 
 void bli_dgemm_asm_8x4(
                         dim_t              k,
@@ -64,11 +64,11 @@ void bli_dgemm_asm_8x4(
     alpha = &alpha_val;
     beta  = &beta_val;
 
-    printf( "before b_next\n" );
+    //printf( "before b_next\n" );
 	////void*   a_next = bli_auxinfo_next_a( data );
 	//void*   b_next = bli_auxinfo_next_b( data );
-    void *b_next = data->b_next;
-    printf( "after b_next\n" );
+    double *b_next = data->b_next;
+    //printf( "after b_next\n" );
 
 	dim_t   k_iter = k / 4;
 	dim_t   k_left = k % 4;

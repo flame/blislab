@@ -18,9 +18,7 @@ void sq2nrm_asm_d8x4(
         double *c,
         unsigned long long ldc,
         //    unsigned long long last,
-        aux_t  *aux
-        );
-
+        aux_t  *aux); 
 void bli_dgemm_ukr_ref( int k,
         double *a,
         double *b,
