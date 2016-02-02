@@ -41,6 +41,20 @@ void bli_dgemm_asm_8x4( int k,
         unsigned long long ldc,
         aux_t* data );
 
+void bli_dgemm_asm_12x4( int k,
+        double *a,
+        double *b,
+        double *c,
+        unsigned long long ldc,
+        aux_t* data );
+
+void bli_dgemm_asm_8x6( int k,
+        double *a,
+        double *b,
+        double *c,
+        unsigned long long ldc,
+        aux_t* data );
+
 void (*blis_micro_kernel) (
         int    k,
         double *a,
@@ -51,6 +65,8 @@ void (*blis_micro_kernel) (
         aux_t  *aux
         ) = {
     sq2nrm_asm_d8x4
+    //bli_dgemm_asm_12x4
+    //bli_dgemm_asm_8x6
         //bli_dgemm_ukr_ref
         //bli_dgemm_asm_8x4
         //bli_dgemm_int_8x4

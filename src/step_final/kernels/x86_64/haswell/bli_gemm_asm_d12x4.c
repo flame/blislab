@@ -32,7 +32,17 @@
 
 */
 
-#include "blis.h"
+//#include "blis.h"
+
+#include <stdio.h>
+#include <immintrin.h> // AVX
+
+#include <blis_dgemm.h>
+#include <avx_types.h>
+
+#define inc_t unsigned long long 
+#define dim_t int
+
 
 
 #define DGEMM_INPUT_GS_BETA_NZ \
@@ -61,14 +71,14 @@
 
 void bli_dgemm_asm_12x4(
                          dim_t              k,
-                         double* restrict   alpha,
-                         double* restrict   a,
-                         double* restrict   b,
-                         double* restrict   beta,
-                         double* restrict   c,
+                         //double*   alpha,
+                         double*   a,
+                         double*   b,
+                         //double*   beta,
+                         double*   c,
                          //inc_t rs_c, inc_t cs_c,
                          inc_t              ldc,
-                         auxinfo_t*         data
+                         aux_t*         data
                        )
 {
 	//void*   a_next = bli_auxinfo_next_a( data );

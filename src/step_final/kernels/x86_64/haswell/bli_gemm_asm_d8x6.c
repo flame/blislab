@@ -69,10 +69,10 @@
 
 void bli_dgemm_asm_8x6(
                         dim_t              k,
-                        double*            alpha,
+                        //double*            alpha,
                         double*            a,
                         double*            b,
-                        double*            beta,
+                        //double*            beta,
                         double*            c,
                         inc_t              ldc,
                         //inc_t rs_c, inc_t cs_c,

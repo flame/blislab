@@ -18,6 +18,8 @@ KERNEL_SRC=    \
 			                 kernels/$(BLISGEMM_ARCH)/sq2nrm_asm_d8x4.c \
 							 kernels/$(BLISGEMM_ARCH)/bli_dgemm_int_d8x4.c \
 							 kernels/$(BLISGEMM_ARCH)/bli_dgemm_asm_d8x4.c \
+			                 #kernels/$(BLISGEMM_ARCH)/bli_gemm_asm_d12x4.c \
+			                 #kernels/$(BLISGEMM_ARCH)/bli_gemm_asm_d8x6.c \
 							 #kernels/$(BLISGEMM_ARCH)/bli_dgemm_ukr.c \
 							 #kernels/$(BLISGEMM_ARCH)/bli_dgemm_ukr.c \
 

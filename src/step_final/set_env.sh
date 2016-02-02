@@ -6,6 +6,7 @@ echo "BLISGEMM_DIR = $BLISGEMM_DIR"
 # Manually set the target architecture.
 export BLISGEMM_ARCH_MAJOR=x86_64
 export BLISGEMM_ARCH_MINOR=sandybridge
+#export BLISGEMM_ARCH_MINOR=haswell
 export BLISGEMM_ARCH=$BLISGEMM_ARCH_MAJOR/$BLISGEMM_ARCH_MINOR
 echo "BLISGEMM_ARCH = $BLISGEMM_ARCH"
 
