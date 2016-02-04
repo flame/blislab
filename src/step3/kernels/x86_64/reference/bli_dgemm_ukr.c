@@ -1,5 +1,3 @@
-//#include <immintrin.h> // AVX
-//#include <avx_types.h>
 
 #include <blis_config.h>
 #include <blis_dgemm.h>

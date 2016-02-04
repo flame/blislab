@@ -39,7 +39,7 @@
 #include <avx_types.h>
 
 #define inc_t unsigned long long 
-#define dim_t int
+//#define dim_t int
 
 
 void bli_dgemm_int_8x4(

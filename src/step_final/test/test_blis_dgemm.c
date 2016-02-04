@@ -131,7 +131,7 @@ void test_blis_dgemm(
                     XB,
                     ldb,
                     XC_ref,
-                    m
+                    ldc_ref
                     );
         }
         ref_time = omp_get_wtime() - ref_beg;
