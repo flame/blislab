@@ -5,12 +5,8 @@
 //#include <avx_types.h>
 
 #define inc_t unsigned long long 
-#define dim_t int
 
-                        //double* restrict alpha,
-                        //double* restrict beta,
-                        //inc_t rs_c,
-                        //inc_t cs_c,
+
 void bli_dgemm_ukr_ref( dim_t k,
                         double *a,
                         double *b,
@@ -18,6 +14,7 @@ void bli_dgemm_ukr_ref( dim_t k,
                         inc_t ldc,
                         aux_t* data )
 {
+
     const inc_t cs_c = ldc;
     const inc_t rs_c = 1;
     double alpha_val = 1.0, beta_val = 1.0;
