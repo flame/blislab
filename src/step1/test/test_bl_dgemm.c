@@ -48,13 +48,14 @@
 #include <stdlib.h>
 #include <omp.h>
 #include <limits.h>
+#include <time.h> 
 
 #include <bl_dgemm.h>
 #include <bl_dgemm_ref.h>
 #include <bl_config.h>
 
 #define USE_SET_DIFF 1
-#define TOLERANCE 1E-12
+#define TOLERANCE 1E-10
 
 void computeError(
         int    ldc,
@@ -105,30 +106,26 @@ void test_bl_dgemm(
 
     nrepeats = 3;
 
+    srand (time(NULL));
+
     // Randonly generate points in [ 0, 1 ].
-    for ( i = 0; i < m; i ++ ) {
+    for ( p = 0; p < k; p ++ ) {
+        for ( i = 0; i < m; i ++ ) {
+            XA[ i * lda + p ] = (double)( rand() % 1000000 ) / 1000000.0;	
+            //XA[ i * lda + p ] = (double)( i * k + p );	
+        }
+    }
+    for ( j = 0; j < n; j ++ ) {
         for ( p = 0; p < k; p ++ ) {
-            //XA[ i * k + p ] = (double)( rand() % 1000000 ) / 1000000.0;	
-            XA[ i * lda + p ] = (double)( i * k + p );	
-        }
-    }
-    for ( i = 0; i < n; i ++ ) {
-        for ( p = 0; p < k; p ++ ) {
-            //XB[ i * k + p ] = (double)( rand() % 1000000 ) / 1000000.0;	
-            XB[ i * ldb + p ] = (double)( 1.0 );	
+            XB[ j * ldb + p ] = (double)( rand() % 1000000 ) / 1000000.0;	
+            //XB[ j * ldb + p ] = (double)( 1.0 );	
         }
     }
 
-    for ( i = 0; i < ldc_ref; i ++ ) {
-        for ( p = 0; p < n; p ++ ) {
-            XC_ref[ i + p * ldc_ref ] = (double)( 0.0 );	
-        }
-    }
-
-
-    for ( i = 0; i < ldc; i ++ ) {
-        for ( p = 0; p < n; p ++ ) {
-            XC[ i + p * ldc ] = (double)( 0.0 );	
+    for ( j = 0; j < n; j ++ ) {
+        for ( i = 0; i < m; i ++ ) {
+            XC_ref[ i + j * ldc_ref ] = (double)( 0.0 );	
+            XC[ i + j * ldc ] = (double)( 0.0 );	
         }
     }
 
