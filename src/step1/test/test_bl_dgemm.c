@@ -97,7 +97,7 @@ void test_bl_dgemm(
     XB    = (double*)malloc( sizeof(double) * k * n );
 
 
-    lda = k;
+    lda = m;
     ldb = k;
     ldc = ( ( m - 1 ) / DGEMM_MR + 1 ) * DGEMM_MR;
     ldc_ref = m;

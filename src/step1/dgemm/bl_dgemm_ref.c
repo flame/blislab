@@ -95,7 +95,7 @@ void bl_dgemm_ref(
     for ( i = 0; i < m; i ++ ) {
       //Cs[ j * m + i ] = 0.0;
       for ( p = 0; p < k; p ++ ) {
-        XC[ j * m + i ] += XA[ p * m + i ] * XB[ j * k + p ];
+        XC[ j * ldc + i ] += XA[ p * lda + i ] * XB[ j * ldb + p ];
       }
     }
   }

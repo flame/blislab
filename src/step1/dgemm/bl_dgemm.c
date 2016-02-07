@@ -72,18 +72,18 @@ void bl_dgemm(
     return;
   }
 
-  #pragma omp parallel for private( i, p )
-  for ( j = 0; j < n; j ++ ) {                  // 2-th loop
+  #pragma omp parallel for private( j, p )
+  for ( i = 0; i < m; i ++ ) {                   // 2-th loop
 
-    for ( p = 0; p < k; p ++ ) {                // 1-th loop
+      for ( j = 0; j < n; j ++ ) {               // 1-th loop
 
-      for ( i = 0; i < m; i ++ ) {              // 0-th loop
+          for ( p = 0; p < k; p ++ ) {           // 0-th loop
 
-          C[ j * ldc + i ] += A[ p * m + i ] * B[ j * k + p ];
+              C[ j * ldc + i ] += A[ p * lda + i ] * B[ j * ldb + p ];
 
-      }                                         // End 0.th loop
-    }                                           // End 1.th loop
-  }                                             // End 2.th loop
+          }                                      // End 0-th loop
+      }                                          // End 1-th loop
+  }                                              // End 2-th loop
 
 }
 
