@@ -1,4 +1,5 @@
-For each step (each directory), run the following command to compile and run:
+
+
 
 $ source set_env.sh
 $ make

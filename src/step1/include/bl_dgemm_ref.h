@@ -19,7 +19,7 @@
  *
  *
  *
- * blisgemm_ref.h
+ * bl_dgemm_ref.h
  *
  *
  *
