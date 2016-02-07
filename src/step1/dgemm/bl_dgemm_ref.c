@@ -82,18 +82,16 @@ void bl_dgemm_ref(
   if ( m == 0 || n == 0 || k == 0 ) return;
 
 
-  // Compute the inner-product term.
+  // Reference GEMM implementation.
   beg = omp_get_wtime();
 
 #ifdef USE_BLAS
-
   dgemm( "N", "N", &m, &n, &k, &alpha,
         XA, &m, XB, &k, &beta, XC, &ldc );
 #else
   #pragma omp parallel for private( i, p )
   for ( j = 0; j < n; j ++ ) {
     for ( i = 0; i < m; i ++ ) {
-      //Cs[ j * m + i ] = 0.0;
       for ( p = 0; p < k; p ++ ) {
         XC[ j * ldc + i ] += XA[ p * lda + i ] * XB[ j * ldb + p ];
       }
