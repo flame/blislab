@@ -1,6 +1,6 @@
 /*
  * --------------------------------------------------------------------------
- * BLISGEMM 
+ * BLISLAB 
  * --------------------------------------------------------------------------
  * Copyright (C) 2015, The University of Texas at Austin
  *
@@ -19,12 +19,12 @@
  *
  *
  *
- * blisgemm_util.c
+ * blisgemm_ref.h
  *
  *
  *
  * Purpose:
- * Aligned memory allocation.
+ * this header file contains reference functions prototypes.
  *
  * Todo:
  *
@@ -35,56 +35,13 @@
  * */
 
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <omp.h>
-
-#include <blis_dgemm.h>
-#include <blis_config.h>
-
-/*
- *
- *
- */ 
-double *blis_malloc_aligned(
+void dblisgemm_ref(
     int    m,
     int    n,
-    int    size
-    )
-{
-  double *ptr;
-  int    err;
-
-  err = posix_memalign( (void**)&ptr, (size_t)GEMM_SIMD_ALIGN_SIZE, size * m * n );
-
-  if ( err ) {
-    printf( "blis_malloc_aligned(): posix_memalign() failures" );
-    exit( 1 );    
-  }
-
-  return ptr;
-}
-
-
-
-/*
- *
- *
- */
-void blisgemm_printmatrix(
-    double *A,
-    int    lda,
-    int    m,
-    int    n
-    )
-{
-  int    i, j;
-  for ( i = 0; i < m; i ++ ) {
-    for ( j = 0; j < n; j ++ ) {
-      printf("%lf\t", A[j * lda + i]);
-    }
-    printf("\n");
-  }
-}
-
+    int    k,
+    double *XA,
+    double *XB,
+    double *XC,
+    int    ldc
+    );
 

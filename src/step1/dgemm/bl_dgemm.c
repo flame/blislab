@@ -19,12 +19,11 @@
  *
  *
  *
- * blisgemm.h
- *
+ * blisgemm.c
  *
  *
  * Purpose:
- * this header file contains all function prototypes.
+ * this is the main file of blis gemm.
  *
  * Todo:
  *
@@ -34,46 +33,47 @@
  * 
  * */
 
+#include <stdio.h>
+#include <omp.h>
+#include <bl_dgemm.h>
+#define min( i, j ) ( (i)<(j) ? (i): (j) )
 
-#include <math.h>
-#include <immintrin.h>
+#include <bl_config.h>
 
 
-typedef unsigned long long dim_t;
-
-struct aux_s {
-  double *b_next;
-  float  *b_next_s;
-  int    ldr;
-  char   *flag;
-  int    pc;
-  int    m;
-  int    n;
-};
-typedef struct aux_s aux_t;
-
+// C must be aligned
 void blis_dgemm(
     int    m,
     int    n,
     int    k,
-    double *XA,
-    double *XB,
-    double *XC,
-    int    ldc
-    );
-
-double *blis_malloc_aligned(
-    int    m,
-    int    n,
-    int    size
-    );
-
-void blis_printmatrix(
     double *A,
-    int    lda,
-    int    m,
-    int    n
-    );
+    double *B,
+    double *C,        // must be aligned
+    int    ldc        // ldc must also be aligned
+)
+{
+  int    i, j, p, blis_ic_nt;
+  int    ic, ib, jc, jb, pc, pb;
+  int    ir, jr;
 
+  // Early return if possible
+  if ( m == 0 || n == 0 || k == 0 ) {
+    printf( "blis_dgemm(): early return\n" );
+    return;
+  }
+
+  #pragma omp parallel for private( i, p )
+  for ( j = 0; j < n; j ++ ) {                  // 3-th loop
+
+    for ( p = 0; p < k; p ++ ) {                // 2-th loop
+
+      for ( i = 0; i < m; i ++ ) {              // 1-th loop
+
+          C[ j * ldc + i ] += A[ p * m + i ] * B[ j * k + p ];
+
+      }                                         // End 1.th loop
+    }                                           // End 2.th loop
+  }                                             // End 3.th loop
+}
 
 

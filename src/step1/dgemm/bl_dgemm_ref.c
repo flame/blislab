@@ -1,6 +1,6 @@
 /*
  * --------------------------------------------------------------------------
- * BLISGEMM 
+ * BLISLAB 
  * --------------------------------------------------------------------------
  * Copyright (C) 2015, The University of Texas at Austin
  *
@@ -19,7 +19,7 @@
  *
  *
  *
- * blisgemm_ref.c
+ * bl_dgemm_ref.c
  *
  *
  * Purpose:
@@ -38,8 +38,8 @@
 #include <limits.h>
 #include <float.h>
 
-#include <blis_dgemm.h>
-#include <blis_dgemm_ref.h>
+#include <bl_dgemm.h>
+#include <bl_dgemm_ref.h>
 
 #ifdef USE_BLAS
 /* 

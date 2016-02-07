@@ -3,10 +3,10 @@
 #include <omp.h>
 #include <limits.h>
 
-#include <blis_dgemm.h>
-#include <blis_dgemm_ref.h>
+#include <bl_dgemm.h>
+#include <bl_dgemm_ref.h>
 
-#include <blis_config.h>
+#include <bl_config.h>
 
 #define USE_SET_DIFF 1
 #define TOLERANCE 1E-10
