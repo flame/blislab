@@ -83,14 +83,14 @@ void blis_dgemm_ref(
 
 #ifdef USE_BLAS
     dgemm( "N", "N", &m, &n, &k, &alpha,
-            As, &k, Bs, &k, &beta, Cs, &m );
+            As, &lda, Bs, &ldb, &beta, Cs, &ldc );
 #else
     #pragma omp parallel for private( i, p )
     for ( j = 0; j < n; j ++ ) {
         for ( i = 0; i < m; i ++ ) {
             //Cs[ j * m + i ] = 0.0;
             for ( p = 0; p < k; p ++ ) {
-                Cs[ j * m + i ] += As[ p * m + i ] * Bs[ j * k + p ];
+                Cs[ j * ldc + i ] += As[ p * lda + i ] * Bs[ j * ldb + p ];
             }
         }
     }
