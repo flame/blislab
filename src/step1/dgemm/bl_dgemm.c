@@ -57,14 +57,14 @@ void bl_dgemm(
     int    n,
     int    k,
     double *A,
+    int    lda,
     double *B,
+    int    ldb,
     double *C,        // must be aligned
     int    ldc        // ldc must also be aligned
 )
 {
-  int    i, j, p, bl_ic_nt;
-  int    ic, ib, jc, jb, pc, pb;
-  int    ir, jr;
+  int    i, j, p;
 
   // Early return if possible
   if ( m == 0 || n == 0 || k == 0 ) {

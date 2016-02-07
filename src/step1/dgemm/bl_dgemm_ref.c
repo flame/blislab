@@ -65,7 +65,9 @@ void bl_dgemm_ref(
     int    n,
     int    k,
     double *XA,
+    int    lda,
     double *XB,
+    int    ldb,
     double *XC,
     int    ldc
     )

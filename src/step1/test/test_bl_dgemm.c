@@ -29,7 +29,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * test_bl_dgemm.h
+ * test_bl_dgemm.c
  *
  *
  * Purpose:
@@ -54,16 +54,16 @@
 #include <bl_config.h>
 
 #define USE_SET_DIFF 1
-#define TOLERANCE 1E-10
+#define TOLERANCE 1E-12
 
 void computeError(
-    int    ldc,
-    int    ldc_ref,
-    int    m,
-    int    n,
-    double *C,
-    double *C_ref
-    )
+        int    ldc,
+        int    ldc_ref,
+        int    m,
+        int    n,
+        double *C,
+        double *C_ref
+        )
 {
     int    i, j;
     for ( i = 0; i < m; i ++ ) {
@@ -79,50 +79,59 @@ void computeError(
 
 
 void test_bl_dgemm(
-    int m,
-    int n,
-    int k
-    ) 
+        int m,
+        int n,
+        int k
+        ) 
 {
     int    i, j, p, nx;
     double *XA, *XB, *XC, *XC_ref, *XD;
     double tmp, error, flops;
     double ref_beg, ref_time, bl_dgemm_beg, bl_dgemm_time;
     int    nrepeats;
-    int    ldc;
+    int    lda, ldb, ldc, ldc_ref;
     double ref_rectime, bl_dgemm_rectime;
 
-    XA    = (double*)malloc( sizeof(double) * m * k );
+    XA    = (double*)malloc( sizeof(double) * k * m );
     XB    = (double*)malloc( sizeof(double) * k * n );
 
 
+    lda = k;
+    ldb = k;
     ldc = ( ( m - 1 ) / DGEMM_MR + 1 ) * DGEMM_MR;
+    ldc_ref = m;
     XC     = bl_malloc_aligned( ldc, n + 4, sizeof(double) );
     XC_ref = (double*)malloc( sizeof(double) * m * n );
 
     nrepeats = 3;
 
     // Randonly generate points in [ 0, 1 ].
-    for ( p = 0; p < k; p ++ ) {
-        for ( i = 0; i < m; i ++ ) {
-            XA[ p * m + i ] = (double)( rand() % 1000000 ) / 1000000.0;	
-            //XA[ p * m + i ] = (double)( p * m + i );	
-        }
-    }
-
-    for ( j = 0; j < n; j ++ ) {
+    for ( i = 0; i < m; i ++ ) {
         for ( p = 0; p < k; p ++ ) {
-            XB[ j * k + p ] = (double)( rand() % 1000000 ) / 1000000.0;	
-            //XB[ j * k + p ] = (double)( 1.0 );	
+            //XA[ i * k + p ] = (double)( rand() % 1000000 ) / 1000000.0;	
+            XA[ i * lda + p ] = (double)( i * k + p );	
+        }
+    }
+    for ( i = 0; i < n; i ++ ) {
+        for ( p = 0; p < k; p ++ ) {
+            //XB[ i * k + p ] = (double)( rand() % 1000000 ) / 1000000.0;	
+            XB[ i * ldb + p ] = (double)( 1.0 );	
         }
     }
 
-    for ( j = 0; j < n; j ++ ) {
-        for ( i = 0; i < m; i ++ ) {
-            XC[ i + j * ldc ] = (double)( 0.0 );	
-            XC_ref[ i + j * m ] = (double)( 0.0 );	
+    for ( i = 0; i < ldc_ref; i ++ ) {
+        for ( p = 0; p < n; p ++ ) {
+            XC_ref[ i + p * ldc_ref ] = (double)( 0.0 );	
         }
     }
+
+
+    for ( i = 0; i < ldc; i ++ ) {
+        for ( p = 0; p < n; p ++ ) {
+            XC[ i + p * ldc ] = (double)( 0.0 );	
+        }
+    }
+
 
     // Use the same coordinate table
     //XB  = XA;
@@ -135,7 +144,9 @@ void test_bl_dgemm(
                     n,
                     k,
                     XA,
+                    lda,
                     XB,
+                    ldb,
                     XC,
                     ldc
                     );
@@ -161,9 +172,11 @@ void test_bl_dgemm(
                     n,
                     k,
                     XA,
+                    lda,
                     XB,
+                    ldb,
                     XC_ref,
-                    m
+                    ldc_ref
                     );
         }
         ref_time = omp_get_wtime() - ref_beg;
@@ -219,3 +232,4 @@ int main( int argc, char *argv[] )
 
     return 0;
 }
+
