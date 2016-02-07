@@ -46,7 +46,7 @@
  *
  *
  */ 
-double *blis_malloc_aligned(
+double *bl_malloc_aligned(
     int    m,
     int    n,
     int    size
@@ -58,7 +58,7 @@ double *blis_malloc_aligned(
   err = posix_memalign( (void**)&ptr, (size_t)GEMM_SIMD_ALIGN_SIZE, size * m * n );
 
   if ( err ) {
-    printf( "blis_malloc_aligned(): posix_memalign() failures" );
+    printf( "bl_malloc_aligned(): posix_memalign() failures" );
     exit( 1 );    
   }
 
@@ -71,7 +71,7 @@ double *blis_malloc_aligned(
  *
  *
  */
-void blisgemm_printmatrix(
+void bl_dgemm_printmatrix(
     double *A,
     int    lda,
     int    m,

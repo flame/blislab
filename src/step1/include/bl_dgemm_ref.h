@@ -35,7 +35,7 @@
  * */
 
 
-void dblisgemm_ref(
+void bl_dgemm_ref(
     int    m,
     int    n,
     int    k,

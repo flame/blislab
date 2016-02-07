@@ -23,7 +23,7 @@
  *
  *
  * Purpose:
- * this is the main file of blis gemm.
+ * this is the main file of blislab dgemm.
  *
  * Todo:
  *
@@ -42,7 +42,7 @@
 
 
 // C must be aligned
-void blis_dgemm(
+void bl_dgemm(
     int    m,
     int    n,
     int    k,
@@ -52,28 +52,29 @@ void blis_dgemm(
     int    ldc        // ldc must also be aligned
 )
 {
-  int    i, j, p, blis_ic_nt;
+  int    i, j, p, bl_ic_nt;
   int    ic, ib, jc, jb, pc, pb;
   int    ir, jr;
 
   // Early return if possible
   if ( m == 0 || n == 0 || k == 0 ) {
-    printf( "blis_dgemm(): early return\n" );
+    printf( "bl_dgemm(): early return\n" );
     return;
   }
 
   #pragma omp parallel for private( i, p )
-  for ( j = 0; j < n; j ++ ) {                  // 3-th loop
+  for ( j = 0; j < n; j ++ ) {                  // 2-th loop
 
-    for ( p = 0; p < k; p ++ ) {                // 2-th loop
+    for ( p = 0; p < k; p ++ ) {                // 1-th loop
 
-      for ( i = 0; i < m; i ++ ) {              // 1-th loop
+      for ( i = 0; i < m; i ++ ) {              // 0-th loop
 
           C[ j * ldc + i ] += A[ p * m + i ] * B[ j * k + p ];
 
-      }                                         // End 1.th loop
-    }                                           // End 2.th loop
-  }                                             // End 3.th loop
+      }                                         // End 0.th loop
+    }                                           // End 1.th loop
+  }                                             // End 2.th loop
+
 }
 
 

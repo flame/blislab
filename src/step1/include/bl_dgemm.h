@@ -52,7 +52,7 @@ struct aux_s {
 };
 typedef struct aux_s aux_t;
 
-void blis_dgemm(
+void bl_dgemm(
     int    m,
     int    n,
     int    k,
@@ -62,13 +62,13 @@ void blis_dgemm(
     int    ldc
     );
 
-double *blis_malloc_aligned(
+double *bl_malloc_aligned(
     int    m,
     int    n,
     int    size
     );
 
-void blis_printmatrix(
+void bl_printmatrix(
     double *A,
     int    lda,
     int    m,

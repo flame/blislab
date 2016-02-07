@@ -48,12 +48,9 @@
  */ 
 void dgemm(char*, char*, int*, int*, int*, double*, double*, 
     int*, double*, int*, double*, double*, int*);
-void sgemm(char*, char*, int*, int*, int*, float*, float*, 
-    int*, float*, int*, float*, float*, int*);
-void daxpy(int*, double*, double*, int*, double*, int*); 
 #endif
 
-void blis_dgemm_ref(
+void bl_dgemm_ref(
     int    m,
     int    n,
     int    k,
@@ -72,10 +69,6 @@ void blis_dgemm_ref(
   // Sanity check for early return.
   if ( m == 0 || n == 0 || k == 0 ) return;
 
-  // Allocate buffers.
-  As = XA;
-  Bs = XB;
-  Cs = XC;
 
   // Compute the inner-product term.
   beg = omp_get_wtime();
@@ -83,27 +76,19 @@ void blis_dgemm_ref(
 #ifdef USE_BLAS
 
   dgemm( "N", "N", &m, &n, &k, &alpha,
-        As, &m, Bs, &k, &beta, Cs, &m );
+        XA, &m, XB, &k, &beta, XC, &ldc );
 #else
   #pragma omp parallel for private( i, p )
   for ( j = 0; j < n; j ++ ) {
     for ( i = 0; i < m; i ++ ) {
       //Cs[ j * m + i ] = 0.0;
       for ( p = 0; p < k; p ++ ) {
-        Cs[ j * m + i ] += As[ p * m + i ] * Bs[ j * k + p ];
+        XC[ j * m + i ] += XA[ p * m + i ] * XB[ j * k + p ];
       }
     }
   }
 #endif
 
   time_dgemm = omp_get_wtime() - beg;
-  //printf("time_dgemm: %lf\n", time_dgemm);
-  //printf("%lf GFLOPS\n", 2.0*m*n*k/time_dgemm/1000.0/1000.0/1000.0);
-  //if ( n <= 32 && m <= 32 ) {
-  //  printf("refC:\n");
-  //  blisgemm_printmatrix( Cs, m, m, n );
-  //}
-
-  // Free  buffers
 
 }

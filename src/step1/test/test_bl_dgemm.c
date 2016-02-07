@@ -33,7 +33,7 @@ void computeError(
 }
 
 
-void test_blis_dgemm(
+void test_bl_dgemm(
     int m,
     int n,
     int k
@@ -42,17 +42,17 @@ void test_blis_dgemm(
     int    i, j, p, nx;
     double *XA, *XB, *XC, *XC_ref, *XD;
     double tmp, error, flops;
-    double ref_beg, ref_time, blis_dgemm_beg, blis_dgemm_time;
+    double ref_beg, ref_time, bl_dgemm_beg, bl_dgemm_time;
     int    nrepeats;
     int    ldc;
-    double ref_rectime, blis_dgemm_rectime;
+    double ref_rectime, bl_dgemm_rectime;
 
     XA    = (double*)malloc( sizeof(double) * m * k );
     XB    = (double*)malloc( sizeof(double) * k * n );
 
 
     ldc = ( ( m - 1 ) / DGEMM_MR + 1 ) * DGEMM_MR;
-    XC     = blis_malloc_aligned( ldc, n + 4, sizeof(double) );
+    XC     = bl_malloc_aligned( ldc, n + 4, sizeof(double) );
     XC_ref = (double*)malloc( sizeof(double) * m * n );
 
     nrepeats = 3;
@@ -83,9 +83,9 @@ void test_blis_dgemm(
     //XB  = XA;
 
     for ( i = 0; i < nrepeats; i ++ ) {
-        blis_dgemm_beg = omp_get_wtime();
+        bl_dgemm_beg = omp_get_wtime();
         {
-            blis_dgemm(
+            bl_dgemm(
                     m,
                     n,
                     k,
@@ -95,23 +95,23 @@ void test_blis_dgemm(
                     ldc
                     );
         }
-        blis_dgemm_time = omp_get_wtime() - blis_dgemm_beg;
+        bl_dgemm_time = omp_get_wtime() - bl_dgemm_beg;
 
         if ( i == 0 ) {
-            blis_dgemm_rectime = blis_dgemm_time;
+            bl_dgemm_rectime = bl_dgemm_time;
         } else {
-            //blis_dgemm_rectime = blis_dgemm_time < blis_dgemm_rectime ? blis_dgemm_time : blis_dgemm_rectime;
-            if ( blis_dgemm_time < blis_dgemm_rectime ) {
-                blis_dgemm_rectime = blis_dgemm_time;
+            //bl_dgemm_rectime = bl_dgemm_time < bl_dgemm_rectime ? bl_dgemm_time : bl_dgemm_rectime;
+            if ( bl_dgemm_time < bl_dgemm_rectime ) {
+                bl_dgemm_rectime = bl_dgemm_time;
             }
         }
     }
-    //printf("blis_dgemm_rectime: %lf\n", blis_dgemm_rectime);
+    //printf("bl_dgemm_rectime: %lf\n", bl_dgemm_rectime);
 
     for ( i = 0; i < nrepeats; i ++ ) {
         ref_beg = omp_get_wtime();
         {
-            blis_dgemm_ref(
+            bl_dgemm_ref(
                     m,
                     n,
                     k,
@@ -148,7 +148,7 @@ void test_blis_dgemm(
     flops = ( m * n / ( 1000.0 * 1000.0 * 1000.0 ) ) * ( 2 * k );
 
     printf( "%5d\t %5d\t %5d\t %5.2lf\t %5.2lf\n", 
-            m, n, k, flops / blis_dgemm_rectime, flops / ref_rectime );
+            m, n, k, flops / bl_dgemm_rectime, flops / ref_rectime );
 
     free( XA     );
     free( XB     );
@@ -170,7 +170,7 @@ int main( int argc, char *argv[] )
     sscanf( argv[ 2 ], "%d", &n );
     sscanf( argv[ 3 ], "%d", &k );
 
-    test_blis_dgemm( m, n, k );
+    test_bl_dgemm( m, n, k );
 
     return 0;
 }
