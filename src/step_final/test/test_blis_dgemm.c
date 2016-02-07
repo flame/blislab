@@ -47,11 +47,11 @@ void test_blis_dgemm(
     int    lda, ldb, ldc, ldc_ref;
     double ref_rectime, blis_dgemm_rectime;
 
-    XA    = (double*)malloc( sizeof(double) * k * m );
+    XA    = (double*)malloc( sizeof(double) * m * k );
     XB    = (double*)malloc( sizeof(double) * k * n );
 
 
-    lda = k;
+    lda = m;
     ldb = k;
     ldc = ( ( m - 1 ) / DGEMM_MR + 1 ) * DGEMM_MR;
     ldc_ref = m;
@@ -61,10 +61,10 @@ void test_blis_dgemm(
     nrepeats = 3;
 
     // Randonly generate points in [ 0, 1 ].
-    for ( i = 0; i < m; i ++ ) {
-        for ( p = 0; p < k; p ++ ) {
+    for ( p = 0; p < k; p ++ ) {
+        for ( i = 0; i < m; i ++ ) {
             //XA[ i * k + p ] = (double)( rand() % 1000000 ) / 1000000.0;	
-            XA[ i * lda + p ] = (double)( i * k + p );	
+            XA[ p * lda + i ] = (double)( p * lda + i );	
         }
     }
     for ( i = 0; i < n; i ++ ) {

@@ -41,6 +41,7 @@
 #include <blis_config.h>
 #include <blis_dgemm_kernel.h>
 
+/*
 inline void packA_kcxmc_d(
         int    m,
         int    k,
@@ -67,6 +68,39 @@ inline void packA_kcxmc_d(
         }
     }
 }
+*/
+
+inline void packA_mcxkc_d(
+        int    m,
+        int    k,
+        double *XA,
+        int    ldXA,
+        int    offseta,
+        double *packA
+        )
+{
+    int    i, p;
+    double *a_pntr[ DGEMM_MR ];
+
+    for ( i = 0; i < m; i ++ ) {
+        //a_pntr[ i ] = XA + ldXA * ( offseta + i );
+        a_pntr[ i ] = XA + ( offseta + i );
+    }
+
+    for ( i = m; i < DGEMM_MR; i ++ ) {
+        a_pntr[ i ] = XA + ( offseta + 0 );
+    }
+
+    for ( p = 0; p < k; p ++ ) {
+        for ( i = 0; i < DGEMM_MR; i ++ ) {
+            *packA = *a_pntr[ i ];
+            packA ++;
+            a_pntr[ i ] = a_pntr[ i ] + ldXA;
+        }
+    }
+}
+
+
 /*
  * --------------------------------------------------------------------------
  */
@@ -218,13 +252,23 @@ void blis_dgemm(
                 int     tid = omp_get_thread_num();
 
                 ib = min( m - ic, DGEMM_MC );
-                for ( i = 0; i < ib; i += DGEMM_MR ) {
+                //for ( i = 0; i < ib; i += DGEMM_MR ) {
+                //    packA_kcxmc_d(
+                //            min( ib - i, DGEMM_MR ),
+                //            pb,
+                //            &XA[ pc ],
+                //            k,
+                //            ic + i,
+                //            &packA[ tid * DGEMM_MC * pb + i * pb ]
+                //            );
+                //}
 
-                    packA_kcxmc_d(
+                for ( i = 0; i < ib; i += DGEMM_MR ) {
+                    packA_mcxkc_d(
                             min( ib - i, DGEMM_MR ),
                             pb,
-                            &XA[ pc ],
-                            k,
+                            &XA[ pc * m ],  // &XA[ pc * lda ],
+                            m,
                             ic + i,
                             &packA[ tid * DGEMM_MC * pb + i * pb ]
                             );

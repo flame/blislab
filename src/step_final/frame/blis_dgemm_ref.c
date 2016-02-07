@@ -82,7 +82,7 @@ void blis_dgemm_ref(
     beg = omp_get_wtime();
 
 #ifdef USE_BLAS
-    dgemm( "T", "N", &m, &n, &k, &alpha,
+    dgemm( "N", "N", &m, &n, &k, &alpha,
             As, &k, Bs, &k, &beta, Cs, &m );
 #else
     #pragma omp parallel for private( i, p )
@@ -90,7 +90,7 @@ void blis_dgemm_ref(
         for ( i = 0; i < m; i ++ ) {
             //Cs[ j * m + i ] = 0.0;
             for ( p = 0; p < k; p ++ ) {
-                Cs[ j * m + i ] += As[ i * k + p ] * Bs[ j * k + p ];
+                Cs[ j * m + i ] += As[ p * m + i ] * Bs[ j * k + p ];
             }
         }
     }
