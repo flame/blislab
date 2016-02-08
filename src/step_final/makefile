@@ -15,13 +15,11 @@ FRAME_CC_SRC=  \
 FRAME_CPP_SRC= \
 
 KERNEL_SRC=    \
-			                 kernels/sq2nrm_asm_d8x4.c \
 							 kernels/bli_dgemm_int_d8x4.c \
 							 kernels/bli_dgemm_asm_d8x4.c \
-			                 #kernels/bli_gemm_asm_d12x4.c \
-			                 #kernels/bli_gemm_asm_d8x6.c \
-							 #kernels/bli_dgemm_ukr.c \
-							 #kernels/bli_dgemm_ukr.c \
+			                 kernels/bli_gemm_asm_d12x4.c \
+			                 kernels/bli_gemm_asm_d8x6.c \
+							 kernels/bli_dgemm_ukr.c \
 
 OTHER_DEP = \
 			                 include/bl_dgemm.h \
@@ -52,5 +50,5 @@ $(SHAREDLIBBLISLAB): $(BLISLAB_OBJ)
 # ---------------------------------------------------------------------------
 
 clean:
-	rm $(BLISLAB_OBJ) $(LIBBLISLAB) $(SHAREDLIBBLISLAB) dgemm/*~ test/*~ include/*~ *~ makefile.in.files/*~
+	rm $(BLISLAB_OBJ) $(LIBBLISLAB) $(SHAREDLIBBLISLAB) dgemm/*~ test/*~ include/*~ *~ makefile.in.files/*~ kernels/*~
 	cd $(BLISLAB_DIR)/test && $(MAKE) clean && cd $(BLISLAB_DIR)

@@ -1,103 +1,56 @@
-/*
-
-   BLIS    
-   An object-based framework for developing high-performance BLAS-like
-   libraries.
-
-   Copyright (C) 2014, The University of Texas at Austin
-
-   Redistribution and use in source and binary forms, with or without
-   modification, are permitted provided that the following conditions are
-   met:
-    - Redistributions of source code must retain the above copyright
-      notice, this list of conditions and the following disclaimer.
-    - Redistributions in binary form must reproduce the above copyright
-      notice, this list of conditions and the following disclaimer in the
-      documentation and/or other materials provided with the distribution.
-    - Neither the name of The University of Texas at Austin nor the names
-      of its contributors may be used to endorse or promote products
-      derived from this software without specific prior written permission.
-
-   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-   "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-   LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-   A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
-   HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-   SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
-   LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-   DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-   THEORY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-   (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
-*/
-
-/* NOTE: The micro-kernels in this file were partially inspired by portions
-   of code found in OpenBLAS 0.2.8 (http://www.openblas.net/). -FGVZ */
-
 #include <stdio.h>
 #include <immintrin.h> // AVX
 
-#include <bl_dgemm.h>
-#include <avx_types.h>
+#include "bl_dgemm.h"
+#include "avx_types.h"
 
-#define inc_t unsigned long long 
-//#define dim_t int
 
 void bli_dgemm_asm_8x4(
-                        dim_t    k,
-                        double*  a,
-                        double*  b,
-                        double*  c,
-                        //inc_t rs_c,
-                        //inc_t cs_c,
-                        inc_t ldc,
-                        aux_t*         data
-                      )
+    int    k,
+    double *a,
+    double *b,
+    double *c,
+    unsigned long long ldc,
+    aux_t  *aux
+    )
 {
-
-    const inc_t cs_c = ldc;
-    const inc_t rs_c = 1;
-    double alpha_val = 1.0, beta_val = 1.0;
-    double *alpha, *beta;
-
-    alpha = &alpha_val;
-    beta  = &beta_val;
-
-    //printf( "before b_next\n" );
-	////void*   a_next = bli_auxinfo_next_a( data );
-	//void*   b_next = bli_auxinfo_next_b( data );
-    double *b_next = data->b_next;
-    //printf( "after b_next\n" );
-
-	dim_t   k_iter = k / 4;
-	dim_t   k_left = k % 4;
+  unsigned long long k_iter = k / 4;
+  unsigned long long k_left = k % 4;
+  unsigned long long pc     = aux->pc;
+  
+  //printf( "%ld\n", last );
 
 	__asm__ volatile
 	(
 	"                                            \n\t"
 	"                                            \n\t"
-	"movq                %2, %%rax               \n\t" // load address of a.
-	"movq                %3, %%rbx               \n\t" // load address of b.
-	"movq                %9, %%r15               \n\t" // load address of b_next.
-	//"movq               %10, %%r14               \n\t" // load address of a_next.
-	"addq          $-4 * 64, %%r15               \n\t"
+	"movq                %2, %%rax               \n\t" // load address of a.              ( v )
+	"movq                %3, %%rbx               \n\t" // load address of b.              ( v )
+	"movq                %5, %%r15               \n\t" // load address of b_next.         ( v )
+	"addq          $-4 * 64, %%r15               \n\t" //                                 ( ? )
 	"                                            \n\t"
 	"vmovapd   0 * 32(%%rax), %%ymm0             \n\t" // initialize loop by pre-loading
 	"vmovapd   0 * 32(%%rbx), %%ymm2             \n\t" // elements of a and b.
-	"vpermilpd  $0x5, %%ymm2, %%ymm3             \n\t"
+  "vpermilpd  $0x5, %%ymm2, %%ymm3             \n\t"
+  "                                            \n\t"
+  "                                            \n\t"
+  "movq                %4, %%rcx               \n\t" // load address of c
+  "movq               %7, %%rdi               \n\t" // load ldc
+  "leaq        (,%%rdi,8), %%rdi               \n\t" // ldc * sizeof(double)
+  "leaq   (%%rcx,%%rdi,2), %%r10               \n\t" // load address of c + 2 * ldc;
+  "                                            \n\t"
+  "                                            \n\t"
 	"                                            \n\t"
-	"movq                %6, %%rcx               \n\t" // load address of c
-	"movq                %8, %%rdi               \n\t" // load cs_c
-	"leaq        (,%%rdi,8), %%rdi               \n\t" // cs_c *= sizeof(double)
-	"leaq   (%%rcx,%%rdi,2), %%r10               \n\t" // load address of c + 2*cs_c;
 	"                                            \n\t"
-	"prefetcht0   3 * 8(%%rcx)                   \n\t" // prefetch c + 0*cs_c
-	"prefetcht0   3 * 8(%%rcx,%%rdi)             \n\t" // prefetch c + 1*cs_c
-	"prefetcht0   3 * 8(%%r10)                   \n\t" // prefetch c + 2*cs_c
-	"prefetcht0   3 * 8(%%r10,%%rdi)             \n\t" // prefetch c + 3*cs_c
+  "prefetcht0   3 * 8(%%rcx)                   \n\t" // prefetch c + 0 * ldc
+  "prefetcht0   3 * 8(%%rcx,%%rdi)             \n\t" // prefetch c + 1 * ldc
+  "prefetcht0   3 * 8(%%r10)                   \n\t" // prefetch c + 2 * ldc
+  "prefetcht0   3 * 8(%%r10,%%rdi)             \n\t" // prefetch c + 3 * ldc
+  "                                            \n\t"
 	"                                            \n\t"
-	"vxorpd    %%ymm8,  %%ymm8,  %%ymm8          \n\t"
+	"                                            \n\t"
+	"                                            \n\t"
+	"vxorpd    %%ymm8,  %%ymm8,  %%ymm8          \n\t" // set ymm8 to 0                   ( v )
 	"vxorpd    %%ymm9,  %%ymm9,  %%ymm9          \n\t"
 	"vxorpd    %%ymm10, %%ymm10, %%ymm10         \n\t"
 	"vxorpd    %%ymm11, %%ymm11, %%ymm11         \n\t"
@@ -108,28 +61,28 @@ void bli_dgemm_asm_8x4(
 	"                                            \n\t"
 	"                                            \n\t"
 	"                                            \n\t"
-	"movq      %0, %%rsi                         \n\t" // i = k_iter;
-	"testq  %%rsi, %%rsi                         \n\t" // check i via logical AND.
-	"je     .DCONSIDKLEFT                        \n\t" // if i == 0, jump to code that
+	"movq      %0, %%rsi                         \n\t" // i = k_iter;                     ( v )
+	"testq  %%rsi, %%rsi                         \n\t" // check i via logical AND.        ( v )
+	"je     .DCONSIDKLEFT                        \n\t" // if i == 0, jump to code that    ( v )
 	"                                            \n\t" // contains the k_left loop.
 	"                                            \n\t"
 	"                                            \n\t"
 	".DLOOPKITER:                                \n\t" // MAIN LOOP
 	"                                            \n\t"
-	"addq         $4 * 4 * 8,  %%r15             \n\t" // b_next += 4*4 (unroll x nr)
+	"addq         $4 * 4 * 8,  %%r15             \n\t" // b_next += 4*4 (unroll x nr)     ( v )
 	"                                            \n\t"
 	"                                            \n\t" // iteration 0
-	"vmovapd   1 * 32(%%rax),  %%ymm1            \n\t"
-	"vmulpd           %%ymm0,  %%ymm2,  %%ymm6   \n\t"
-	"vperm2f128 $0x3, %%ymm2,  %%ymm2,  %%ymm4   \n\t"
-	"vmulpd           %%ymm0,  %%ymm3,  %%ymm7   \n\t"
-	"vperm2f128 $0x3, %%ymm3,  %%ymm3,  %%ymm5   \n\t"
-	"vaddpd           %%ymm15, %%ymm6,  %%ymm15  \n\t"
-	"vaddpd           %%ymm13, %%ymm7,  %%ymm13  \n\t"
+	"vmovapd   1 * 32(%%rax),  %%ymm1            \n\t" // preload a47 for iter 0
+	"vmulpd           %%ymm0,  %%ymm2,  %%ymm6   \n\t" // ymm6 ( c_tmp0 ) = ymm0 ( a03 ) * ymm2( b0 )
+	"vperm2f128 $0x3, %%ymm2,  %%ymm2,  %%ymm4   \n\t" // ymm4 ( b0x3_0 )
+	"vmulpd           %%ymm0,  %%ymm3,  %%ymm7   \n\t" // ymm7 ( c_tmp1 ) = ymm0 ( a03 ) * ymm3( b0x5 )
+	"vperm2f128 $0x3, %%ymm3,  %%ymm3,  %%ymm5   \n\t" // ymm5 ( b0x3_1 )
+	"vaddpd           %%ymm15, %%ymm6,  %%ymm15  \n\t" // ymm15 ( c_03_0 ) += ymm6( c_tmp0 )
+	"vaddpd           %%ymm13, %%ymm7,  %%ymm13  \n\t" // ymm13 ( c_03_1 ) += ymm7( c_tmp1 )
 	"                                            \n\t"
-	"prefetcht0  16 * 32(%%rax)                  \n\t"
+	"prefetcht0  16 * 32(%%rax)                  \n\t" // prefetch a03 for iter 1
 	"vmulpd           %%ymm1,  %%ymm2,  %%ymm6   \n\t"
-	"vmovapd   1 * 32(%%rbx),  %%ymm2            \n\t"
+	"vmovapd   1 * 32(%%rbx),  %%ymm2            \n\t" // preload b for iter 1
 	"vmulpd           %%ymm1,  %%ymm3,  %%ymm7   \n\t"
 	"vpermilpd  $0x5, %%ymm2,  %%ymm3            \n\t"
 	"vaddpd           %%ymm14, %%ymm6,  %%ymm14  \n\t"
@@ -137,7 +90,7 @@ void bli_dgemm_asm_8x4(
 	"                                            \n\t"
 	"vmulpd           %%ymm0,  %%ymm4,  %%ymm6   \n\t"
 	"vmulpd           %%ymm0,  %%ymm5,  %%ymm7   \n\t"
-	"vmovapd   2 * 32(%%rax),  %%ymm0            \n\t"
+	"vmovapd   2 * 32(%%rax),  %%ymm0            \n\t" // preload a03 for iter 1
 	"vaddpd           %%ymm11, %%ymm6,  %%ymm11  \n\t"
 	"vaddpd           %%ymm9,  %%ymm7,  %%ymm9   \n\t"
 	"prefetcht0   0 * 32(%%r15)                  \n\t" // prefetch b_next[0*4]
@@ -149,7 +102,7 @@ void bli_dgemm_asm_8x4(
 	"                                            \n\t"
 	"                                            \n\t"
 	"                                            \n\t" // iteration 1
-	"vmovapd   3 * 32(%%rax),  %%ymm1            \n\t"
+	"vmovapd   3 * 32(%%rax),  %%ymm1            \n\t" // preload a47 for iter 1
 	"vmulpd           %%ymm0,  %%ymm2,  %%ymm6   \n\t"
 	"vperm2f128 $0x3, %%ymm2,  %%ymm2,  %%ymm4   \n\t"
 	"vmulpd           %%ymm0,  %%ymm3,  %%ymm7   \n\t"
@@ -157,9 +110,9 @@ void bli_dgemm_asm_8x4(
 	"vaddpd           %%ymm15, %%ymm6,  %%ymm15  \n\t"
 	"vaddpd           %%ymm13, %%ymm7,  %%ymm13  \n\t"
 	"                                            \n\t"
-	"prefetcht0  18 * 32(%%rax)                  \n\t"
+	"prefetcht0  18 * 32(%%rax)                  \n\t" // prefetch a for iter 9  ( ? )
 	"vmulpd           %%ymm1,  %%ymm2,  %%ymm6   \n\t"
-	"vmovapd   2 * 32(%%rbx),  %%ymm2            \n\t"
+	"vmovapd   2 * 32(%%rbx),  %%ymm2            \n\t" // preload b for iter 2 
 	"vmulpd           %%ymm1,  %%ymm3,  %%ymm7   \n\t"
 	"vpermilpd  $0x5, %%ymm2,  %%ymm3            \n\t"
 	"vaddpd           %%ymm14, %%ymm6,  %%ymm14  \n\t"
@@ -167,7 +120,7 @@ void bli_dgemm_asm_8x4(
 	"                                            \n\t"
 	"vmulpd           %%ymm0,  %%ymm4,  %%ymm6   \n\t"
 	"vmulpd           %%ymm0,  %%ymm5,  %%ymm7   \n\t"
-	"vmovapd   4 * 32(%%rax),  %%ymm0            \n\t"
+	"vmovapd   4 * 32(%%rax),  %%ymm0            \n\t" // preload a03 for iter 2
 	"vaddpd           %%ymm11, %%ymm6,  %%ymm11  \n\t"
 	"vaddpd           %%ymm9,  %%ymm7,  %%ymm9   \n\t"
 	"                                            \n\t"
@@ -178,7 +131,7 @@ void bli_dgemm_asm_8x4(
 	"                                            \n\t"
 	"                                            \n\t"
 	"                                            \n\t" // iteration 2
-	"vmovapd   5 * 32(%%rax),  %%ymm1            \n\t"
+	"vmovapd   5 * 32(%%rax),  %%ymm1            \n\t" // preload a47 for iter 2
 	"vmulpd           %%ymm0,  %%ymm2,  %%ymm6   \n\t"
 	"vperm2f128 $0x3, %%ymm2,  %%ymm2,  %%ymm4   \n\t"
 	"vmulpd           %%ymm0,  %%ymm3,  %%ymm7   \n\t"
@@ -186,9 +139,9 @@ void bli_dgemm_asm_8x4(
 	"vaddpd           %%ymm15, %%ymm6,  %%ymm15  \n\t"
 	"vaddpd           %%ymm13, %%ymm7,  %%ymm13  \n\t"
 	"                                            \n\t"
-	"prefetcht0  20 * 32(%%rax)                  \n\t"
+	"prefetcht0  20 * 32(%%rax)                  \n\t" // prefetch a for iter 10 ( ? )
 	"vmulpd           %%ymm1,  %%ymm2,  %%ymm6   \n\t"
-	"vmovapd   3 * 32(%%rbx),  %%ymm2            \n\t"
+	"vmovapd   3 * 32(%%rbx),  %%ymm2            \n\t" // preload b for iter 3
 	"addq         $4 * 4 * 8,  %%rbx             \n\t" // b += 4*4 (unroll x nr)
 	"vmulpd           %%ymm1,  %%ymm3,  %%ymm7   \n\t"
 	"vpermilpd  $0x5, %%ymm2,  %%ymm3            \n\t"
@@ -197,7 +150,7 @@ void bli_dgemm_asm_8x4(
 	"                                            \n\t"
 	"vmulpd           %%ymm0,  %%ymm4,  %%ymm6   \n\t"
 	"vmulpd           %%ymm0,  %%ymm5,  %%ymm7   \n\t"
-	"vmovapd   6 * 32(%%rax),  %%ymm0            \n\t"
+	"vmovapd   6 * 32(%%rax),  %%ymm0            \n\t" // preload a03 for iter 3
 	"vaddpd           %%ymm11, %%ymm6,  %%ymm11  \n\t"
 	"vaddpd           %%ymm9,  %%ymm7,  %%ymm9   \n\t"
 	"prefetcht0   2 * 32(%%r15)                  \n\t" // prefetch b_next[2*4]
@@ -209,7 +162,7 @@ void bli_dgemm_asm_8x4(
 	"                                            \n\t"
 	"                                            \n\t"
 	"                                            \n\t" // iteration 3
-	"vmovapd   7 * 32(%%rax),  %%ymm1            \n\t"
+	"vmovapd   7 * 32(%%rax),  %%ymm1            \n\t" // preload a47 for iter 3
 	"addq         $4 * 8 * 8,  %%rax             \n\t" // a += 4*8 (unroll x mr)
 	"vmulpd           %%ymm0,  %%ymm2,  %%ymm6   \n\t"
 	"vperm2f128 $0x3, %%ymm2,  %%ymm2,  %%ymm4   \n\t"
@@ -218,10 +171,9 @@ void bli_dgemm_asm_8x4(
 	"vaddpd           %%ymm15, %%ymm6,  %%ymm15  \n\t"
 	"vaddpd           %%ymm13, %%ymm7,  %%ymm13  \n\t"
 	"                                            \n\t"
-	//"prefetcht0  22 * 32(%%rax)                  \n\t"
-	"prefetcht0  14 * 32(%%rax)                  \n\t"
+	"prefetcht0  14 * 32(%%rax)                  \n\t" // prefetch a for iter 11 ( ? )
 	"vmulpd           %%ymm1,  %%ymm2,  %%ymm6   \n\t"
-	"vmovapd   0 * 32(%%rbx),  %%ymm2            \n\t"
+	"vmovapd   0 * 32(%%rbx),  %%ymm2            \n\t" // preload b for iter 4
 	"vmulpd           %%ymm1,  %%ymm3,  %%ymm7   \n\t"
 	"vpermilpd  $0x5, %%ymm2,  %%ymm3            \n\t"
 	"vaddpd           %%ymm14, %%ymm6,  %%ymm14  \n\t"
@@ -229,7 +181,7 @@ void bli_dgemm_asm_8x4(
 	"                                            \n\t"
 	"vmulpd           %%ymm0,  %%ymm4,  %%ymm6   \n\t"
 	"vmulpd           %%ymm0,  %%ymm5,  %%ymm7   \n\t"
-	"vmovapd   0 * 32(%%rax),  %%ymm0            \n\t"
+	"vmovapd   0 * 32(%%rax),  %%ymm0            \n\t" // preload a03 for iter 4
 	"vaddpd           %%ymm11, %%ymm6,  %%ymm11  \n\t"
 	"vaddpd           %%ymm9,  %%ymm7,  %%ymm9   \n\t"
 	"                                            \n\t"
@@ -240,8 +192,6 @@ void bli_dgemm_asm_8x4(
 	"                                            \n\t"
 	"                                            \n\t"
 	"                                            \n\t"
-	//"addq   $4 * 8 * 8, %%rax                    \n\t" // a      += 4*8 (unroll x mr)
-	//"addq   $4 * 4 * 8, %%rbx                    \n\t" // b      += 4*4 (unroll x nr)
 	"                                            \n\t"
 	"decq   %%rsi                                \n\t" // i -= 1;
 	"jne    .DLOOPKITER                          \n\t" // iterate again if i != 0.
@@ -261,7 +211,7 @@ void bli_dgemm_asm_8x4(
 	"                                            \n\t"
 	".DLOOPKLEFT:                                \n\t" // EDGE LOOP
 	"                                            \n\t"
-	"vmovapd   1 * 32(%%rax),  %%ymm1            \n\t"
+	"vmovapd   1 * 32(%%rax),  %%ymm1            \n\t" // preload a47 
 	"addq         $8 * 1 * 8,  %%rax             \n\t" // a += 8 (1 x mr)
 	"vmulpd           %%ymm0,  %%ymm2, %%ymm6    \n\t"
 	"vperm2f128 $0x3, %%ymm2,  %%ymm2, %%ymm4    \n\t"
@@ -270,7 +220,7 @@ void bli_dgemm_asm_8x4(
 	"vaddpd           %%ymm15, %%ymm6, %%ymm15   \n\t"
 	"vaddpd           %%ymm13, %%ymm7, %%ymm13   \n\t"
 	"                                            \n\t"
-	"prefetcht0  14 * 32(%%rax)                  \n\t"
+	"prefetcht0  14 * 32(%%rax)                  \n\t" // prefetch a03 for iter 7 later ( ? )
 	"vmulpd           %%ymm1,  %%ymm2, %%ymm6    \n\t"
 	"vmovapd   1 * 32(%%rbx),  %%ymm2            \n\t"
 	"addq         $4 * 1 * 8,  %%rbx             \n\t" // b += 4 (1 x nr)
@@ -368,379 +318,144 @@ void bli_dgemm_asm_8x4(
 	"                                            \n\t" //   ab70 )  ab71 )  ab72 )  ab73 )
 	"                                            \n\t"
 	"                                            \n\t"
-	"movq         %4, %%rax                      \n\t" // load address of alpha
-	"movq         %5, %%rbx                      \n\t" // load address of beta 
-	"vbroadcastsd    (%%rax), %%ymm0             \n\t" // load alpha and duplicate
-	"vbroadcastsd    (%%rbx), %%ymm2             \n\t" // load beta and duplicate
-	"                                            \n\t"
-	"vmulpd           %%ymm0,  %%ymm8,  %%ymm8   \n\t" // scale by alpha
-	"vmulpd           %%ymm0,  %%ymm9,  %%ymm9   \n\t"
-	"vmulpd           %%ymm0,  %%ymm10, %%ymm10  \n\t"
-	"vmulpd           %%ymm0,  %%ymm11, %%ymm11  \n\t"
-	"vmulpd           %%ymm0,  %%ymm12, %%ymm12  \n\t"
-	"vmulpd           %%ymm0,  %%ymm13, %%ymm13  \n\t"
-	"vmulpd           %%ymm0,  %%ymm14, %%ymm14  \n\t"
-	"vmulpd           %%ymm0,  %%ymm15, %%ymm15  \n\t"
-	"                                            \n\t"
-	"                                            \n\t"
-	"                                            \n\t"
-	"                                            \n\t"
-	"                                            \n\t"
-	"                                            \n\t"
-	"movq                %7, %%rsi               \n\t" // load rs_c
-	"leaq        (,%%rsi,8), %%rsi               \n\t" // rsi = rs_c * sizeof(double)
-	"                                            \n\t"
-	"leaq   (%%rcx,%%rsi,4), %%rdx               \n\t" // load address of c + 4*rs_c;
-	"                                            \n\t"
-	"leaq        (,%%rsi,2), %%r12               \n\t" // r12 = 2*rs_c;
-	"leaq   (%%r12,%%rsi,1), %%r13               \n\t" // r13 = 3*rs_c;
-	"                                            \n\t"
-	"                                            \n\t"
-	"                                            \n\t"
-	"                                            \n\t" // determine if
-	"                                            \n\t" //    c    % 32 == 0, AND
-	"                                            \n\t" //  8*cs_c % 32 == 0, AND
-	"                                            \n\t" //    rs_c      == 1
-	"                                            \n\t" // ie: aligned, ldim aligned, and
-	"                                            \n\t" // column-stored
-	"                                            \n\t"
-	"cmpq       $8, %%rsi                        \n\t" // set ZF if (8*rs_c) == 8.
-	"sete           %%bl                         \n\t" // bl = ( ZF == 1 ? 1 : 0 );
-	"testq     $31, %%rcx                        \n\t" // set ZF if c & 32 is zero.
-	"setz           %%bh                         \n\t" // bh = ( ZF == 0 ? 1 : 0 );
-	"testq     $31, %%rdi                        \n\t" // set ZF if (8*cs_c) & 32 is zero.
-	"setz           %%al                         \n\t" // al = ( ZF == 0 ? 1 : 0 );
-	"                                            \n\t" // and(bl,bh) followed by
-	"                                            \n\t" // and(bh,al) will reveal result
-	"                                            \n\t"
-	"                                            \n\t" // now avoid loading C if beta == 0
-	"                                            \n\t"
-	"vxorpd    %%ymm0,  %%ymm0,  %%ymm0          \n\t" // set ymm0 to zero.
-	"vucomisd  %%xmm0,  %%xmm2                   \n\t" // set ZF if beta == 0.
-	"je      .DBETAZERO                          \n\t" // if ZF = 1, jump to beta == 0 case
-	"                                            \n\t"
-	"                                            \n\t"
-	"                                            \n\t" // check if aligned/column-stored
-	"andb     %%bl, %%bh                         \n\t" // set ZF if bl & bh == 1.
-	"andb     %%bh, %%al                         \n\t" // set ZF if bh & al == 1.
-	"jne     .DCOLSTORED                         \n\t" // jump to column storage case
-	"                                            \n\t"
-	"                                            \n\t"
-	"                                            \n\t"
-	".DGENSTORED:                                \n\t"
-	"                                            \n\t" // update c00:c33
-	"                                            \n\t"
-	"vextractf128 $1, %%ymm9,  %%xmm1            \n\t"
-	"vmovlpd    (%%rcx),       %%xmm0,  %%xmm0   \n\t" // load c00 and c10,
-	"vmovhpd    (%%rcx,%%rsi), %%xmm0,  %%xmm0   \n\t"
-	"vmulpd           %%xmm2,  %%xmm0,  %%xmm0   \n\t" // scale by beta,
-	"vaddpd           %%xmm9,  %%xmm0,  %%xmm0   \n\t" // add the gemm result,
-	"vmovlpd          %%xmm0,  (%%rcx)           \n\t" // and store back to memory.
-	"vmovhpd          %%xmm0,  (%%rcx,%%rsi)     \n\t"
-	"vmovlpd    (%%rcx,%%r12), %%xmm0,  %%xmm0   \n\t" // load c20 and c30,
-	"vmovhpd    (%%rcx,%%r13), %%xmm0,  %%xmm0   \n\t"
-	"vmulpd           %%xmm2,  %%xmm0,  %%xmm0   \n\t" // scale by beta,
-	"vaddpd           %%xmm1,  %%xmm0,  %%xmm0   \n\t" // add the gemm result,
-	"vmovlpd          %%xmm0,  (%%rcx,%%r12)     \n\t" // and store back to memory.
-	"vmovhpd          %%xmm0,  (%%rcx,%%r13)     \n\t"
-	"addq      %%rdi, %%rcx                      \n\t" // c += cs_c;
-	"                                            \n\t"
-	"vextractf128 $1, %%ymm11, %%xmm1            \n\t"
-	"vmovlpd    (%%rcx),       %%xmm0,  %%xmm0   \n\t" // load c01 and c11,
-	"vmovhpd    (%%rcx,%%rsi), %%xmm0,  %%xmm0   \n\t"
-	"vmulpd           %%xmm2,  %%xmm0,  %%xmm0   \n\t" // scale by beta,
-	"vaddpd           %%xmm11, %%xmm0,  %%xmm0   \n\t" // add the gemm result,
-	"vmovlpd          %%xmm0,  (%%rcx)           \n\t" // and store back to memory.
-	"vmovhpd          %%xmm0,  (%%rcx,%%rsi)     \n\t"
-	"vmovlpd    (%%rcx,%%r12), %%xmm0,  %%xmm0   \n\t" // load c21 and c31,
-	"vmovhpd    (%%rcx,%%r13), %%xmm0,  %%xmm0   \n\t"
-	"vmulpd           %%xmm2,  %%xmm0,  %%xmm0   \n\t" // scale by beta,
-	"vaddpd           %%xmm1,  %%xmm0,  %%xmm0   \n\t" // add the gemm result,
-	"vmovlpd          %%xmm0,  (%%rcx,%%r12)     \n\t" // and store back to memory.
-	"vmovhpd          %%xmm0,  (%%rcx,%%r13)     \n\t"
-	"addq      %%rdi, %%rcx                      \n\t" // c += cs_c;
-	"                                            \n\t"
-	"vextractf128 $1, %%ymm13, %%xmm1            \n\t"
-	"vmovlpd    (%%rcx),       %%xmm0,  %%xmm0   \n\t" // load c02 and c12,
-	"vmovhpd    (%%rcx,%%rsi), %%xmm0,  %%xmm0   \n\t"
-	"vmulpd           %%xmm2,  %%xmm0,  %%xmm0   \n\t" // scale by beta,
-	"vaddpd           %%xmm13, %%xmm0,  %%xmm0   \n\t" // add the gemm result,
-	"vmovlpd          %%xmm0,  (%%rcx)           \n\t" // and store back to memory.
-	"vmovhpd          %%xmm0,  (%%rcx,%%rsi)     \n\t"
-	"vmovlpd    (%%rcx,%%r12), %%xmm0,  %%xmm0   \n\t" // load c22 and c32,
-	"vmovhpd    (%%rcx,%%r13), %%xmm0,  %%xmm0   \n\t"
-	"vmulpd           %%xmm2,  %%xmm0,  %%xmm0   \n\t" // scale by beta,
-	"vaddpd           %%xmm1,  %%xmm0,  %%xmm0   \n\t" // add the gemm result,
-	"vmovlpd          %%xmm0,  (%%rcx,%%r12)     \n\t" // and store back to memory.
-	"vmovhpd          %%xmm0,  (%%rcx,%%r13)     \n\t"
-	"addq      %%rdi, %%rcx                      \n\t" // c += cs_c;
-	"                                            \n\t"
-	"vextractf128 $1, %%ymm15, %%xmm1            \n\t"
-	"vmovlpd    (%%rcx),       %%xmm0,  %%xmm0   \n\t" // load c03 and c13,
-	"vmovhpd    (%%rcx,%%rsi), %%xmm0,  %%xmm0   \n\t"
-	"vmulpd           %%xmm2,  %%xmm0,  %%xmm0   \n\t" // scale by beta,
-	"vaddpd           %%xmm15, %%xmm0,  %%xmm0   \n\t" // add the gemm result,
-	"vmovlpd          %%xmm0,  (%%rcx)           \n\t" // and store back to memory.
-	"vmovhpd          %%xmm0,  (%%rcx,%%rsi)     \n\t"
-	"vmovlpd    (%%rcx,%%r12), %%xmm0,  %%xmm0   \n\t" // load c23 and c33,
-	"vmovhpd    (%%rcx,%%r13), %%xmm0,  %%xmm0   \n\t"
-	"vmulpd           %%xmm2,  %%xmm0,  %%xmm0   \n\t" // scale by beta,
-	"vaddpd           %%xmm1,  %%xmm0,  %%xmm0   \n\t" // add the gemm result,
-	"vmovlpd          %%xmm0,  (%%rcx,%%r12)     \n\t" // and store back to memory.
-	"vmovhpd          %%xmm0,  (%%rcx,%%r13)     \n\t"
-	"                                            \n\t"
-	"                                            \n\t" // update c40:c73
-	"                                            \n\t"
-	"vextractf128 $1, %%ymm8,  %%xmm1            \n\t"
-	"vmovlpd    (%%rdx),       %%xmm0,  %%xmm0   \n\t" // load c40 and c50,
-	"vmovhpd    (%%rdx,%%rsi), %%xmm0,  %%xmm0   \n\t"
-	"vmulpd           %%xmm2,  %%xmm0,  %%xmm0   \n\t" // scale by beta,
-	"vaddpd           %%xmm8,  %%xmm0,  %%xmm0   \n\t" // add the gemm result,
-	"vmovlpd          %%xmm0,  (%%rdx)           \n\t" // and store back to memory.
-	"vmovhpd          %%xmm0,  (%%rdx,%%rsi)     \n\t"
-	"vmovlpd    (%%rdx,%%r12), %%xmm0,  %%xmm0   \n\t" // load c60 and c70,
-	"vmovhpd    (%%rdx,%%r13), %%xmm0,  %%xmm0   \n\t"
-	"vmulpd           %%xmm2,  %%xmm0,  %%xmm0   \n\t" // scale by beta,
-	"vaddpd           %%xmm1,  %%xmm0,  %%xmm0   \n\t" // add the gemm result,
-	"vmovlpd          %%xmm0,  (%%rdx,%%r12)     \n\t" // and store back to memory.
-	"vmovhpd          %%xmm0,  (%%rdx,%%r13)     \n\t"
-	"addq      %%rdi, %%rdx                      \n\t" // c += cs_c;
-	"                                            \n\t"
-	"vextractf128 $1, %%ymm10, %%xmm1            \n\t"
-	"vmovlpd    (%%rdx),       %%xmm0,  %%xmm0   \n\t" // load c41 and c51,
-	"vmovhpd    (%%rdx,%%rsi), %%xmm0,  %%xmm0   \n\t"
-	"vmulpd           %%xmm2,  %%xmm0,  %%xmm0   \n\t" // scale by beta,
-	"vaddpd           %%xmm10, %%xmm0,  %%xmm0   \n\t" // add the gemm result,
-	"vmovlpd          %%xmm0,  (%%rdx)           \n\t" // and store back to memory.
-	"vmovhpd          %%xmm0,  (%%rdx,%%rsi)     \n\t"
-	"vmovlpd    (%%rdx,%%r12), %%xmm0,  %%xmm0   \n\t" // load c61 and c71,
-	"vmovhpd    (%%rdx,%%r13), %%xmm0,  %%xmm0   \n\t"
-	"vmulpd           %%xmm2,  %%xmm0,  %%xmm0   \n\t" // scale by beta,
-	"vaddpd           %%xmm1,  %%xmm0,  %%xmm0   \n\t" // add the gemm result,
-	"vmovlpd          %%xmm0,  (%%rdx,%%r12)     \n\t" // and store back to memory.
-	"vmovhpd          %%xmm0,  (%%rdx,%%r13)     \n\t"
-	"addq      %%rdi, %%rdx                      \n\t" // c += cs_c;
-	"                                            \n\t"
-	"vextractf128 $1, %%ymm12, %%xmm1            \n\t"
-	"vmovlpd    (%%rdx),       %%xmm0,  %%xmm0   \n\t" // load c42 and c52,
-	"vmovhpd    (%%rdx,%%rsi), %%xmm0,  %%xmm0   \n\t"
-	"vmulpd           %%xmm2,  %%xmm0,  %%xmm0   \n\t" // scale by beta,
-	"vaddpd           %%xmm12, %%xmm0,  %%xmm0   \n\t" // add the gemm result,
-	"vmovlpd          %%xmm0,  (%%rdx)           \n\t" // and store back to memory.
-	"vmovhpd          %%xmm0,  (%%rdx,%%rsi)     \n\t"
-	"vmovlpd    (%%rdx,%%r12), %%xmm0,  %%xmm0   \n\t" // load c62 and c72,
-	"vmovhpd    (%%rdx,%%r13), %%xmm0,  %%xmm0   \n\t"
-	"vmulpd           %%xmm2,  %%xmm0,  %%xmm0   \n\t" // scale by beta,
-	"vaddpd           %%xmm1,  %%xmm0,  %%xmm0   \n\t" // add the gemm result,
-	"vmovlpd          %%xmm0,  (%%rdx,%%r12)     \n\t" // and store back to memory.
-	"vmovhpd          %%xmm0,  (%%rdx,%%r13)     \n\t"
-	"addq      %%rdi, %%rdx                      \n\t" // c += cs_c;
-	"                                            \n\t"
-	"vextractf128 $1, %%ymm14, %%xmm1            \n\t"
-	"vmovlpd    (%%rdx),       %%xmm0,  %%xmm0   \n\t" // load c43 and c53,
-	"vmovhpd    (%%rdx,%%rsi), %%xmm0,  %%xmm0   \n\t"
-	"vmulpd           %%xmm2,  %%xmm0,  %%xmm0   \n\t" // scale by beta,
-	"vaddpd           %%xmm14, %%xmm0,  %%xmm0   \n\t" // add the gemm result,
-	"vmovlpd          %%xmm0,  (%%rdx)           \n\t" // and store back to memory.
-	"vmovhpd          %%xmm0,  (%%rdx,%%rsi)     \n\t"
-	"vmovlpd    (%%rdx,%%r12), %%xmm0,  %%xmm0   \n\t" // load c63 and c73,
-	"vmovhpd    (%%rdx,%%r13), %%xmm0,  %%xmm0   \n\t"
-	"vmulpd           %%xmm2,  %%xmm0,  %%xmm0   \n\t" // scale by beta,
-	"vaddpd           %%xmm1,  %%xmm0,  %%xmm0   \n\t" // add the gemm result,
-	"vmovlpd          %%xmm0,  (%%rdx,%%r12)     \n\t" // and store back to memory.
-	"vmovhpd          %%xmm0,  (%%rdx,%%r13)     \n\t"
-	"                                            \n\t"
-	"                                            \n\t"
-	"jmp    .DDONE                               \n\t" // jump to end.
-	"                                            \n\t"
-	"                                            \n\t"
-	"                                            \n\t"
-	".DCOLSTORED:                                \n\t"
-	"                                            \n\t" // update c00:c33
-	"                                            \n\t"
-	"vmovapd    (%%rcx),       %%ymm0            \n\t" // load c00:c30,
-	"vmulpd           %%ymm2,  %%ymm0,  %%ymm0   \n\t" // scale by beta,
-	"vaddpd           %%ymm9,  %%ymm0,  %%ymm0   \n\t" // add the gemm result,
-	"vmovapd          %%ymm0,  (%%rcx)           \n\t" // and store back to memory.
-	"addq      %%rdi, %%rcx                      \n\t" // c += cs_c;
-	"                                            \n\t"
-	"vmovapd    (%%rcx),       %%ymm0            \n\t" // load c01:c31,
-	"vmulpd           %%ymm2,  %%ymm0,  %%ymm0   \n\t" // scale by beta,
-	"vaddpd           %%ymm11, %%ymm0,  %%ymm0   \n\t" // add the gemm result,
-	"vmovapd          %%ymm0,  (%%rcx)           \n\t" // and store back to memory.
-	"addq      %%rdi, %%rcx                      \n\t" // c += cs_c;
-	"                                            \n\t"
-	"vmovapd    (%%rcx),       %%ymm0            \n\t" // load c02:c32,
-	"vmulpd           %%ymm2,  %%ymm0,  %%ymm0   \n\t" // scale by beta,
-	"vaddpd           %%ymm13, %%ymm0,  %%ymm0   \n\t" // add the gemm result,
-	"vmovapd          %%ymm0,  (%%rcx)           \n\t" // and store back to memory.
-	"addq      %%rdi, %%rcx                      \n\t" // c += cs_c;
-	"                                            \n\t"
-	"vmovapd    (%%rcx),       %%ymm0            \n\t" // load c03:c33,
-	"vmulpd           %%ymm2,  %%ymm0,  %%ymm0   \n\t" // scale by beta,
-	"vaddpd           %%ymm15, %%ymm0,  %%ymm0   \n\t" // add the gemm result,
-	"vmovapd          %%ymm0,  (%%rcx)           \n\t" // and store back to memory.
-	"                                            \n\t"
-	"                                            \n\t" // update c40:c73
-	"                                            \n\t"
-	"vmovapd    (%%rdx),       %%ymm0            \n\t" // load c40:c70,
-	"vmulpd           %%ymm2,  %%ymm0,  %%ymm0   \n\t" // scale by beta,
-	"vaddpd           %%ymm8,  %%ymm0,  %%ymm0   \n\t" // add the gemm result,
-	"vmovapd          %%ymm0,  (%%rdx)           \n\t" // and store back to memory.
-	"addq      %%rdi, %%rdx                      \n\t" // c += cs_c;
-	"                                            \n\t"
-	"vmovapd    (%%rdx),       %%ymm0            \n\t" // load c41:c71,
-	"vmulpd           %%ymm2,  %%ymm0,  %%ymm0   \n\t" // scale by beta,
-	"vaddpd           %%ymm10, %%ymm0,  %%ymm0   \n\t" // add the gemm result,
-	"vmovapd          %%ymm0,  (%%rdx)           \n\t" // and store back to memory.
-	"addq      %%rdi, %%rdx                      \n\t" // c += cs_c;
-	"                                            \n\t"
-	"vmovapd    (%%rdx),       %%ymm0            \n\t" // load c42:c72,
-	"vmulpd           %%ymm2,  %%ymm0,  %%ymm0   \n\t" // scale by beta,
-	"vaddpd           %%ymm12, %%ymm0,  %%ymm0   \n\t" // add the gemm result,
-	"vmovapd          %%ymm0,  (%%rdx)           \n\t" // and store back to memory.
-	"addq      %%rdi, %%rdx                      \n\t" // c += cs_c;
-	"                                            \n\t"
-	"vmovapd    (%%rdx),       %%ymm0            \n\t" // load c43:c73,
-	"vmulpd           %%ymm2,  %%ymm0,  %%ymm0   \n\t" // scale by beta,
-	"vaddpd           %%ymm14, %%ymm0,  %%ymm0   \n\t" // add the gemm result,
-	"vmovapd          %%ymm0,  (%%rdx)           \n\t" // and store back to memory.
-	"                                            \n\t"
-	"                                            \n\t"
-	"jmp    .DDONE                               \n\t" // jump to end.
-	"                                            \n\t"
-	"                                            \n\t"
-	"                                            \n\t"
-	"                                            \n\t"
-	".DBETAZERO:                                 \n\t"
-	"                                            \n\t" // check if aligned/column-stored
-	"andb     %%bl, %%bh                         \n\t" // set ZF if bl & bh == 1.
-	"andb     %%bh, %%al                         \n\t" // set ZF if bh & al == 1.
-	"jne     .DCOLSTORBZ                         \n\t" // jump to column storage case
-	"                                            \n\t"
-	"                                            \n\t"
-	"                                            \n\t"
-	".DGENSTORBZ:                                \n\t"
-	"                                            \n\t" // update c00:c33
-	"                                            \n\t"
-	"vextractf128 $1, %%ymm9,  %%xmm1            \n\t"
-	"vmovlpd          %%xmm9,  (%%rcx)           \n\t" // store to c00:c30
-	"vmovhpd          %%xmm9,  (%%rcx,%%rsi)     \n\t"
-	"vmovlpd          %%xmm1,  (%%rcx,%%r12)     \n\t"
-	"vmovhpd          %%xmm1,  (%%rcx,%%r13)     \n\t"
-	"addq      %%rdi, %%rcx                      \n\t" // c += cs_c;
-	"                                            \n\t"
-	"vextractf128 $1, %%ymm11, %%xmm1            \n\t"
-	"vmovlpd          %%xmm11, (%%rcx)           \n\t" // store to c01:c31
-	"vmovhpd          %%xmm11, (%%rcx,%%rsi)     \n\t"
-	"vmovlpd          %%xmm1,  (%%rcx,%%r12)     \n\t"
-	"vmovhpd          %%xmm1,  (%%rcx,%%r13)     \n\t"
-	"addq      %%rdi, %%rcx                      \n\t" // c += cs_c;
-	"                                            \n\t"
-	"vextractf128 $1, %%ymm13, %%xmm1            \n\t"
-	"vmovlpd          %%xmm13, (%%rcx)           \n\t" // store to c02:c32
-	"vmovhpd          %%xmm13, (%%rcx,%%rsi)     \n\t"
-	"vmovlpd          %%xmm1,  (%%rcx,%%r12)     \n\t"
-	"vmovhpd          %%xmm1,  (%%rcx,%%r13)     \n\t"
-	"addq      %%rdi, %%rcx                      \n\t" // c += cs_c;
-	"                                            \n\t"
-	"vextractf128 $1, %%ymm15, %%xmm1            \n\t"
-	"vmovlpd          %%xmm15, (%%rcx)           \n\t" // store to c03:c33
-	"vmovhpd          %%xmm15, (%%rcx,%%rsi)     \n\t"
-	"vmovlpd          %%xmm1,  (%%rcx,%%r12)     \n\t"
-	"vmovhpd          %%xmm1,  (%%rcx,%%r13)     \n\t"
-	"                                            \n\t"
-	"                                            \n\t" // update c40:c73
-	"                                            \n\t"
-	"vextractf128 $1, %%ymm8,  %%xmm1            \n\t"
-	"vmovlpd          %%xmm8,  (%%rdx)           \n\t" // store to c40:c70
-	"vmovhpd          %%xmm8,  (%%rdx,%%rsi)     \n\t"
-	"vmovlpd          %%xmm1,  (%%rdx,%%r12)     \n\t"
-	"vmovhpd          %%xmm1,  (%%rdx,%%r13)     \n\t"
-	"addq      %%rdi, %%rdx                      \n\t" // c += cs_c;
-	"                                            \n\t"
-	"vextractf128 $1, %%ymm10, %%xmm1            \n\t"
-	"vmovlpd          %%xmm10, (%%rdx)           \n\t" // store to c41:c71
-	"vmovhpd          %%xmm10, (%%rdx,%%rsi)     \n\t"
-	"vmovlpd          %%xmm1,  (%%rdx,%%r12)     \n\t"
-	"vmovhpd          %%xmm1,  (%%rdx,%%r13)     \n\t"
-	"addq      %%rdi, %%rdx                      \n\t" // c += cs_c;
-	"                                            \n\t"
-	"vextractf128 $1, %%ymm12, %%xmm1            \n\t"
-	"vmovlpd          %%xmm12, (%%rdx)           \n\t" // store to c42:c72
-	"vmovhpd          %%xmm12, (%%rdx,%%rsi)     \n\t"
-	"vmovlpd          %%xmm1,  (%%rdx,%%r12)     \n\t"
-	"vmovhpd          %%xmm1,  (%%rdx,%%r13)     \n\t"
-	"addq      %%rdi, %%rdx                      \n\t" // c += cs_c;
-	"                                            \n\t"
-	"vextractf128 $1, %%ymm14, %%xmm1            \n\t"
-	"vmovlpd          %%xmm14, (%%rdx)           \n\t" // store to c43:c73
-	"vmovhpd          %%xmm14, (%%rdx,%%rsi)     \n\t"
-	"vmovlpd          %%xmm1,  (%%rdx,%%r12)     \n\t"
-	"vmovhpd          %%xmm1,  (%%rdx,%%r13)     \n\t"
-	"                                            \n\t"
-	"                                            \n\t"
-	"jmp    .DDONE                               \n\t" // jump to end.
-	"                                            \n\t"
-	"                                            \n\t"
-	"                                            \n\t"
-	".DCOLSTORBZ:                                \n\t"
-	"                                            \n\t" // update c00:c33
-	"                                            \n\t"
-	"vmovapd          %%ymm9,  (%%rcx)           \n\t" // store c00:c30
-	"addq      %%rdi, %%rcx                      \n\t" // c += cs_c;
-	"                                            \n\t"
-	"vmovapd          %%ymm11, (%%rcx)           \n\t" // store c01:c31
-	"addq      %%rdi, %%rcx                      \n\t" // c += cs_c;
-	"                                            \n\t"
-	"vmovapd          %%ymm13, (%%rcx)           \n\t" // store c02:c32
-	"addq      %%rdi, %%rcx                      \n\t" // c += cs_c;
-	"                                            \n\t"
-	"vmovapd          %%ymm15, (%%rcx)           \n\t" // store c03:c33
-	"                                            \n\t"
-	"                                            \n\t" // update c40:c73
-	"                                            \n\t"
-	"vmovapd          %%ymm8,  (%%rdx)           \n\t" // store c40:c70
-	"addq      %%rdi, %%rdx                      \n\t" // c += cs_c;
-	"                                            \n\t"
-	"vmovapd          %%ymm10, (%%rdx)           \n\t" // store c41:c71
-	"addq      %%rdi, %%rdx                      \n\t" // c += cs_c;
-	"                                            \n\t"
-	"vmovapd          %%ymm12, (%%rdx)           \n\t" // store c42:c72
-	"addq      %%rdi, %%rdx                      \n\t" // c += cs_c;
-	"                                            \n\t"
-	"vmovapd          %%ymm14, (%%rdx)           \n\t" // store c43:c73
 	"                                            \n\t"
-	"                                            \n\t"
-	"                                            \n\t"
-	"                                            \n\t"
+//	"movq      %6, %%rdi                         \n\t" // load pc
+//	"testq  %%rdi, %%rdi                         \n\t" // check pc via logical AND. 
+//	"je     .SQDISTANCE                          \n\t" // if pc == 0, jump to code
+	"                                            \n\t"
+	"                                            \n\t"
+  "movq                   %4, %%rcx            \n\t" // load address of c
+	"movq                  %7, %%rdi            \n\t" // load  ldc
+	"leaq           (,%%rdi,8), %%rdi            \n\t" // rsi = ldc * sizeof(double)
+	"                                            \n\t"
+	"                                            \n\t"
+	"vmovapd    0 * 32(%%rcx),  %%ymm0           \n\t" // ymm0 = C_c( 0:3, 0 )
+	"vaddpd            %%ymm9,  %%ymm0,  %%ymm9  \n\t" // ymm0 += ymm9
+	"vmovapd    1 * 32(%%rcx),  %%ymm1           \n\t" // ymm0 = C_c( 4:7, 0 )
+	"vaddpd            %%ymm8,  %%ymm1,  %%ymm8  \n\t" // ymm0 += ymm8
+	"                                            \n\t"
+	"addq              %%rdi,   %%rcx            \n\t"
+	"                                            \n\t"
+	"vmovapd    0 * 32(%%rcx),  %%ymm2           \n\t" // ymm0 = C_c( 0:3, 1 )
+	"vaddpd            %%ymm11, %%ymm2,  %%ymm11 \n\t" // ymm0 += ymm11
+	"vmovapd    1 * 32(%%rcx),  %%ymm3           \n\t" // ymm0 = C_c( 4:7, 1 )
+	"vaddpd            %%ymm10, %%ymm3,  %%ymm10 \n\t" // ymm0 += ymm10
+	"                                            \n\t"
+	"addq              %%rdi,   %%rcx            \n\t"
+	"                                            \n\t"
+	"vmovapd    0 * 32(%%rcx),  %%ymm4           \n\t" // ymm0 = C_c( 0:3, 2 )
+	"vaddpd            %%ymm13, %%ymm4,  %%ymm13 \n\t" // ymm0 += ymm13
+	"vmovapd    1 * 32(%%rcx),  %%ymm5           \n\t" // ymm0 = C_c( 4:7, 2 )
+	"vaddpd            %%ymm12, %%ymm5,  %%ymm12 \n\t" // ymm0 += ymm12
+	"                                            \n\t"
+	"addq              %%rdi,   %%rcx            \n\t"
+	"                                            \n\t"
+	"vmovapd    0 * 32(%%rcx),  %%ymm6           \n\t" // ymm0 = C_c( 0:3, 3 )
+	"vaddpd            %%ymm15, %%ymm6,  %%ymm15 \n\t" // ymm0 += ymm15
+	"vmovapd    1 * 32(%%rcx),  %%ymm7           \n\t" // ymm0 = C_c( 4:7, 3 )
+	"vaddpd            %%ymm14, %%ymm7,  %%ymm14 \n\t" // ymm0 += ymm14
+	"                                            \n\t"
+	"                                            \n\t"
+	"                                            \n\t"
+	"                                            \n\t"
+	".SQDISTANCE:                                \n\t"
+	"                                            \n\t"
+//	"movq     %8, %%rdi                         \n\t" // load lastiter flag
+//	"testq  %%rdi, %%rdi                         \n\t" // check the flag via logical AND. 
+//	"je     .STOREBACK                           \n\t" // if flag == 0, jump to code
+//	"                                            \n\t"
+//
+//	"movq                %7, %%rax               \n\t" // load address of aa.
+//	"movq                %8, %%rbx               \n\t" // load address of bb.
+//	"movq                %9, %%rdx               \n\t" // load address of neg2.
+//	"                                            \n\t"
+//	"vbroadcastsd   0(%%rdx),  %%ymm0            \n\t" // ymm0 = -2.0
+//	"vmulpd           %%ymm0,  %%ymm9,  %%ymm9   \n\t"
+//	"vmulpd           %%ymm0,  %%ymm11, %%ymm11  \n\t"
+//	"vmulpd           %%ymm0,  %%ymm13, %%ymm13  \n\t"
+//	"vmulpd           %%ymm0,  %%ymm15, %%ymm15  \n\t"
+//	"vmovapd    0 * 32(%%rax),  %%ymm1           \n\t" // ymm1 = aa03
+//	"vmulpd           %%ymm0,  %%ymm8,  %%ymm8   \n\t"
+//	"vmulpd           %%ymm0,  %%ymm10, %%ymm10  \n\t"
+//	"vmulpd           %%ymm0,  %%ymm12, %%ymm12  \n\t"
+//	"vmulpd           %%ymm0,  %%ymm14, %%ymm14  \n\t"
+//	"                                            \n\t"
+//	"vmovapd    1 * 32(%%rax),  %%ymm2           \n\t" // ymm2 = aa47
+//	"vaddpd           %%ymm1,  %%ymm9,  %%ymm9   \n\t"
+//	"vaddpd           %%ymm1,  %%ymm11, %%ymm11  \n\t"
+//	"vaddpd           %%ymm1,  %%ymm13, %%ymm13  \n\t"
+//	"vaddpd           %%ymm1,  %%ymm15, %%ymm15  \n\t"
+//	"vbroadcastsd   0(%%rbx),  %%ymm0            \n\t" // ymm0 = bb0
+//	"vaddpd           %%ymm2,  %%ymm8,  %%ymm8   \n\t"
+//	"vaddpd           %%ymm2,  %%ymm10, %%ymm10  \n\t"
+//	"vaddpd           %%ymm2,  %%ymm12, %%ymm12  \n\t"
+//	"vaddpd           %%ymm2,  %%ymm14, %%ymm14  \n\t"
+//	"                                            \n\t"
+//	"vbroadcastsd   8(%%rbx),  %%ymm1            \n\t" // ymm1 = bb1
+//	"vaddpd           %%ymm0,  %%ymm9,  %%ymm9   \n\t"
+//	"vaddpd           %%ymm0,  %%ymm8,  %%ymm8   \n\t"
+//	"                                            \n\t"
+//	"vbroadcastsd  16(%%rbx),  %%ymm0            \n\t" // ymm0 = bb2
+//	"vaddpd           %%ymm1,  %%ymm11, %%ymm11  \n\t"
+//	"vaddpd           %%ymm1,  %%ymm10, %%ymm10  \n\t"
+//	"                                            \n\t"
+//	"vbroadcastsd  24(%%rbx),  %%ymm1            \n\t" // ymm1 = bb3
+//	"vaddpd           %%ymm0,  %%ymm13, %%ymm13  \n\t"
+//	"vaddpd           %%ymm0,  %%ymm12, %%ymm12  \n\t"
+//	"vaddpd           %%ymm1,  %%ymm15, %%ymm15  \n\t"
+//	"vaddpd           %%ymm1,  %%ymm14, %%ymm14  \n\t"
+	"                                            \n\t"
+	"                                            \n\t"
+	"                                            \n\t"
+	".STOREBACK:                                 \n\t"
+	"                                            \n\t"
+	"movq                   %4, %%rcx            \n\t" // load address of c
+	"movq                  %7, %%rdi            \n\t" // load address of ldc
+	"leaq           (,%%rdi,8), %%rdi            \n\t" // rsi = ldc * sizeof(double)
+	"                                            \n\t"
+	"vmovapd           %%ymm9,   0(%%rcx)         \n\t" // C_c( 0, 0:3 ) = ymm9
+	"vmovapd           %%ymm8,  32(%%rcx)         \n\t" // C_c( 1, 0:3 ) = ymm8
+	"addq              %%rdi,   %%rcx            \n\t"
+	"vmovapd           %%ymm11,  0(%%rcx)         \n\t" // C_c( 2, 0:3 ) = ymm11
+	"vmovapd           %%ymm10, 32(%%rcx)         \n\t" // C_c( 3, 0:3 ) = ymm10
+	"addq              %%rdi,   %%rcx            \n\t"
+	"vmovapd           %%ymm13,  0(%%rcx)         \n\t" // C_c( 4, 0:3 ) = ymm13
+	"vmovapd           %%ymm12, 32(%%rcx)         \n\t" // C_c( 5, 0:3 ) = ymm12
+	"addq              %%rdi,   %%rcx            \n\t"
+	"vmovapd           %%ymm15,  0(%%rcx)         \n\t" // C_c( 6, 0:3 ) = ymm15
+	"vmovapd           %%ymm14, 32(%%rcx)         \n\t" // C_c( 7, 0:3 ) = ymm14
 	"                                            \n\t"
 	".DDONE:                                     \n\t"
 	"                                            \n\t"
-
 	: // output operands (none)
 	: // input operands
-	  "m" (k_iter), // 0
-	  "m" (k_left), // 1
-	  "m" (a),      // 2
-	  "m" (b),      // 3
-	  "m" (alpha),  // 4
-	  "m" (beta),   // 5
-	  "m" (c),      // 6
-	  "m" (rs_c),   // 7
-	  "m" (cs_c),   // 8
-	  "m" (b_next)/*, // 9
-	  "m" (a_next)*/  // 10
+	  "m" (k_iter),      // 0
+	  "m" (k_left),      // 1
+	  "m" (a),           // 2
+	  "m" (b),           // 3
+	  "m" (c),           // 4
+	  "m" (aux->b_next), // 5
+    "m" (pc),          // 6
+    "m" (ldc)         // 7
+//    "m" (last)         // 8
 	: // register clobber list
-	  "rax", "rbx", "rcx", "rdx", "rsi", "rdi", 
-	  "r8", "r9", "r10", "r11", "r12", "r13", "r14", "r15",
+	  "rax", "rbx", "rcx", "rsi", "rdi",
+    "r15",
 	  "xmm0", "xmm1", "xmm2", "xmm3",
 	  "xmm4", "xmm5", "xmm6", "xmm7",
 	  "xmm8", "xmm9", "xmm10", "xmm11",
 	  "xmm12", "xmm13", "xmm14", "xmm15",
 	  "memory"
 	);
+
+
+  //printf( "ldc = %d\n", ldc );
+  //printf( "%lf, %lf, %lf, %lf\n", c[0], c[ ldc + 0], c[ ldc * 2 + 0], c[ ldc * 3 + 0] );
+  //printf( "%lf, %lf, %lf, %lf\n", c[1], c[ ldc + 1], c[ ldc * 2 + 1], c[ ldc * 3 + 1] );
+  //printf( "%lf, %lf, %lf, %lf\n", c[2], c[ ldc + 2], c[ ldc * 2 + 2], c[ ldc * 3 + 2] );
+  //printf( "%lf, %lf, %lf, %lf\n", c[3], c[ ldc + 3], c[ ldc * 2 + 3], c[ ldc * 3 + 3] );
+  //printf( "%lf, %lf, %lf, %lf\n", c[4], c[ ldc + 4], c[ ldc * 2 + 4], c[ ldc * 3 + 4] );
+  //printf( "%lf, %lf, %lf, %lf\n", c[5], c[ ldc + 5], c[ ldc * 2 + 5], c[ ldc * 3 + 5] );
+  //printf( "%lf, %lf, %lf, %lf\n", c[6], c[ ldc + 6], c[ ldc * 2 + 6], c[ ldc * 3 + 6] );
+  //printf( "%lf, %lf, %lf, %lf\n", c[7], c[ ldc + 7], c[ ldc * 2 + 7], c[ ldc * 3 + 7] );
 }
-
-
-

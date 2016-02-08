@@ -1,5 +1,10 @@
-#include <bl_config.h>
-#include <bl_dgemm.h>
+//#include <bl_config.h>
+#include "bl_dgemm.h"
+
+#define DGEMM_MR 8
+#define DGEMM_NR 4
+
+
 
 //micro-panel a is stored in column major, lda=DGEMM_MR=8
 #define A(i,j) a[ (j)*DGEMM_MR + (i) ]
@@ -8,7 +13,7 @@
 
 #define C(i,j) c[ (j)*ldc + (i) ]
 
-void bli_dgemm_ukr_ref( dim_t k,
+void bli_dgemm_ukr_ref( int    k,
                         double *a,
                         double *b,
                         double *c,

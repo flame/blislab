@@ -62,7 +62,6 @@ typedef unsigned long long dim_t;
 struct aux_s {
     double *b_next;
     float  *b_next_s;
-    int    ldr;
     char   *flag;
     int    pc;
     int    m;

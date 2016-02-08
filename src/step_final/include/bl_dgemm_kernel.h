@@ -54,14 +54,6 @@
 extern "C" {
 #endif
 
-void sq2nrm_asm_d8x4(
-        int    k,
-        double *a,
-        double *b,
-        double *c,
-        unsigned long long ldc,
-        aux_t  *aux); 
-
 void bli_dgemm_ukr_ref( int k,
         double *a,
         double *b,
@@ -106,9 +98,8 @@ void (*bl_micro_kernel) (
         aux_t  *aux
         ) = {
         //bli_dgemm_ukr_ref
-        sq2nrm_asm_d8x4
         //bli_dgemm_int_8x4
-        //bli_dgemm_asm_8x4
+        bli_dgemm_asm_8x4
         //bli_dgemm_asm_8x6
         //bli_dgemm_asm_12x4
 };

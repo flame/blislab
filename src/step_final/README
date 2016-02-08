@@ -18,7 +18,6 @@
 │   ├── bli_dgemm_ukr.c
 │   ├── bli_gemm_asm_d12x4.c
 │   ├── bli_gemm_asm_d8x6.c
-│   ├── rnn_rank_k_asm_d8x4.c
 │   └── sq2nrm_asm_d8x4.c
 ├── lib
 ├── makefile.in.files
