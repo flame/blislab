@@ -30,14 +30,14 @@ hold;
 
 
 
-plot( run_step1_mt( :, 1 ), run_step1_mt( :,4), '.-', 'LineWidth', 2, 'Color',  [0 0.2 1.0] );
-plot( run_step1_mt( :, 1 ), run_step1_mt( :, 5), '.-', 'LineWidth', 2, 'Color', [1 0 0.2] );
+%plot( run_step1_mt( :, 1 ), run_step1_mt( :,4), '.-', 'LineWidth', 2, 'Color',  [0 0.2 1.0] );
+%plot( run_step1_mt( :, 1 ), run_step1_mt( :, 5), '.-', 'LineWidth', 2, 'Color', [1 0 0.2] );
 
 %plot( run_step3_mt( :, 1 ), run_step3_mt( :,4), '.-', 'LineWidth', 2, 'Color',  [0 0.2 1.0] );
 %plot( run_step3_mt( :, 1 ), run_step3_mt( :, 5), '.-', 'LineWidth', 2, 'Color', [1 0 0.2] );
 
-%plot( run_step_final_mt( :, 1 ), run_step_final_mt( :,4), '.-', 'LineWidth', 2, 'Color',  [0 0.2 1.0] );
-%plot( run_step_final_mt( :, 1 ), run_step_final_mt( :, 5), '.-', 'LineWidth', 2, 'Color', [1 0 0.2] );
+plot( run_step_final_mt( :, 1 ), run_step_final_mt( :,4), '.-', 'LineWidth', 2, 'Color',  [0 0.2 1.0] );
+plot( run_step_final_mt( :, 1 ), run_step_final_mt( :, 5), '.-', 'LineWidth', 2, 'Color', [1 0 0.2] );
 
 
 
@@ -75,6 +75,6 @@ ax.YTick = [  0, 50, 100, 150, 200, 248];
 ax.XTick = [ 0, 1000, 2000, 3000, 4000, 5000 ];
 set( gca,'FontSize',14 );
 
-legend( 'dgemm\_step1\_mt', ...
+legend( 'dgemm\_step\_final\_mt', ...
         'dgemm\_mkl\_mt', ...
         'Location','SouthEast');

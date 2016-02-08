@@ -1,0 +1,259 @@
+\subsection{Simple matrix-matrix multiplication}
+
+In our discussions, we will consider the computation
+$$C:=AB + C$$
+where $A$, $B$, and $C$ are $m\times k$, $k\times n$, $m\times n$  matrices.
+respectively. 
+Letting 
+{\footnotesize%
+\[
+A = 
+\left( \begin{array}{c c c c}
+\alpha_{0,0} & \cdots & \alpha_{0,k-1} \\
+\vdots &  & \vdots \\
+\alpha_{m-1,0} & \cdots & \alpha_{m-1,k-1} \\
+\end{array}
+\right),
+B = 
+\left( \begin{array}{c c c c}
+\beta_{0,0} & \cdots & \beta_{0,n-1} \\
+\vdots &  & \vdots \\
+\beta_{k-1,0} & \cdots & \beta_{k-1,n-1} \\
+\end{array}
+\right), \mbox{~and~}
+C = 
+\left( \begin{array}{c c c c}
+\gamma_{0,0} & \cdots & \gamma_{0,n-1} \\
+\vdots &  & \vdots \\
+\gamma_{m-1,0} & \cdots & \gamma_{m-1,n-1} \\
+\end{array}
+\right).
+\]%
+}
+$ C := A B + C $ computes
+\[
+\gamma_{i,j} := \sum_{p=0}^{k-1} \alpha_{i,p} \beta_{p,j} +
+\gamma_{i,j}.
+\]
+If $ A $, $ B $, and $ C $ are stored as floating point numbers in two-dimensional arrays {\tt
+  A}, {\tt B}, and {\tt C}, 
+the following pseudocode computes $ C := A B + C $:
+%\begin{algorithm}[!htp]
+%\begin{algorithmic}
+%  \FOR {$i=0:1:m-1$}
+%    \FOR {$j=0:1:n-1$}
+%      \FOR {$p=0:1:k-1$}
+%        \STATE {$C(i,j) += C(i,j) + A(i,k)*B(k,j)$;}
+%      \ENDFOR
+%    \ENDFOR
+%  \ENDFOR
+%\end{algorithmic}
+%\caption{Naive \GEMM{} Approach} 
+%\label{a:3loops}
+%\end{algorithm}
+%%% \begin{tabular}{l@{}}
+%%% {\bf for} $j\!=\! 0:n\!-\!1$ {\bf steps of} $1$ \\
+%%%  \hspace{2ex}  {\bf for} $p \!=\! 0:k\!-\!1$ {\bf steps of} $1$ \\
+%%%  \hspace{4ex}           {\bf for} $i \!=\! 0:m\!-\!1$ {\bf steps of} $1$ \\
+%%% \hspace{6ex}             \textcolor{black}{$C(i,j)$}~$\mathrel{\!+\!}=$~\textcolor{black}{$A(i,p)$}~\textcolor{black}{$B(p,j)$} \\
+%%% \hspace{4ex} {\bf endfor}\\
+%%% \hspace{2ex} {\bf endfor}\\ 
+%%% {\bf endfor}\\ 
+%%% \end{tabular}
+
+\vspace{0.1in}
+\begin{center}
+\begin{minipage}{3in}
+\begin{verbatim}
+for i=0:m-1
+   for j=0:n-1
+      for p=0:k-1
+         C( i,j ) := A( i,p ) * B( p,j ) + C( i,j )
+      endfor
+   endfor
+endfor
+\end{verbatim}
+\end{minipage}
+\end{center}
+\vspace{0.1in}
+Counting a multiply and an add separately,
+the computation requires $ 2 m n k $  floating point operations flops.
+
+\subsection{Set up}
+
+To let you efficiently learn about how to efficiently compute, you
+start your project with much of the infrastructure in place.  We have
+structured the subdirectory, {\tt step1}, somewhat like a project that
+implements a real library might.   This may be overkill for our
+purposes, but how to structure a software project is a useful skill to learn.
+
+\begin{figure}[tb!]
+	\begin{center}
+\begin{minipage}{4in}
+	\dirtree{%
+		.1 step1.
+		.2 README 
+%%%\DTcomment{
+%%%  \rm \color{red}
+%%%  contents of the directory, how to compile and execute the source code{.} 
+%%%}
+.
+		.2 makefile 
+%%%\DTcomment{
+%%%			\rm \color{red}
+%%%			comment{.} 
+%%%		}
+.
+		.2 sourceme.sh 
+%%% \DTcomment{
+%%%			\rm \color{red}
+%%%			comment{.} 
+%%%		}
+.
+		.2 dgemm 
+%%%\DTcomment{
+%%%			\rm \color{red}
+%%%			comment{.} 
+%%%		}
+.
+		.3 bl\_dgemm.c 
+%%% \DTcomment{
+%%%			\rm \color{red}
+%%%			comment{.} 
+%%%		}
+.
+		.3 bl\_dgemm\_ref.c 
+%%%\DTcomment{
+%%%			\rm \color{red}
+%%%			comment{.} 
+%%%		}
+.
+		.3 bl\_dgemm\_util.c 
+%%% \DTcomment{
+%%%			\rm \color{red}
+%%%			comment{.} 
+%%%		}
+.
+		.2 include 
+%%%\DTcomment{
+%%%			\rm \color{red}
+%%%			comment{.} 
+%%%		}
+.
+		.3 bl\_dgemm.h 
+%%% \DTcomment{
+%%%			\rm \color{red}
+%%%			comment{.} 
+%%%		}
+.
+		.3 bl\_dgemm\_ref.h 
+%%%\DTcomment{
+%%%			\rm \color{red}
+%%%			comment{.} 
+%%%		}
+.
+		.3 bl\_config.h 
+%%% \DTcomment{
+%%%			\rm \color{red}
+%%%			comment{.} 
+%%%		}
+.
+		.2 lib 
+%%%\DTcomment{
+%%%			\rm \color{red}
+%%%			comment{.} 
+%%%		}
+.
+		.2 makefile.in.files
+%%% \DTcomment{
+%%%			\rm \color{red}
+%%%			comment{.} 
+%%%		}
+.
+		.3 make.intel.inc 
+%%% \DTcomment{
+%%%			\rm \color{red}
+%%%			comment{.} 
+%%%		}
+.
+		.3 make.gnu.inc 
+%%%\DTcomment{
+%%%			\rm \color{red}
+%%%			comment{.} 
+%%%		}
+.
+		.3 make.inc 
+%%% \DTcomment{
+%%%			\rm \color{red}
+%%%			comment{.} 
+%%%		}
+.
+		.2 test 
+%%%\DTcomment{
+%%%			\rm \color{red}
+%%%			comment{.} 
+%%%		}
+.
+		.3 makefile 
+%%% \DTcomment{
+%%%			\rm \color{red}
+%%%			comment{.} 
+%%%		}
+.
+		.3 test\_bl\_dgemm.c 
+%%%\DTcomment{
+%%%			\rm \color{red}
+%%%			comment{.} 
+%%%		}
+.
+		.3 run\_bl\_dgemm.sh 
+%%% \DTcomment{
+%%%			\rm \color{red}
+%%%			comment{.} 
+%%%		}
+.
+		.3 test\_bl\_dgemm.x 
+%%%\DTcomment{
+%%%			\rm \color{red}
+%%%			comment{.} 
+%%%		}
+.       
+		.3 tacc\_run\_bl\_dgemm.sh 
+%%% \DTcomment{
+%%%			\rm \color{red}
+%%%			comment{.} 
+%%%		}
+.	
+	}
+\end{minipage}
+\end{center}
+\caption{Structure of directory {\tt step1}.}
+\label{fig:DirStep1}
+\end{figure}
+
+Consider Figure~\ref{fig:DirStep1}, which illustrates the directory
+structure for subdirectory {\tt step1}:
+\begin{description}
+\item[{\tt README}]
+Is a file that describes the contents of the directory.
+\item[{\tt dgemm}]
+Is the subdirectory routines that implement \Gemm\ can be found.
+In it
+\begin{description}
+\item[{\tt bl\_dgemm\_ref}] contains the routine {\tt dgemm\_ref} that
+  is a simple implementation of \Gemm\ that you will use to check the
+  correctness of your implementations.
+\item[{\tt my\_dgemm}] contains the routine {\tt dgemm} that
+  that initially is a simple implementation of \Gemm\ and that you will optimize as part of the first step on your way to mastering how to optimize \Gemm.
+\item[{\tt bl\_dgemm\_util}] contains utility routines that will come in handy later.
+\end{description}
+\item[{\tt include}]
+This directory contains 
+include files with various macro definitions and 
+other header information.
+\item[{\tt lib}] This directory will hold libraries that you will install so you can compare your performance with existing high-performance solutions.
+\item[{\tt test}] This directory contains "test drivers" for the various implementations.
+\item[{\tt }]
+\end{description}
+
+
