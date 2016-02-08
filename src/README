@@ -1,6 +1,0 @@
-For each step (each directory), run the following command to compile and run:
-
-$ source set_env.sh
-$ make
-$ cd test
-$ ./run_blis_dgemm.sh
