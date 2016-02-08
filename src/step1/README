@@ -1,7 +1,27 @@
+├── README
+├── sourceme.sh
+├── makefile
+├── dgemm
+│   ├── bl_dgemm.c
+│   ├── bl_dgemm_ref.c
+│   └── bl_dgemm_util.c
+├── include
+│   ├── bl_config.h
+│   ├── bl_dgemm.h
+│   └── bl_dgemm_ref.h
+├── lib
+├── makefile.in.files
+│   ├── make.gnu.inc
+│   ├── make.inc
+│   └── make.intel.inc
+└── test
+    ├── makefile
+    ├── run_bl_dgemm.sh
+    ├── tacc_run_bl_dgemm.sh
+    └── test_bl_dgemm.c
 
-
-
-$ source set_env.sh
+How to compile and execute the code:
+$ source sourceme.sh
 $ make
 $ cd test
-$ ./run_blis_dgemm.sh
+$ ./run_bl_dgemm.sh
