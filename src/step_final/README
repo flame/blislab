@@ -1,6 +1,41 @@
-For each step (each directory), run the following command to compile and run:
+.
+├── README
+├── sourceme.sh
+├── makefile
+├── dgemm
+│   ├── bl_dgemm.c
+│   ├── bl_dgemm_ref.c
+│   └── bl_dgemm_util.c
+├── include
+│   ├── avx_types.h
+│   ├── bl_config.h
+│   ├── bl_dgemm.h
+│   ├── bl_dgemm_kernel.h
+│   └── bl_dgemm_ref.h
+├── kernels
+│   ├── bli_dgemm_asm_d8x4.c
+│   ├── bli_dgemm_int_d8x4.c
+│   ├── bli_dgemm_ukr.c
+│   ├── bli_gemm_asm_d12x4.c
+│   ├── bli_gemm_asm_d8x6.c
+│   ├── rnn_rank_k_asm_d8x4.c
+│   └── sq2nrm_asm_d8x4.c
+├── lib
+├── makefile.in.files
+│   ├── make.gnu.inc
+│   ├── make.inc
+│   └── make.intel.inc
+└── test
+    ├── makefile
+    ├── run_blis_dgemm.sh
+    ├── tacc_run_blis_dgemm.sh
+    └── test_bl_dgemm.c
 
-$ source set_env.sh
+How to compile and execute the code:
+1. Change the options in sourceme.sh and set the environment variables.
+$ source sourceme.sh
+2. Compile the code, generate the library and test executables.
 $ make
+3. Execute the test driver.
 $ cd test
-$ ./run_blis_dgemm.sh
+$ ./run_bl_dgemm.sh
