@@ -234,16 +234,6 @@ void bl_dgemm(
                 int     tid = omp_get_thread_num();
 
                 ib = min( m - ic, DGEMM_MC );
-                //for ( i = 0; i < ib; i += DGEMM_MR ) {
-                //    packA_kcxmc_d(
-                //            min( ib - i, DGEMM_MR ),
-                //            pb,
-                //            &XA[ pc ],
-                //            k,
-                //            ic + i,
-                //            &packA[ tid * DGEMM_MC * pb + i * pb ]
-                //            );
-                //}
 
                 for ( i = 0; i < ib; i += DGEMM_MR ) {
                     packA_mcxkc_d(
