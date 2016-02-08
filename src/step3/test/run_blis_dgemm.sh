@@ -10,7 +10,7 @@ kstep=15
 echo "run_step3_st=["
 for (( k=4; k<kmax; k+=kstep ))
 do
-    ./test_blis_dgemm.x     $k $k $k
+    ./test_bl_dgemm.x     $k $k $k
 done
 echo "];"
 
@@ -25,7 +25,7 @@ kstep=31
 echo "run_step3_mt=["
 for (( k=4; k<kmax; k+=kstep ))
 do
-    ./test_blis_dgemm.x     $k $k $k
+    ./test_bl_dgemm.x     $k $k $k
 done
 echo "];"
 

@@ -29,11 +29,11 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * avx_types.h
+ * bl_dgemm_kernel.h
  *
  *
  * Purpose:
- * this header file contains a union definition for AVX intrinsics (easy for debugging purpose).
+ * this header file contains all function prototypes.
  *
  * Todo:
  *
@@ -43,8 +43,9 @@
  * 
  * */
 
-#ifndef BLISLAB_CONFIG_H
-#define BLISLAB_CONFIG_H
+
+#ifndef BLISLAB_DGEMM_KERNEL_H
+#define BLISLAB_DGEMM_KERNEL_H
 
 // Allow C++ users to include this header file in their source code. However,
 // we make the extern "C" conditional on whether we're using a C++ compiler,
@@ -53,17 +54,23 @@
 extern "C" {
 #endif
 
-typedef union {
-    __m256d v;
-    __m256i u;
-    double d[ 4 ];
-} v4df_t;
+void bli_dgemm_ukr_ref( int k,
+        double *a,
+        double *b,
+        double *c,
+        unsigned long long ldc,
+        aux_t* data );
 
-
-typedef union {
-    __m128i v;
-    int d[ 4 ];
-} v4li_t;
+void (*bl_micro_kernel) (
+        int    k,
+        double *a,
+        double *b,
+        double *c,
+        unsigned long long ldc,
+        aux_t  *aux
+        ) = {
+        bli_dgemm_ukr_ref
+};
 
 // End extern "C" construct block.
 #ifdef __cplusplus

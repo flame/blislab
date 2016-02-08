@@ -29,11 +29,11 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * avx_types.h
+ * bl_dgemm_util.c
  *
  *
  * Purpose:
- * this header file contains a union definition for AVX intrinsics (easy for debugging purpose).
+ * Utility routines (Mem allocation, Print, etc.) that will come in handy later.
  *
  * Todo:
  *
@@ -43,32 +43,56 @@
  * 
  * */
 
-#ifndef BLISLAB_CONFIG_H
-#define BLISLAB_CONFIG_H
 
-// Allow C++ users to include this header file in their source code. However,
-// we make the extern "C" conditional on whether we're using a C++ compiler,
-// since regular C compilers don't understand the extern "C" construct.
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include <stdio.h>
+#include <stdlib.h>
+#include <omp.h>
 
-typedef union {
-    __m256d v;
-    __m256i u;
-    double d[ 4 ];
-} v4df_t;
+#include <bl_dgemm.h>
+#include <bl_config.h>
 
+/*
+ *
+ *
+ */ 
+double *bl_malloc_aligned(
+        int    m,
+        int    n,
+        int    size
+        )
+{
+    double *ptr;
+    int    err;
 
-typedef union {
-    __m128i v;
-    int d[ 4 ];
-} v4li_t;
+    err = posix_memalign( (void**)&ptr, (size_t)GEMM_SIMD_ALIGN_SIZE, size * m * n );
 
-// End extern "C" construct block.
-#ifdef __cplusplus
+    if ( err ) {
+        printf( "bl_malloc_aligned(): posix_memalign() failures" );
+        exit( 1 );    
+    }
+
+    return ptr;
 }
-#endif
 
-#endif
+
+
+/*
+ *
+ *
+ */
+void bl_dgemm_printmatrix(
+        double *A,
+        int    lda,
+        int    m,
+        int    n
+        )
+{
+    int    i, j;
+    for ( i = 0; i < m; i ++ ) {
+        for ( j = 0; j < n; j ++ ) {
+            printf("%lf\t", A[j * lda + i]);
+        }
+        printf("\n");
+    }
+}
 

@@ -1,29 +1,39 @@
 /*
  * --------------------------------------------------------------------------
- * BLISGEMM 
+ * BLISLAB 
  * --------------------------------------------------------------------------
- * Copyright (C) 2015, The University of Texas at Austin
+ * Copyright (C) 2016, The University of Texas at Austin
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are
+ * met:
+ *  - Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ *  - Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ *  - Neither the name of The University of Texas nor the names of its
+ *    contributors may be used to endorse or promote products derived
+ *    from this software without specific prior written permission.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+ * HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+ * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- *
- *
- * blis_dgemm.c
+ * bl_dgemm.c
  *
  *
  * Purpose:
- * this is the main file of blis gemm.
+ * this is the main file of blislab dgemm.
  *
  * Todo:
  *
@@ -33,15 +43,16 @@
  * 
  * */
 
+
 #include <stdio.h>
 #include <omp.h>
-#include <blis_dgemm.h>
+#include <bl_dgemm.h>
 #define min( i, j ) ( (i)<(j) ? (i): (j) )
 
-#include <blis_config.h>
-#include <blis_dgemm_kernel.h>
+#include <bl_config.h>
+#include <bl_dgemm_kernel.h>
 
-inline void packA_kcxmc_d(
+inline void packA_mcxkc_d(
         int    m,
         int    k,
         double *XA,
@@ -54,19 +65,24 @@ inline void packA_kcxmc_d(
     double *a_pntr[ DGEMM_MR ];
 
     for ( i = 0; i < m; i ++ ) {
-        a_pntr[ i ] = XA + ldXA * ( offseta + i );
+        //a_pntr[ i ] = XA + ldXA * ( offseta + i );
+        a_pntr[ i ] = XA + ( offseta + i );
     }
 
     for ( i = m; i < DGEMM_MR; i ++ ) {
-        a_pntr[ i ] = XA + ldXA * ( offseta + 0 );
+        a_pntr[ i ] = XA + ( offseta + 0 );
     }
 
     for ( p = 0; p < k; p ++ ) {
         for ( i = 0; i < DGEMM_MR; i ++ ) {
-            *packA ++ = *a_pntr[ i ] ++;
+            *packA = *a_pntr[ i ];
+            packA ++;
+            a_pntr[ i ] = a_pntr[ i ] + ldXA;
         }
     }
 }
+
+
 /*
  * --------------------------------------------------------------------------
  */
@@ -101,7 +117,7 @@ inline void packB_kcxnc_d(
 /*
  * --------------------------------------------------------------------------
  */
-void blis_macro_kernel(
+void bl_macro_kernel(
         int    m,
         int    n,
         int    k,
@@ -113,7 +129,7 @@ void blis_macro_kernel(
         int    lastiter
         )
 {
-    int blis_ic_nt;
+    int bl_ic_nt;
     int    i, ii, j;
     aux_t  aux;
     char *str;
@@ -127,16 +143,16 @@ void blis_macro_kernel(
 
 
     //// sequential is the default situation
-    //blis_ic_nt = 1;
+    //bl_ic_nt = 1;
     //// check the environment variable
     //str = getenv( "BLISGEMM_IC_NT" );
     //if ( str != NULL ) {
-    //    blis_ic_nt = (int)strtol( str, NULL, 10 );
+    //    bl_ic_nt = (int)strtol( str, NULL, 10 );
     //}
 
 
     // We can also parallelize with OMP here.
-    //#pragma omp parallel for num_threads( blis_ic_nt ) private( j, i, aux )
+    //#pragma omp parallel for num_threads( bl_ic_nt ) private( j, i, aux )
     for ( j = 0; j < n; j += DGEMM_NR ) {                      // 2-th loop around micro-kernel
         aux.n  = min( n - j, DGEMM_NR );
         for ( i = 0; i < m; i += DGEMM_MR ) {                    // 1-th loop around micro-kernel
@@ -145,7 +161,7 @@ void blis_macro_kernel(
                 aux.b_next += DGEMM_NR * k;
             }
 
-            ( *blis_micro_kernel ) (
+            ( *bl_micro_kernel ) (
                     k,
                     &packA[ i * k ],
                     &packB[ j * k ],
@@ -159,17 +175,19 @@ void blis_macro_kernel(
 }
 
 // C must be aligned
-void blis_dgemm(
+void bl_dgemm(
         int    m,
         int    n,
         int    k,
         double *XA,
+        int    lda,
         double *XB,
+        int    ldb,
         double *C,        // must be aligned
         int    ldc        // ldc must also be aligned
         )
 {
-    int    i, j, p, blis_ic_nt;
+    int    i, j, p, bl_ic_nt;
     int    ic, ib, jc, jb, pc, pb;
     int    ir, jr;
     double *packA, *packB;
@@ -177,28 +195,28 @@ void blis_dgemm(
 
     // Early return if possible
     if ( m == 0 || n == 0 || k == 0 ) {
-        printf( "blis_dgemm(): early return\n" );
+        printf( "bl_dgemm(): early return\n" );
         return;
     }
 
     // sequential is the default situation
-    blis_ic_nt = 1;
+    bl_ic_nt = 1;
     // check the environment variable
     str = getenv( "BLISGEMM_IC_NT" );
     if ( str != NULL ) {
-        blis_ic_nt = (int)strtol( str, NULL, 10 );
+        bl_ic_nt = (int)strtol( str, NULL, 10 );
     }
 
     // Allocate packing buffers
-    packA  = blis_malloc_aligned( DGEMM_KC, ( DGEMM_MC + 1 ) * blis_ic_nt, sizeof(double) );
-    packB  = blis_malloc_aligned( DGEMM_KC, ( DGEMM_NC + 1 )            , sizeof(double) );
+    packA  = bl_malloc_aligned( DGEMM_KC, ( DGEMM_MC + 1 ) * bl_ic_nt, sizeof(double) );
+    packB  = bl_malloc_aligned( DGEMM_KC, ( DGEMM_NC + 1 )            , sizeof(double) );
 
     for ( jc = 0; jc < n; jc += DGEMM_NC ) {                  // 5-th loop around micro-kernel
         jb = min( n - jc, DGEMM_NC );
         for ( pc = 0; pc < k; pc += DGEMM_KC ) {                // 4-th loop around micro-kernel
             pb = min( k - pc, DGEMM_KC );
 
-            #pragma omp parallel for num_threads( blis_ic_nt ) private( jr )
+            #pragma omp parallel for num_threads( bl_ic_nt ) private( jr )
             for ( j = 0; j < jb; j += DGEMM_NR ) {
 
                 packB_kcxnc_d(
@@ -211,24 +229,34 @@ void blis_dgemm(
                         );
             }
 
-            #pragma omp parallel for num_threads( blis_ic_nt ) private( ic, ib, i, ir )
+            #pragma omp parallel for num_threads( bl_ic_nt ) private( ic, ib, i, ir )
             for ( ic = 0; ic < m; ic += DGEMM_MC ) {              // 3-th loop around micro-kernel
                 int     tid = omp_get_thread_num();
 
                 ib = min( m - ic, DGEMM_MC );
-                for ( i = 0; i < ib; i += DGEMM_MR ) {
+                //for ( i = 0; i < ib; i += DGEMM_MR ) {
+                //    packA_kcxmc_d(
+                //            min( ib - i, DGEMM_MR ),
+                //            pb,
+                //            &XA[ pc ],
+                //            k,
+                //            ic + i,
+                //            &packA[ tid * DGEMM_MC * pb + i * pb ]
+                //            );
+                //}
 
-                    packA_kcxmc_d(
+                for ( i = 0; i < ib; i += DGEMM_MR ) {
+                    packA_mcxkc_d(
                             min( ib - i, DGEMM_MR ),
                             pb,
-                            &XA[ pc ],
-                            k,
+                            &XA[ pc * m ],  // &XA[ pc * lda ],
+                            m,
                             ic + i,
                             &packA[ tid * DGEMM_MC * pb + i * pb ]
                             );
                 }
 
-                blis_macro_kernel(
+                bl_macro_kernel(
                         ib,
                         jb,
                         pb,

@@ -1,6 +1,6 @@
 #!/bin/bash
-#SBATCH -J blis_dgemm_job
-#SBATCH -o step3_st_mt_%j.txt
+#SBATCH -J blisgemm_job
+#SBATCH -o step_final_st_mt_%j.txt
 #SBATCH -p gpu
 #SBATCH -t 01:00:00
 #SBATCH -n 1

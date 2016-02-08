@@ -1,30 +1,29 @@
-export BLISGEMM_DIR=..
+export BLISLAB_DIR=..
 
-ifeq ($(BLISGEMM_USE_INTEL),true)
-include $(BLISGEMM_DIR)/make.intel.inc
+ifeq ($(BLISLAB_USE_INTEL),true)
+include $(BLISLAB_DIR)/makefile.in.files/make.intel.inc
 else
-include $(BLISGEMM_DIR)/make.gnu.inc
+include $(BLISLAB_DIR)/makefile.in.files/make.gnu.inc
 endif
 
 
-BLISGEMM_TEST_CC_SRC= \
-									 test_blis_dgemm.c \
+BLISLAB_TEST_CC_SRC= \
+									 test_bl_dgemm.c \
 
-BLISGEMM_TEST_CPP_SRC=\
-#									 test_dblisgemm_stl.cpp \
+BLISLAB_TEST_CPP_SRC=\
 
 
 OTHER_DEP = \
-			                $(LIBBLISGEMM) \
+			                $(LIBBLISLAB) \
 
 #$(info ${OTHER_DEP})
 
-BLISGEMM_TEST_EXE= $(BLISGEMM_TEST_CC_SRC:.c=.x) $(BLISGEMM_TEST_CPP_SRC:.cpp=.x)
+BLISLAB_TEST_EXE= $(BLISLAB_TEST_CC_SRC:.c=.x) $(BLISLAB_TEST_CPP_SRC:.cpp=.x)
 
-all: $(BLISGEMM_TEST_EXE)
+all: $(BLISLAB_TEST_EXE)
 
 clean:
-	rm -f $(BLISGEMM_TEST_EXE)
+	rm -f $(BLISLAB_TEST_EXE)
 
 # ---------------------------------------------------------------------------
 # Executable files compiling rules

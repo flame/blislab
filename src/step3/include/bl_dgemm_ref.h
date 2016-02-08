@@ -29,11 +29,11 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * avx_types.h
+ * bl_dgemm_ref.h
  *
  *
  * Purpose:
- * this header file contains a union definition for AVX intrinsics (easy for debugging purpose).
+ * this header file contains reference functions prototypes.
  *
  * Todo:
  *
@@ -43,8 +43,8 @@
  * 
  * */
 
-#ifndef BLISLAB_CONFIG_H
-#define BLISLAB_CONFIG_H
+#ifndef BLISLAB_DGEMM_H
+#define BLISLAB_DGEMM_H
 
 // Allow C++ users to include this header file in their source code. However,
 // we make the extern "C" conditional on whether we're using a C++ compiler,
@@ -53,17 +53,17 @@
 extern "C" {
 #endif
 
-typedef union {
-    __m256d v;
-    __m256i u;
-    double d[ 4 ];
-} v4df_t;
-
-
-typedef union {
-    __m128i v;
-    int d[ 4 ];
-} v4li_t;
+void bl_dgemm_ref(
+    int    m,
+    int    n,
+    int    k,
+    double *XA,
+    int    lda,
+    double *XB,
+    int    ldb,
+    double *XC,
+    int    ldc
+    );
 
 // End extern "C" construct block.
 #ifdef __cplusplus
