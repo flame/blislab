@@ -21,7 +21,10 @@
     └── test_bl_dgemm.c
 
 How to compile and execute the code:
+1. Change the options in sourceme.sh and set the environment variables.
 $ source sourceme.sh
+2. Compile the code, generate the library and test executables.
 $ make
+3. Execute the test driver.
 $ cd test
 $ ./run_bl_dgemm.sh
