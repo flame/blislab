@@ -8,7 +8,7 @@ $(info * Using CFLAGS=${CFLAGS})
 $(info * Using LDFLAGS=${LDFLAGS})
 
 FRAME_CC_SRC=  \
-							 dgemm/bl_dgemm.c \
+							 dgemm/my_dgemm.c \
 							 dgemm/bl_dgemm_ref.c \
 							 dgemm/bl_dgemm_util.c \
 
