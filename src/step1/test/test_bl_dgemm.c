@@ -43,7 +43,6 @@
  * 
  * */
 
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <omp.h>
@@ -78,7 +77,6 @@ void computeError(
 
 }
 
-
 void test_bl_dgemm(
         int m,
         int n,
@@ -93,9 +91,8 @@ void test_bl_dgemm(
     int    lda, ldb, ldc, ldc_ref;
     double ref_rectime, bl_dgemm_rectime;
 
-    XA    = (double*)malloc( sizeof(double) * k * m );
+    XA    = (double*)malloc( sizeof(double) * m * k );
     XB    = (double*)malloc( sizeof(double) * k * n );
-
 
     lda = m;
     ldb = k;
@@ -130,9 +127,6 @@ void test_bl_dgemm(
     }
 
 
-    // Use the same coordinate table
-    //XB  = XA;
-
     for ( i = 0; i < nrepeats; i ++ ) {
         bl_dgemm_beg = omp_get_wtime();
         {
@@ -153,13 +147,9 @@ void test_bl_dgemm(
         if ( i == 0 ) {
             bl_dgemm_rectime = bl_dgemm_time;
         } else {
-            //bl_dgemm_rectime = bl_dgemm_time < bl_dgemm_rectime ? bl_dgemm_time : bl_dgemm_rectime;
-            if ( bl_dgemm_time < bl_dgemm_rectime ) {
-                bl_dgemm_rectime = bl_dgemm_time;
-            }
+            bl_dgemm_rectime = bl_dgemm_time < bl_dgemm_rectime ? bl_dgemm_time : bl_dgemm_rectime;
         }
     }
-    //printf("bl_dgemm_rectime: %lf\n", bl_dgemm_rectime);
 
     for ( i = 0; i < nrepeats; i ++ ) {
         ref_beg = omp_get_wtime();
@@ -181,18 +171,13 @@ void test_bl_dgemm(
         if ( i == 0 ) {
             ref_rectime = ref_time;
         } else {
-            //ref_rectime = ref_time < ref_rectime ? ref_time : ref_rectime;
-            if ( ref_time < ref_rectime ) {
-                ref_rectime = ref_time;
-            }
+            ref_rectime = ref_time < ref_rectime ? ref_time : ref_rectime;
         }
     }
 
-    //printf("ref_rectime: %lf\n", ref_rectime);
-
     computeError(
             ldc,
-            m,
+            ldc_ref,
             m,
             n,
             XC,
