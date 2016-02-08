@@ -53,6 +53,12 @@
 %%%			comment{.} 
 %%%		}
 .
+		.3 avx\_types.h 
+%%% \DTcomment{
+%%%			\rm \color{red}
+%%%			comment{.} 
+%%%		}
+.
 		.3 bl\_dgemm.h 
 %%% \DTcomment{
 %%%			\rm \color{red}
@@ -84,6 +90,30 @@
 %%%		}
 .
 		.3 bli\_dgemm\_ukr.c
+%%%\DTcomment{
+%%%			\rm \color{red}
+%%%			comment{.} 
+%%%		}
+.
+		.3 bli\_dgemm\_int\_d8x4.c
+%%%\DTcomment{
+%%%			\rm \color{red}
+%%%			comment{.} 
+%%%		}
+.
+		.3 bli\_dgemm\_asm\_d8x4.c
+%%%\DTcomment{
+%%%			\rm \color{red}
+%%%			comment{.} 
+%%%		}
+.
+		.3 bli\_dgemm\_asm\_d8x6.c
+%%%\DTcomment{
+%%%			\rm \color{red}
+%%%			comment{.} 
+%%%		}
+.
+		.3 bli\_dgemm\_asm\_d12x4.c
 %%%\DTcomment{
 %%%			\rm \color{red}
 %%%			comment{.} 
@@ -170,26 +200,20 @@
 	}
 \end{minipage}
 \end{center}
-\caption{Structure of directory {\tt step2}.}
+\caption{Structure of directory {\tt step3}.}
 \label{fig:DirStep1}
 \end{figure}
 
 Figure~\ref{fig:DirStep1} illustrates the directory
-structure for subdirectory {\tt step2}. Comparing to {\tt step1}, we have modified/added the following directories/files:
+structure for subdirectory {\tt step3}. Comparing to {\tt step2}, we have modified/added the following directories/files:
 
 \begin{description}
-\item[{\tt include}] 
-\begin{description}
-\item[{\tt bl\_config.h}] configures the step size for different loops ({\tt MC}, {\tt NC}, {\tt KC}, {\tt MR}, {\tt NR}).
-\end{description}
-\item[{\tt dgemm}]
-\begin{description}
-\item[{\tt my\_dgemm.c}] contains the routine {\tt dgemm} that
-  that employs the packing routines and blocking algorithms for \Gemm\ .
-\end{description}
 \item[{\tt kernels}] This directory contains the micro-kernel implementations for various architecture.
 \begin{description}
-\item[{\tt bli\_dgemm\_ukr.c}] Is a reference C implementation of micro-kernel.
+\item[{\tt bli\_dgemm\_int\_d8x4.c}] Is a {\tt AVX} intrinsics micro-kernel implementation for Sandy Bridge/Ivy Bridge micro-architecture.
+\item[{\tt bli\_dgemm\_asm\_d8x4.c}] Is a {\tt AVX} assembly micro-kernel implementation for Sandy Bridge/Ivy Bridge micro-architecture.
+\item[{\tt bli\_dgemm\_asm\_d8x6.c}] Is a {\tt AVX2} assembly micro-kernel implementation for Haswell micro-architecture.
+\item[{\tt bli\_dgemm\_asm\_d12x4.c}] Is an alternative {\tt AVX2} assembly micro-kernel implementation for Haswell micro-architecture.
 \end{description}
 \end{description}
 
