@@ -1,7 +1,7 @@
 ifeq ($(BLISLAB_USE_INTEL),true)
-include $(BLISLAB_DIR)/makefile.in.files/make.intel.inc
+include $(BLISLAB_DIR)/make.inc.files/make.intel.inc
 else
-include $(BLISLAB_DIR)/makefile.in.files/make.gnu.inc
+include $(BLISLAB_DIR)/make.inc.files/make.gnu.inc
 endif
 
 $(info * Using CFLAGS=${CFLAGS})
@@ -43,5 +43,5 @@ $(SHAREDLIBBLISLAB): $(BLISLAB_OBJ)
 # ---------------------------------------------------------------------------
 
 clean:
-	rm $(BLISLAB_OBJ) $(LIBBLISLAB) $(SHAREDLIBBLISLAB) dgemm/*~ test/*~ include/*~ *~ makefile.in.files/*~
+	rm $(BLISLAB_OBJ) $(LIBBLISLAB) $(SHAREDLIBBLISLAB) dgemm/*~ test/*~ include/*~ *~ make.inc.files/*~
 	cd $(BLISLAB_DIR)/test && $(MAKE) clean && cd $(BLISLAB_DIR)

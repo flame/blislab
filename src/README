@@ -21,7 +21,7 @@ BLISlab: A Sandbox for Optimizing GEMM
 │   │   └── bl_dgemm_ref.h
 │   ├── lib
 │   ├── makefile
-│   ├── makefile.in.files
+│   ├── make.inc.files
 │   │   ├── make.gnu.inc
 │   │   ├── make.inc
 │   │   └── make.intel.inc
@@ -46,7 +46,7 @@ BLISlab: A Sandbox for Optimizing GEMM
 │   │   └── bli_dgemm_ukr.c
 │   ├── lib
 │   ├── makefile
-│   ├── makefile.in.files
+│   ├── make.inc.files
 │   │   ├── make.gnu.inc
 │   │   ├── make.inc
 │   │   └── make.intel.inc
@@ -76,7 +76,7 @@ BLISlab: A Sandbox for Optimizing GEMM
     │   └── bli_gemm_asm_d8x6.c
     ├── lib
     ├── makefile
-    ├── makefile.in.files
+    ├── make.inc.files
     │   ├── make.gnu.inc
     │   ├── make.inc
     │   └── make.intel.inc

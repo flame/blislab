@@ -1,9 +1,9 @@
 export BLISLAB_DIR=..
 
 ifeq ($(BLISLAB_USE_INTEL),true)
-include $(BLISLAB_DIR)/makefile.in.files/make.intel.inc
+include $(BLISLAB_DIR)/make.inc.files/make.intel.inc
 else
-include $(BLISLAB_DIR)/makefile.in.files/make.gnu.inc
+include $(BLISLAB_DIR)/make.inc.files/make.gnu.inc
 endif
 
 

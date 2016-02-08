@@ -11,7 +11,7 @@
 │   ├── bl_dgemm.h
 │   └── bl_dgemm_ref.h
 ├── lib
-├── makefile.in.files
+├── make.inc.files
 │   ├── make.gnu.inc
 │   ├── make.inc
 │   └── make.intel.inc
