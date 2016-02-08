@@ -12,7 +12,7 @@ BLISlab: A Sandbox for Optimizing GEMM
 .
 ├── step1
 │   ├── dgemm
-│   │   ├── bl_dgemm.c
+│   │   ├── my_dgemm.c
 │   │   ├── bl_dgemm_ref.c
 │   │   └── bl_dgemm_util.c
 │   ├── include
@@ -34,7 +34,7 @@ BLISlab: A Sandbox for Optimizing GEMM
 │       └── test_bl_dgemm.c
 ├── step2
 │   ├── dgemm
-│   │   ├── bl_dgemm.c
+│   │   ├── my_dgemm.c
 │   │   ├── bl_dgemm_ref.c
 │   │   └── bl_dgemm_util.c
 │   ├── include
@@ -59,7 +59,7 @@ BLISlab: A Sandbox for Optimizing GEMM
 │       └── test_bl_dgemm.c
 └── step3
     ├── dgemm
-    │   ├── bl_dgemm.c
+    │   ├── my_dgemm.c
     │   ├── bl_dgemm_ref.c
     │   └── bl_dgemm_util.c
     ├── include
