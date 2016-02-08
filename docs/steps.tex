@@ -23,36 +23,39 @@
 \begin{figure}[!htp]
   \centering
   \includegraphics[scale=.5]{figures/step1_single_thread_ivy.eps}
-  \caption{Step1 performance}
+  \caption{Step1 performance (triple loops)}
   \label{fig:naive}
 \end{figure} 
 
 \begin{figure}[!htp]
   \centering
   \includegraphics[scale=.5]{figures/step3_single_thread_ivy.eps}
-  \caption{Step3 performance}
+  \caption{Step3 performance (6 loops with blocking)}
   \label{fig:packing}
 \end{figure} 
 
 \begin{figure}[!htp]
   \centering
   \includegraphics[scale=.5]{figures/step10_single_thread_ivy.eps}
-  \caption{Step10 performance}
+  \caption{Step10 performance (blocking+Intrinsics)}
   \label{fig:int}
 \end{figure} 
 
 \begin{figure}[!htp]
   \centering
   \includegraphics[scale=.5]{figures/step_final_single_thread_ivy.eps}
-  \caption{Step Final performance}
+  \caption{Step Final performance (blocking+AVX assembly)}
   \label{fig:final}
 \end{figure} 
 
 \begin{figure}[!htp]
   \centering
   \includegraphics[scale=.5]{figures/step_final_multi_thread_ivy.eps}
-  \caption{Step Final performance (multi-thread)}
+  \caption{Step Final performance (multi-thread), sawtooth due to workload imbalance
+in OMP threads}
   \label{fig:final_mt}
 \end{figure} 
+
+
 
 
