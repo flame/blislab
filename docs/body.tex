@@ -12,37 +12,14 @@
 
 \input 03step2
 
-\section{Step 3: GOTO paper: Combine Step1 (small matrice for kernel) and Step2 (blocking for framework)}
+\section{Step 3: Blocking for Multiple Levels of Cache}
 
 \input 04step3
 
 % ----------------------------------------------------------------
-\section{The Goto Approach to Implementing {\sc gemm}}
-\label{sec:BLIS}
 
-\begin{figure}[tb!]
-\begin{center}
-\begin{minipage}{3in}
-\mbox{\includegraphics[width=3.0in]{mm_blis_color.pdf}}
-\end{minipage}
-~~~
-\begin{minipage}[t]{3in}
-\footnotesize  
-\mbox{\input blis_gemm_new  }
-\end{minipage}
-\end{center}
-\caption{Left: The Goto algorithm for matrix-matrix multiplication as  
-  refactored in BLIS.  Right: the same algorithm, but expressed as  
-  loops.}
-\label{fig:blis_gemm}
-\end{figure}
 
-\cite{Goto:2008:AHP}
-\cite{BLIS1}
-\cite{BLIS2}
-\cite{BLIS3}
-\cite{BLIS4}
-
+\NoShow{
 \section{Organization of the Project}
 
 \input DirectoryTree
@@ -53,7 +30,7 @@ One goal of this exercise is to teach the reader how a software library project 
 
 % ----------------------------------------------------------------
 \input {steps}
-
+}
 
 % ----------------------------------------------------------------
 \section{Conclusion}

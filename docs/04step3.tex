@@ -1,3 +1,45 @@
+\subsection{The Goto Approach to Implementing {\sc gemm}}
+\label{sec:BLIS}
+
+\begin{figure}[tb!]
+	\begin{center}
+		\begin{minipage}{3in}
+			\mbox{\includegraphics[width=3.0in]{mm_blis_color.pdf}}
+		\end{minipage}
+		~~~
+		\begin{minipage}[t]{3in}
+			\footnotesize  
+			\mbox{\input blis_gemm_new  }
+		\end{minipage}
+	\end{center}
+	\caption{Left: The Goto algorithm for matrix-matrix multiplication as  
+		refactored in BLIS.  Right: the same algorithm, but expressed as  
+		loops.}
+	\label{fig:blis_gemm}
+\end{figure}
+
+Around 2000, Kazushige Goto revolutionized how \Gemm\ is implemented on current CPUs with his techniques
+that were first published in the paper
+\begin{quote}
+	Kazushige Goto, Robert A. van de Geijn.\\
+	\href{http://dl.acm.org/citation.cfm?id=1356052.1356053&coll=DL&dl=GUIDE&CFID=71223967&CFTOKEN=96440140}{Anatomy of high-performance matrix multiplication.}\\
+	ACM Transactions on Mathematical Software (TOMS).\\
+	Volume 34 Issue 3, May 2008, Article No. 12.
+\end{quote}
+A further "refactoring" of this approach was more recently described in 
+\begin{quote}
+	Field G. Van Zee, Robert A. van de Geijn. \\
+	\href{http://dl.acm.org/citation.cfm?id=2786970.2764454&coll=DL&dl=GUIDE&CFID=702354034&CFTOKEN=48470379}{%
+		BLIS: A Framework for Rapidly Instantiating BLAS Functionality.} \\
+	ACM Transactions on Mathematical Software (TOMS).\\
+	Volume 41 Issue 3, June 2015,
+	Article No. 14.
+\end{quote}
+The advantage of the BLIS framework is that it reduces the kernel that must be highly optimized, possibly with vector intrinsics or in assemply code, to a {\em micro-kernel}. 
+
+The 
+
+
 \subsection{Set up}
 
 \begin{figure}[tb!]

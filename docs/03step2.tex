@@ -1,196 +1,54 @@
-\subsection{Set up}
+\subsection{Poorman's BLAS}
 
-\begin{figure}[tb!]
-	\begin{center}
-\begin{minipage}{4in}
-	\dirtree{%
-		.1 step2.
-		.2 README 
-%%%\DTcomment{
-%%%  \rm \color{red}
-%%%  contents of the directory, how to compile and execute the source code{.} 
-%%%}
-.
-		.2 sourceme.sh 
-%%%\DTcomment{
-%%%			\rm \color{red}
-%%%			comment{.} 
-%%%		}
-.
-		.2 makefile 
-%%% \DTcomment{
-%%%			\rm \color{red}
-%%%			comment{.} 
-%%%		}
-.
-		.2 dgemm 
-%%%\DTcomment{
-%%%			\rm \color{red}
-%%%			comment{.} 
-%%%		}
-.
-		.3 my\_dgemm.c 
-%%% \DTcomment{
-%%%			\rm \color{red}
-%%%			comment{.} 
-%%%		}
-.
-		.3 bl\_dgemm\_ref.c 
-%%%\DTcomment{
-%%%			\rm \color{red}
-%%%			comment{.} 
-%%%		}
-.
-		.3 bl\_dgemm\_util.c 
-%%% \DTcomment{
-%%%			\rm \color{red}
-%%%			comment{.} 
-%%%		}
-.
-		.2 include 
-%%%\DTcomment{
-%%%			\rm \color{red}
-%%%			comment{.} 
-%%%		}
-.
-		.3 bl\_dgemm.h 
-%%% \DTcomment{
-%%%			\rm \color{red}
-%%%			comment{.} 
-%%%		}
-.
-		.3 bl\_dgemm\_ref.h 
-%%%\DTcomment{
-%%%			\rm \color{red}
-%%%			comment{.} 
-%%%		}
-.
-		.3 bl\_config.h 
-%%% \DTcomment{
-%%%			\rm \color{red}
-%%%			comment{.} 
-%%%		}
-.
-		.3 bl\_dgemm\_kernel.h 
-%%% \DTcomment{
-%%%			\rm \color{red}
-%%%			comment{.} 
-%%%		}
-.
-		.2 kernels
-%%%\DTcomment{
-%%%			\rm \color{red}
-%%%			comment{.} 
-%%%		}
-.
-		.3 bli\_dgemm\_ukr.c
-%%%\DTcomment{
-%%%			\rm \color{red}
-%%%			comment{.} 
-%%%		}
-.
-		.2 lib 
-%%%\DTcomment{
-%%%			\rm \color{red}
-%%%			comment{.} 
-%%%		}
-.
-        .3 libblislab.a
-%%% \DTcomment{
-%%%			\rm \color{red}
-%%%			comment{.} 
-%%%		}
-.
-        .3 libblislab.so
-%%% \DTcomment{
-%%%			\rm \color{red}
-%%%			comment{.} 
-%%%		}
-.
-		.2 make.inc.files
-%%% \DTcomment{
-%%%			\rm \color{red}
-%%%			comment{.} 
-%%%		}
-.
-		.3 make.intel.inc 
-%%% \DTcomment{
-%%%			\rm \color{red}
-%%%			comment{.} 
-%%%		}
-.
-		.3 make.gnu.inc 
-%%%\DTcomment{
-%%%			\rm \color{red}
-%%%			comment{.} 
-%%%		}
-.
-		.3 make.inc 
-%%% \DTcomment{
-%%%			\rm \color{red}
-%%%			comment{.} 
-%%%		}
-.
-		.2 test 
-%%%\DTcomment{
-%%%			\rm \color{red}
-%%%			comment{.} 
-%%%		}
-.
-		.3 makefile 
-%%% \DTcomment{
-%%%			\rm \color{red}
-%%%			comment{.} 
-%%%		}
-.
-		.3 test\_bl\_dgemm.c 
-%%%\DTcomment{
-%%%			\rm \color{red}
-%%%			comment{.} 
-%%%		}
-.
-		.3 run\_bl\_dgemm.sh 
-%%% \DTcomment{
-%%%			\rm \color{red}
-%%%			comment{.} 
-%%%		}
-.
-		.3 test\_bl\_dgemm.x 
-%%%\DTcomment{
-%%%			\rm \color{red}
-%%%			comment{.} 
-%%%		}
-.       
-		.3 tacc\_run\_bl\_dgemm.sh 
-%%% \DTcomment{
-%%%			\rm \color{red}
-%%%			comment{.} 
-%%%		}
-.	
-	}
-\end{minipage}
-\end{center}
-\caption{Structure of directory {\tt step2}.}
-\label{fig:DirStep1}
-\end{figure}
+Step 1 of this exercise makes you realize that
+with the advent of cache-based architectures, high-performance implementation of \Gemm\ necessitated careful attention to 
+the amortization of the cost of data movement between memory layers and computation with that data.
+To keep this manageable, it helps to realize that only a ``kernel'' that performs a  matrix-matrix multiplication with relatively small matrices needs to be highly optimized, since
+computation with larger matrices can be blocked to then use such a kernel without an adverse impact on overall performance.  This 
+insight was first explicitly advocated in~\cite{poorman:journal}
+\begin{quote}
+	Bo K\o{a}gstr\"{o}m , Per Ling , Charles Van Loan.\\
+	GEMM-based level 3 BLAS: high-performance model implementations and performance evaluation benchmark. \\
+	ACM Transactions on Mathematical Software (TOMS). \\
+	Volume 24 Issue 3, p.268-302, Sept. 1998.
+\end{quote}
+This at one point was referred to as "poorman's BLAS" in the sense that if one could only afford to optimize matrix-matrix multiplication (with a submatrix), then one could build \Gemm, and other important matrix-matrix operations known as the level-3 BLAS, in terms of this.  What we will see later is that actually in general this is a good idea, for the sake of modularity as well as for performance.
 
-Figure~\ref{fig:DirStep1} illustrates the directory
-structure for subdirectory {\tt step2}. Comparing to {\tt step1}, we have modified/added the following directories/files:
+\subsection{Blocked matrix-matrix multiplication}
 
-\begin{description}
-\item[{\tt include}] 
-\begin{description}
-\item[{\tt bl\_config.h}] configures the step size for different loops ({\tt MC}, {\tt NC}, {\tt KC}, {\tt MR}, {\tt NR}).
-\end{description}
-\item[{\tt dgemm}]
-\begin{description}
-\item[{\tt my\_dgemm.c}] contains the routine {\tt dgemm} that
-  that employs the packing routines and blocking algorithms for \Gemm\ .
-\end{description}
-\item[{\tt kernels}] This directory contains the micro-kernel implementations for various architecture.
-\begin{description}
-\item[{\tt bli\_dgemm\_ukr.c}] Is a reference C implementation of micro-kernel.
-\end{description}
-\end{description}
-
-
+Key to blocking \Gemm\ to take advantage of the hierarchical memory of
+a processor is understanding how to compute $ C := A B + C $ when
+these matrices have been blocked.  Partition
+{\footnotesize%
+\[
+A = 
+\left( \begin{array}{c c c c}
+A_{0,0} & \cdots & A_{0,K-1} \\
+\vdots &  & \vdots \\
+A_{M-1,0} & \cdots & A_{M-1,K-1} \\
+\end{array}
+\right),
+B = 
+\left( \begin{array}{c c c c}
+B_{0,0} & \cdots & B_{0,N-1} \\
+\vdots &  & \vdots \\
+B_{K-1,0} & \cdots & B_{K-1,N-1} \\
+\end{array}
+\right), \mbox{~and~}
+C = 
+\left( \begin{array}{c c c c}
+C_{0,0} & \cdots & C_{0,N-1} \\
+\vdots &  & \vdots \\
+C_{M-1,0} & \cdots & C_{M-1,N-1} \\
+\end{array}
+\right).
+\]%
+}
+where $ C_{i,j} $ is $ m_i \times n_j
+$, $ A_{i,p} $ is $ m_i \times k_p
+$, and $ B_{p,j} $ is $ k_p \times n_j
+$.
+Then
+\[
+C_{i,j} := \sum_{p=0}^{K-1} A_{i,p} B_{p,j} + C_{i,j}.
+\]

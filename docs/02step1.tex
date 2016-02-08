@@ -284,3 +284,137 @@ compare your performance.
 \end{description}
 
 
+
+What we want you to do is to start with the implementation in {\tt my\_dgemm.c} and optimize it by applying various standard optimization techniques.
+
+
+
+The implementation in {\tt my\_dgemm.c} is a straight-forward implementation with three loops:
+\begin{verbatim}
+  for ( i = 0; i < m; i ++ ) {                   // 2-th loop
+  
+     for ( j = 0; j < n; j ++ ) {                // 1-th loop
+  
+        for ( p = 0; p < k; p ++ ) {             // 0-th loop
+  
+           C[ j * ldc + i ] += A[ p * lda + i ] * B[ j * ldb + p ];
+  
+        }                                        // End 0-th loop
+     }                                           // End 1-th loop
+  }                                              // End 2-th loop
+\end{verbatim}
+The first thing to notice is how two-dimensional arrays are mapped to memory in so-called {\em column-major order}.  The reason for this choice is that the original BLAS assumed column-major storage of arrays because the interface was for Fortran users first.  
+Examining
+\begin{verbatim}
+C[ j * ldc + i ] += A[ p * lda + i ] * B[ j * ldb + p ];
+\end{verbatim}
+we notice that, for example, the linear array at address $ C $ is used to store elements $ C_{i,j} $ so that the $ i,j $ element is mapped to location {\tt j * ldc + i}.  The way to view this is that the columns of $ C $ are each stored contiguously.  However, think of matrix $ C $ as embedded in a large array that has {\tt ldc} rows so that accessing a row means going through array {\tt C} with stride {\tt ldc}.  The term {\em leading dimension} of two-dimensional array {\tt C} is typically used to refer to the row dimension of this larger array, hence the variable {\tt ldc} (\underline{l}eading \underline{d}imension of \underline{\tt C}).
+
+\subsubsection{Execute the default implementation}
+
+{\bf Jianyu: Describe how to execute with the defaults, using the Intel compiler and describe how to view and interpret the results.}
+
+\subsubsection{Change to the GNU compiler}
+
+By default, the exercise compiles and links with Intel's {\tt icc} compiler, which will apply compiler optimizations to the code.  Since we want you to explicitly learn about what kind of tricks lead to high performance, and because some of you may not have access to the Intel compiler, you should first change to using the GNU C compiler.
+
+{\bf Jianyu: Describe how to change the makefiles to using the GNU compiler, and how to view and interpret the results.}
+
+\subsubsection{Turn off optimization}
+
+Next, we want you to turn off the optimization performed by the compiler.  This has two purposes: first, it means you are going to have to explicitly perform optimizations, which will allow you to learn about how architectures and algorithms interact.  Second, it may very well be that the optimizing compiler will try to "undo" what you are explicitly trying to accomplish.  Third, the more tricks you build into your code, the harder it gets for the compiler to figure out how to optimize.
+
+{\bf Jianyu: Describe how to change the makefiles to using the GNU compiler but with the optimization turned off, and how to view and interpret the results.}
+
+
+\subsection{Basic techniques}
+
+\subsubsection{Using pointers}
+
+Now that optimization is turned off, the computation of the address where an element of a matrix exists is explicitly exposed.  (An optimizing compiler would get rid of this overhead.)
+What you will want to do is to change the implementation in {\tt my\_gemm.c} so that it instead uses pointers.
+Before you do so, you may want to back up the original {\tt my\_gemm.c} in case you need to restart from scratch.  Indeed, at each step you may want to back up in a separate file the previous implementations.
+
+Here is the basic idea.  Let's say we want to set 
+all elements of $C $ to zero.  A basic loop, patterned after what you found in {\tt my\_gemm.c} might look like
+\begin{verbatim}
+   for ( i = 0; i < m; i ++ ) {                   
+      for ( j = 0; j < n; j ++ ) {                
+         C[ j * ldc + i ] = 0.0;
+      }                                           
+   }                                              
+\end{verbatim}
+Using pointers, we might implement this as
+\begin{verbatim}
+   double *cp;
+
+   for ( j = 0; j < n; j ++ ) {
+      cp = &C[ j * ldc ];           // point cp to top of jth column               
+      for ( i = 0; i < m; i ++ ) {                
+         *cp++ = 0.0;                // set the element that cp points to to zero and 
+                                     // advance the pointer.
+      }                                           
+   }                                              
+\end{verbatim}
+Notice that we purposely exchanged the order of the loops so that advancing the pointer takes us down the columns of $ C $.
+
+\subsubsection{Loop unrolling}
+
+Updating loop index {\tt i} and the pointer {\tt cp} every time through the inner loop creates considerable overhead.  For this reason, a compiler will perform {\em loop unrolling}.  Using an unrolling factor of four, our simple loop for setting {\tt C} to zero becomes
+ \begin{verbatim}
+    double *cp;
+ 
+    for ( j = 0; j < n; j ++ ) {
+    cp = &C[ j * ldc ];           
+    for ( i = 0; i < m; i += 4 ) {                
+       *(cp+0) = 0.0; 
+       *(cp+1) = 0.0; 
+       *(cp+2) = 0.0; 
+       *(cp+3) = 0.0;
+       
+       cp += 4;                
+       }                                           
+    }                                              
+ \end{verbatim}
+Importantly:
+\begin{itemize}
+	\item {\tt i} and {\tt cp} are now only updates once every four iterations.
+	\item {\tt *(cp+0)} uses a machine instruction known as {\em indirect addressing} that is much more efficient than if one computed with {\tt *(cp+k)} where $ k $ is a variable.  
+	\item
+	When data it brought in for memory into cache, it is brought in a cache line of 64 bytes at a time.  This means that accessing contiguous data in chunks of 64 bytes reduces the cost of memory movement between the memory layers.
+\end{itemize}
+Notice that when you unroll, you may have to deal with a ``fringe'' if, in this case, {\tt m} is not a multiple of four.  If you set {\tt ???} to your unrolling factor, then the driver routine that tests your code will automatically only test problems that are nice multiples of the unrolling factor.  For the sake of this exercise, you need not worry about this fringe.
+
+\subsubsection{Register variables}
+
+Notice that computation can only happen if data is stored in registers.  A compiler will automatically transform code so that the intermediate steps that place certain data in registers is inserted.  One can give a hint to the compiler that it would be good to keep certain data in registers as illustrated in the following somewhat contrived example:
+\begin{verbatim}
+   double *cp;
+
+   for ( j = 0; j < n; j ++ ) {
+      cp = &C[ j * ldc ];           
+      for ( i = 0; i < m; i += 4 ) {
+         register double c0=0.0, c1=0.0, c2=0.0, c3=0.0;                
+         *(cp+0) = c0; 
+         *(cp+1) = c1; 
+         *(cp+2) = c2; 
+         *(cp+3) = c3;
+
+         cp += 4;                
+      }                                           
+   }       
+\end{verbatim}
+
+\subsubsection{Putting it all together}
+
+We now ask you to employ the techniques discussed above to optimize {\tt my\_dgemm}.  For now, just worry about trying to attain better performance for smallish matrices.  In particular, consider the following picture:
+\begin{center}
+	\includegraphics[width=3in]{figures/Step2.pdf}
+\end{center}
+What we want you to do is to write your code so that $ m_R \times n_R $ blocks of $ C $ are kept in registers.  
+You get to choose $ m_R $ and $ n_R $, but you will want to update file {\tt ??} with those choices.
+
+\subsubsection{Vector intrinsics}
+
+You will notice that even for smallish matrices, your implementation performs (much) worse than the implementations that are part of MKL and/or BLIS.  
+The reason is that the compiler is not using the fastest instructions for floating point arithmetic.  These can be accessed either by using {\em vector intrinsic functions}, which allows you to explicitly utilize them from C, or by coding in assemply code.  For now, let's not yet go there.  We will talk more about this in Step 3.
