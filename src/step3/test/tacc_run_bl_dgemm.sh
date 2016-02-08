@@ -1,6 +1,6 @@
 #!/bin/bash
-#SBATCH -J blisgemm_job
-#SBATCH -o step_final_st_mt_%j.txt
+#SBATCH -J bl_dgemm_job
+#SBATCH -o bl_dgemm_output-%j.txt
 #SBATCH -p gpu
 #SBATCH -t 01:00:00
 #SBATCH -n 1
@@ -10,4 +10,4 @@ export OMP_NUM_THREADS=10
 export BLISGEMM_IC_NT=10
 export KMP_AFFINITY=compact,verbose
 
-ibrun tacc_affinity run_blis_dgemm.sh
+ibrun tacc_affinity run_bl_dgemm.sh

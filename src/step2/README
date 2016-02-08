@@ -7,18 +7,12 @@
 │   ├── bl_dgemm_ref.c
 │   └── bl_dgemm_util.c
 ├── include
-│   ├── avx_types.h
 │   ├── bl_config.h
 │   ├── bl_dgemm.h
 │   ├── bl_dgemm_kernel.h
 │   └── bl_dgemm_ref.h
 ├── kernels
-│   ├── bli_dgemm_asm_d8x4.c
-│   ├── bli_dgemm_int_d8x4.c
 │   ├── bli_dgemm_ukr.c
-│   ├── bli_gemm_asm_d12x4.c
-│   ├── bli_gemm_asm_d8x6.c
-│   └── sq2nrm_asm_d8x4.c
 ├── lib
 ├── makefile.in.files
 │   ├── make.gnu.inc
@@ -38,3 +32,4 @@ $ make
 3. Execute the test driver.
 $ cd test
 $ ./run_bl_dgemm.sh
+
