@@ -1,5 +1,5 @@
-#include <blis_config.h>
-#include <blis_dgemm.h>
+#include <bl_config.h>
+#include <bl_dgemm.h>
 
 //micro-panel a is stored in column major, lda=DGEMM_MR=8
 #define A(i,j) a[ (j)*DGEMM_MR + (i) ]
@@ -16,8 +16,8 @@ void bli_dgemm_ukr_ref( dim_t k,
                         aux_t* data )
 {
 
-    const dim_t m = 8;
-    const dim_t n = 4;
+    const dim_t m = DGEMM_MR;
+    const dim_t n = DGEMM_NR;
 
     dim_t l, j, i;
 

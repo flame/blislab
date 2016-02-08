@@ -1,45 +1,45 @@
-ifeq ($(BLISGEMM_USE_INTEL),true)
-include $(BLISGEMM_DIR)/make.intel.inc
+ifeq ($(BLISLAB_USE_INTEL),true)
+include $(BLISLAB_DIR)/makefile.in.files/make.intel.inc
 else
-include $(BLISGEMM_DIR)/make.gnu.inc
+include $(BLISLAB_DIR)/makefile.in.files/make.gnu.inc
 endif
 
 $(info * Using CFLAGS=${CFLAGS})
 $(info * Using LDFLAGS=${LDFLAGS})
 
 FRAME_CC_SRC=  \
-							 frame/blis_dgemm.c \
-							 frame/blis_dgemm_ref.c \
-							 frame/blis_dgemm_util.c \
+							 dgemm/bl_dgemm.c \
+							 dgemm/bl_dgemm_ref.c \
+							 dgemm/bl_dgemm_util.c \
 
 FRAME_CPP_SRC= \
 
 KERNEL_SRC=    \
-			                 kernels/$(BLISGEMM_ARCH)/sq2nrm_asm_d8x4.c \
-							 kernels/$(BLISGEMM_ARCH)/bli_dgemm_int_d8x4.c \
-							 kernels/$(BLISGEMM_ARCH)/bli_dgemm_asm_d8x4.c \
-			                 #kernels/$(BLISGEMM_ARCH)/bli_gemm_asm_d12x4.c \
-			                 #kernels/$(BLISGEMM_ARCH)/bli_gemm_asm_d8x6.c \
-							 #kernels/$(BLISGEMM_ARCH)/bli_dgemm_ukr.c \
-							 #kernels/$(BLISGEMM_ARCH)/bli_dgemm_ukr.c \
+			                 kernels/sq2nrm_asm_d8x4.c \
+							 kernels/bli_dgemm_int_d8x4.c \
+							 kernels/bli_dgemm_asm_d8x4.c \
+			                 #kernels/bli_gemm_asm_d12x4.c \
+			                 #kernels/bli_gemm_asm_d8x6.c \
+							 #kernels/bli_dgemm_ukr.c \
+							 #kernels/bli_dgemm_ukr.c \
 
 OTHER_DEP = \
-			                 include/blis_dgemm.h \
-			                 include/blis_dgemm_kernel.h \
+			                 include/bl_dgemm.h \
+			                 include/bl_dgemm_kernel.h \
 
-BLISGEMM_OBJ=$(FRAME_CC_SRC:.c=.o) $(FRAME_CPP_SRC:.cpp=.o) $(KERNEL_SRC:.c=.o) $(FRAME_CC_SRC_S:.c=.os) $(KERNEL_SRC_S:.c=.os)
+BLISLAB_OBJ=$(FRAME_CC_SRC:.c=.o) $(FRAME_CPP_SRC:.cpp=.o) $(KERNEL_SRC:.c=.o) $(FRAME_CC_SRC_S:.c=.os) $(KERNEL_SRC_S:.c=.os)
 
-all: $(LIBBLISGEMM) $(SHAREDLIBBLISGEMM) TESTBLISGEMM
+all: $(LIBBLISLAB) $(SHAREDLIBBLISLAB) TESTBLISLAB
 
-TESTBLISGEMM: $(LIBBLISGEMM)
-	cd $(BLISGEMM_DIR)/test && $(MAKE) && cd $(BLISGEMM_DIR) $(LDFLAGS)
+TESTBLISLAB: $(LIBBLISLAB)
+	cd $(BLISLAB_DIR)/test && $(MAKE) && cd $(BLISLAB_DIR) $(LDFLAGS)
 
-$(LIBBLISGEMM): $(BLISGEMM_OBJ)
-	$(ARCH) $(ARCHFLAGS) $@ $(BLISGEMM_OBJ)
+$(LIBBLISLAB): $(BLISLAB_OBJ)
+	$(ARCH) $(ARCHFLAGS) $@ $(BLISLAB_OBJ)
 	$(RANLIB) $@
 
-$(SHAREDLIBBLISGEMM): $(BLISGEMM_OBJ)
-	$(CC) $(CFLAGS) -shared -o $@ $(BLISGEMM_OBJ) $(LDLIBS)
+$(SHAREDLIBBLISLAB): $(BLISLAB_OBJ)
+	$(CC) $(CFLAGS) -shared -o $@ $(BLISLAB_OBJ) $(LDLIBS)
 
 # ---------------------------------------------------------------------------
 # Object files compiling rules
@@ -52,5 +52,5 @@ $(SHAREDLIBBLISGEMM): $(BLISGEMM_OBJ)
 # ---------------------------------------------------------------------------
 
 clean:
-	rm $(BLISGEMM_OBJ) $(LIBBLISGEMM) $(SHAREDLIBBLISGEMM) frame/*~ test/*~ include/*~ *~
-	cd $(BLISGEMM_DIR)/test && $(MAKE) clean && cd $(BLISGEMM_DIR)
+	rm $(BLISLAB_OBJ) $(LIBBLISLAB) $(SHAREDLIBBLISLAB) dgemm/*~ test/*~ include/*~ *~ makefile.in.files/*~
+	cd $(BLISLAB_DIR)/test && $(MAKE) clean && cd $(BLISLAB_DIR)
