@@ -43,6 +43,7 @@
  * 
  * */
 
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <omp.h>
@@ -108,8 +109,8 @@ void test_bl_dgemm(
     // Randonly generate points in [ 0, 1 ].
     for ( p = 0; p < k; p ++ ) {
         for ( i = 0; i < m; i ++ ) {
-            XA[ i * lda + p ] = (double)( rand() % 1000000 ) / 1000000.0;	
-            //XA[ i * lda + p ] = (double)( i * k + p );	
+            XA[ p * lda + i ] = (double)( rand() % 1000000 ) / 1000000.0;	
+            //XA[ p * lda + i ] = (double)( p * lda + i );	
         }
     }
     for ( j = 0; j < n; j ++ ) {
@@ -125,7 +126,6 @@ void test_bl_dgemm(
             XC[ i + j * ldc ] = (double)( 0.0 );	
         }
     }
-
 
     for ( i = 0; i < nrepeats; i ++ ) {
         bl_dgemm_beg = omp_get_wtime();

@@ -43,6 +43,7 @@
  * 
  * */
 
+
 #include <omp.h>
 #include <stdlib.h>
 #include <limits.h>
@@ -53,52 +54,51 @@
 
 #ifdef USE_BLAS
 /* 
- * dgemm prototypes
+ * dgemm prototype
  *
  */ 
 void dgemm(char*, char*, int*, int*, int*, double*, double*, 
-    int*, double*, int*, double*, double*, int*);
+        int*, double*, int*, double*, double*, int*);
 #endif
 
 void bl_dgemm_ref(
-    int    m,
-    int    n,
-    int    k,
-    double *XA,
-    int    lda,
-    double *XB,
-    int    ldb,
-    double *XC,
-    int    ldc
-    )
+        int    m,
+        int    n,
+        int    k,
+        double *XA,
+        int    lda,
+        double *XB,
+        int    ldb,
+        double *XC,
+        int    ldc
+        )
 {
-  // Local variables.
-  int    i, j, p;
-  double beg, time_collect, time_dgemm, time_square;
-  double *As, *Bs, *Cs;
-  double alpha = 1.0, beta = 1.0;
+    // Local variables.
+    int    i, j, p;
+    double beg, time_collect, time_dgemm, time_square;
+    double alpha = 1.0, beta = 1.0;
 
-  // Sanity check for early return.
-  if ( m == 0 || n == 0 || k == 0 ) return;
+    // Sanity check for early return.
+    if ( m == 0 || n == 0 || k == 0 ) return;
 
-
-  // Reference GEMM implementation.
-  beg = omp_get_wtime();
+    // Reference GEMM implementation.
+    beg = omp_get_wtime();
 
 #ifdef USE_BLAS
-  dgemm( "N", "N", &m, &n, &k, &alpha,
-        XA, &m, XB, &k, &beta, XC, &ldc );
+    dgemm( "N", "N", &m, &n, &k, &alpha,
+            XA, &lda, XB, &ldb, &beta, XC, &ldc );
 #else
-  #pragma omp parallel for private( i, p )
-  for ( j = 0; j < n; j ++ ) {
-    for ( i = 0; i < m; i ++ ) {
-      for ( p = 0; p < k; p ++ ) {
-        XC[ j * ldc + i ] += XA[ p * lda + i ] * XB[ j * ldb + p ];
-      }
+    #pragma omp parallel for private( i, p )
+    for ( j = 0; j < n; j ++ ) {
+        for ( i = 0; i < m; i ++ ) {
+            for ( p = 0; p < k; p ++ ) {
+                XC[ j * ldc + i ] += XA[ p * lda + i ] * XB[ j * ldb + p ];
+            }
+        }
     }
-  }
 #endif
 
-  time_dgemm = omp_get_wtime() - beg;
+    time_dgemm = omp_get_wtime() - beg;
 
 }
+

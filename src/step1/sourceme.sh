@@ -3,12 +3,6 @@
 export BLISLAB_DIR=.
 echo "BLISLAB_DIR = $BLISLAB_DIR"
 
-# Manually set the target architecture.
-export BLISLAB_ARCH_MAJOR=x86_64
-export BLISLAB_ARCH_MINOR=sandybridge
-export BLISLAB_ARCH=$BLISLAB_ARCH_MAJOR/$BLISLAB_ARCH_MINOR
-echo "BLISLAB_ARCH = $BLISLAB_ARCH"
-
 # For macbook pro
 #export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:/opt/intel/lib:/opt/intel/mkl/lib
 #echo "DYLD_LIBRARY_PATH = $DYLD_LIBRARY_PATH"

@@ -60,40 +60,40 @@ extern "C" {
 typedef unsigned long long dim_t;
 
 struct aux_s {
-  double *b_next;
-  float  *b_next_s;
-  int    ldr;
-  char   *flag;
-  int    pc;
-  int    m;
-  int    n;
+    double *b_next;
+    float  *b_next_s;
+    int    ldr;
+    char   *flag;
+    int    pc;
+    int    m;
+    int    n;
 };
 typedef struct aux_s aux_t;
 
 void bl_dgemm(
-    int    m,
-    int    n,
-    int    k,
-    double *XA,
-    int    lda,
-    double *XB,
-    int    ldb,
-    double *XC,
-    int    ldc
-    );
+        int    m,
+        int    n,
+        int    k,
+        double *XA,
+        int    lda,
+        double *XB,
+        int    ldb,
+        double *XC,
+        int    ldc
+        );
 
 double *bl_malloc_aligned(
-    int    m,
-    int    n,
-    int    size
-    );
+        int    m,
+        int    n,
+        int    size
+        );
 
 void bl_printmatrix(
-    double *A,
-    int    lda,
-    int    m,
-    int    n
-    );
+        double *A,
+        int    lda,
+        int    m,
+        int    n
+        );
 
 // End extern "C" construct block.
 #ifdef __cplusplus

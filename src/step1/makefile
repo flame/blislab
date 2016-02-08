@@ -4,6 +4,8 @@ else
 include $(BLISLAB_DIR)/makefile.in.files/make.gnu.inc
 endif
 
+$(info * Using CFLAGS=${CFLAGS})
+$(info * Using LDFLAGS=${LDFLAGS})
 
 FRAME_CC_SRC=  \
 							 dgemm/bl_dgemm.c \
@@ -41,5 +43,5 @@ $(SHAREDLIBBLISLAB): $(BLISLAB_OBJ)
 # ---------------------------------------------------------------------------
 
 clean:
-	rm $(BLISLAB_OBJ) $(LIBBLISLAB) $(SHAREDLIBBLISLAB) dgemm/*~ test/*~ include/*~ *~
+	rm $(BLISLAB_OBJ) $(LIBBLISLAB) $(SHAREDLIBBLISLAB) dgemm/*~ test/*~ include/*~ *~ makefile.in.files/*~
 	cd $(BLISLAB_DIR)/test && $(MAKE) clean && cd $(BLISLAB_DIR)
