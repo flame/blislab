@@ -285,7 +285,6 @@ compare your performance.
 \end{description}
 
 
-
 What we want you to do is to start with the implementation in {\tt my\_dgemm.c} and optimize it by applying various standard optimization techniques.
 	         %C[ j * ldc + i ] += A[ p * lda + i ] * B[ j * ldb + p ];
 \begin{figure}[tb!]
@@ -305,6 +304,7 @@ What we want you to do is to start with the implementation in {\tt my\_dgemm.c} 
 	\caption{Simple implementation of \Gemm.}
 	\label{fig:threeloops}
 \end{figure}
+
 The implementation in {\tt my\_dgemm.c} is a straight-forward implementation with the three loops given in Figure~\ref{fig:threeloops}.
 The first thing to notice is how two-dimensional arrays are mapped to memory in so-called {\em column-major order}.  The reason for this choice is that the original BLAS assumed column-major storage of arrays because the interface was for Fortran users first.  
 Examining
