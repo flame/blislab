@@ -51,7 +51,10 @@
 
 #include <bl_config.h>
 
-// C must be aligned
+#define A(i,j) A[ (j)*lda + (i) ]
+#define B(i,j) B[ (j)*ldb + (i) ]
+#define C(i,j) C[ (j)*ldc + (i) ]
+
 void bl_dgemm(
     int    m,
     int    n,
@@ -73,13 +76,14 @@ void bl_dgemm(
   }
 
   #pragma omp parallel for private( j, p )
-  for ( i = 0; i < m; i ++ ) {                   // 2-th loop
+  for ( i = 0; i < m; i ++ ) {                    // 2-th loop
 
-      for ( j = 0; j < n; j ++ ) {               // 1-th loop
+      for ( j = 0; j < n; j ++ ) {                // 1-th loop
 
-          for ( p = 0; p < k; p ++ ) {           // 0-th loop
+          for ( p = 0; p < k; p ++ ) {            // 0-th loop
 
-              C[ j * ldc + i ] += A[ p * lda + i ] * B[ j * ldb + p ];
+              //C[ j * ldc + i ] += A[ p * lda + i ] * B[ j * ldb + p ];
+              C( i, j ) += A( i, p ) * B( p, j ); //Each operand is a MACRO defined above bl_dgemm() function.
 
           }                                      // End 0-th loop
       }                                          // End 1-th loop

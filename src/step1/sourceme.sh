@@ -23,7 +23,7 @@ echo "BLISLAB_MKL_DIR = $BLISLAB_MKL_DIR"
 
 # Parallel options
 export KMP_AFFINITY=compact,verbose
-export OMP_NUM_THREADS=10
-export BLISLAB_IC_NT=10
-#export OMP_NUM_THREADS=1
-#export BLISLAB_IC_NT=1
+#export OMP_NUM_THREADS=10
+#export BLISLAB_IC_NT=10
+export OMP_NUM_THREADS=1
+export BLISLAB_IC_NT=1
