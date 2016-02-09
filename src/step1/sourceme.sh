@@ -3,10 +3,6 @@
 export BLISLAB_DIR=.
 echo "BLISLAB_DIR = $BLISLAB_DIR"
 
-# For macbook pro
-#export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:/opt/intel/lib:/opt/intel/mkl/lib
-#echo "DYLD_LIBRARY_PATH = $DYLD_LIBRARY_PATH"
-
 # Compiler options (if false, then use GNU compilers)
 export BLISLAB_USE_INTEL=true
 echo "BLISLAB_USE_INTEL = $BLISLAB_USE_INTEL"
@@ -14,6 +10,10 @@ echo "BLISLAB_USE_INTEL = $BLISLAB_USE_INTEL"
 # Whether use BLAS or not?
 export BLISLAB_USE_BLAS=true
 echo "BLISLAB_USE_BLAS = $BLISLAB_USE_BLAS"
+
+# Optimization Level
+export COMPILER_OPTIMIZATION_LEVEL=O2
+echo "COMPILER_OPTIMIZATION_LEVEL = $COMPILER_OPTIMIZATION_LEVEL"
 
 # Manually set the mkl path
 #export BLISLAB_MKL_DIR=/opt/intel/mkl
@@ -27,3 +27,4 @@ export KMP_AFFINITY=compact,verbose
 #export BLISLAB_IC_NT=10
 export OMP_NUM_THREADS=1
 export BLISLAB_IC_NT=1
+

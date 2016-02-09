@@ -51,9 +51,9 @@
 
 #include <bl_config.h>
 
-#define A(i,j) A[ (j)*lda + (i) ]
-#define B(i,j) B[ (j)*ldb + (i) ]
-#define C(i,j) C[ (j)*ldc + (i) ]
+#define A( i, j ) A[ (j)*lda + (i) ]
+#define B( i, j ) B[ (j)*ldb + (i) ]
+#define C( i, j ) C[ (j)*ldc + (i) ]
 
 void bl_dgemm(
     int    m,
