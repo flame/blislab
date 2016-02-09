@@ -251,9 +251,10 @@ Is a file that describes the contents of the directory and how to compile and ex
 \item[{\tt sourceme.sh}]
 Is a file that configures the environment variables.
 \begin{description}
-\item[{\tt BLISLAB\_USE\_INTEL}] determines whether you use Intel compiler or GNU compiler.
-\item[{\tt BLISLAB\_USE\_BLAS}] determines whether your reference \Gemm\ adopts {\tt BLAS} implementation (if you have {\tt BLAS} installed on your machine), or the simple triple loops implementation.
- \item[{\tt OMP\_NUM\_THREADS} and {\tt BLISLAB\_IC\_NT}] determines your thread number for parallel version of your code. For your first step, you can just set them both to 1.
+\item[{\tt BLISLAB\_USE\_INTEL}] determines whether you use Intel compiler or GNU compiler ({\tt true} or {\tt false}).
+\item[{\tt BLISLAB\_USE\_BLAS}] determines whether your reference \Gemm\ adopts {\tt BLAS} implementation (if you have {\tt BLAS} installed on your machine), or the simple triple loops implementation ({\tt true} or {\tt false}).
+\item[{\tt COMPILER\_OPT\_LEVEL}] determines the optimization level for your GNU or Intel compiler ({\tt O0}, {\tt O1}, {\tt O2}, {\tt O3}).
+\item[{\tt OMP\_NUM\_THREADS} and {\tt BLISLAB\_IC\_NT}] determines your thread number for parallel version of your code. For your first step, you can just set them both to 1.
 \end{description}
 \item[{\tt dgemm}]
 Is the subdirectory routines that implement \Gemm\ can be found.
@@ -290,6 +291,7 @@ What we want you to do is to start with the implementation in {\tt my\_dgemm.c} 
 
 
 The implementation in {\tt my\_dgemm.c} is a straight-forward implementation with three loops:
+%C[ j * ldc + i ] += A[ p * lda + i ] * B[ j * ldb + p ];
 \begin{verbatim}
   for ( i = 0; i < m; i ++ ) {                   // 2-th loop
   
@@ -297,7 +299,7 @@ The implementation in {\tt my\_dgemm.c} is a straight-forward implementation wit
   
         for ( p = 0; p < k; p ++ ) {             // 0-th loop
   
-           C[ j * ldc + i ] += A[ p * lda + i ] * B[ j * ldb + p ];
+           C( i, j ) += A( i, p ) * B( p, j );
   
         }                                        // End 0-th loop
      }                                           // End 1-th loop
@@ -305,27 +307,78 @@ The implementation in {\tt my\_dgemm.c} is a straight-forward implementation wit
 \end{verbatim}
 The first thing to notice is how two-dimensional arrays are mapped to memory in so-called {\em column-major order}.  The reason for this choice is that the original BLAS assumed column-major storage of arrays because the interface was for Fortran users first.  
 Examining
+%C[ j * ldc + i ] += A[ p * lda + i ] * B[ j * ldb + p ];
 \begin{verbatim}
-C[ j * ldc + i ] += A[ p * lda + i ] * B[ j * ldb + p ];
+C( i, j ) += A( i, p ) * B( p, j );
 \end{verbatim}
-we notice that, for example, the linear array at address $ C $ is used to store elements $ C_{i,j} $ so that the $ i,j $ element is mapped to location {\tt j * ldc + i}.  The way to view this is that the columns of $ C $ are each stored contiguously.  However, think of matrix $ C $ as embedded in a large array that has {\tt ldc} rows so that accessing a row means going through array {\tt C} with stride {\tt ldc}.  The term {\em leading dimension} of two-dimensional array {\tt C} is typically used to refer to the row dimension of this larger array, hence the variable {\tt ldc} (\underline{l}eading \underline{d}imension of \underline{\tt C}).
+we notice that, each operand is a {\tt MACRO}. For example,
+\begin{verbatim}
+#define C( i, j ) C[ (j)*ldc + (i) ]
+\end{verbatim}
+%{\tt C(i, j)} can be expanded to {\tt j * ldc + i}.
+The linear array at address $ C $ is used to store elements $ C_{i,j} $ so that the $ i,j $ element is mapped to location {\tt j * ldc + i}.  The way to view this is that the columns of $ C $ are each stored contiguously.  However, think of matrix $ C $ as embedded in a large array that has {\tt ldc} rows so that accessing a row means going through array {\tt C} with stride {\tt ldc}.  The term {\em leading dimension} of two-dimensional array {\tt C} is typically used to refer to the row dimension of this larger array, hence the variable {\tt ldc} (\underline{l}eading \underline{d}imension of \underline{\tt C}).
+%we notice that, for example, the linear array at address $ C $ is used to store elements $ C_{i,j} $ so that the $ i,j $ element is mapped to location {\tt j * ldc + i}.  The way to view this is that the columns of $ C $ are each stored contiguously.  However, think of matrix $ C $ as embedded in a large array that has {\tt ldc} rows so that accessing a row means going through array {\tt C} with stride {\tt ldc}.  The term {\em leading dimension} of two-dimensional array {\tt C} is typically used to refer to the row dimension of this larger array, hence the variable {\tt ldc} (\underline{l}eading \underline{d}imension of \underline{\tt C}).
 
 \subsubsection{Execute the default implementation}
-
-{\bf Jianyu: Describe how to execute with the defaults, using the Intel compiler and describe how to view and interpret the results.}
+%{\bf Jianyu: Describe how to execute with the defaults, using the Intel compiler and describe how to view and interpret the results.}
+By default, the exercise compiles and links with Intel's {\tt icc} compiler, which will apply compiler optimizations ({\tt O3} optimization level) to the code.
+You need to set the environment variable by executing:
+\begin{verbatim}
+$ source sourceme.sh
+\end{verbatim}
+in the terminal, and you will see the output:
+\begin{verbatim}
+BLISLAB_USE_INTEL = true
+COMPILER_OPT_LEVEL = O3
+\end{verbatim}
 
 \subsubsection{Change to the GNU compiler}
 
-By default, the exercise compiles and links with Intel's {\tt icc} compiler, which will apply compiler optimizations to the code.  Since we want you to explicitly learn about what kind of tricks lead to high performance, and because some of you may not have access to the Intel compiler, you should first change to using the GNU C compiler.
-
-{\bf Jianyu: Describe how to change the makefiles to using the GNU compiler, and how to view and interpret the results.}
+Since we want you to explicitly learn about what kind of tricks lead to high performance, and because some of you may not have access to the Intel compiler, you should first change to using the GNU C compiler.
+%{\bf Jianyu: Describe how to change the makefiles to using the GNU compiler, and how to view and interpret the results.}
+You need first edit {\tt sourceme.sh}: 
+\begin{verbatim}
+BLISLAB_USE_INTEL=false
+\end{verbatim}
+Then, similar to the default setting, you need to set the environment variable by executing:
+\begin{verbatim}
+$ source sourceme.sh
+\end{verbatim}
+in the terminal, and you will observe:
+\begin{verbatim}
+BLISLAB_USE_INTEL = false
+COMPILER_OPT_LEVEL = O3
+\end{verbatim}
 
 \subsubsection{Turn off optimization}
 
 Next, we want you to turn off the optimization performed by the compiler.  This has two purposes: first, it means you are going to have to explicitly perform optimizations, which will allow you to learn about how architectures and algorithms interact.  Second, it may very well be that the optimizing compiler will try to "undo" what you are explicitly trying to accomplish.  Third, the more tricks you build into your code, the harder it gets for the compiler to figure out how to optimize.
+%{\bf Jianyu: Describe how to change the makefiles to using the GNU compiler but with the optimization turned off, and how to view and interpret the results.}
+You need first edit {\tt sourceme.sh}: 
+\begin{verbatim}
+COMPILER_OPT_LEVEL = O0
+\end{verbatim}
+Then, similar to the default setting, you need to set the environment variable by executing:
+\begin{verbatim}
+$ source sourceme.sh
+\end{verbatim}
+in the terminal, and you will see the output:
+\begin{verbatim}
+BLISLAB_USE_INTEL = false
+COMPILER_OPT_LEVEL = O0
+\end{verbatim}
 
-{\bf Jianyu: Describe how to change the makefiles to using the GNU compiler but with the optimization turned off, and how to view and interpret the results.}
+\subsubsection{(\textbf{Optional}) Turn on BLAS as reference implementation}
 
+By default, your reference \Gemm\ implementation is a very slow triple-loop implementation.
+If you have {\tt BLAS} installed on your test machine, you can adopt {\tt BLAS} as your reference implementation by setting:
+\begin{verbatim}
+BLISLAB_USE_BLAS=true
+\end{verbatim}
+in {\tt sourceme.sh}. After executing {\tt \$ source sourceme.sh}, you will observe:
+\begin{verbatim}
+BLISLAB_USE_BLAS = true
+\end{verbatim}
 
 \subsection{Basic techniques}
 
