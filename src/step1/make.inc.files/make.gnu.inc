@@ -6,10 +6,10 @@ ARCHFLAGS = cr
 RANLIB = ranlib
 
 ifeq ($(BLISLAB_USE_BLAS),true)
-CFLAGS = -$(COMPILER_OPTIMIZATION_LEVEL) -fopenmp -mavx -fPIC -DUSE_BLAS
+CFLAGS = -$(COMPILER_OPT_LEVEL) -fopenmp -mavx -fPIC -DUSE_BLAS
 LDLIBS = $(LIBBLISLAB) -lpthread -lm -fopenmp -lblas
 else
-CFLAGS = -$(COMPILER_OPTIMIZATION_LEVEL) -fopenmp -mavx -fPIC
+CFLAGS = -$(COMPILER_OPT_LEVEL) -fopenmp -mavx -fPIC
 LDLIBS = $(LIBBLISLAB) -lpthread -lm -fopenmp
 endif
 
