@@ -57,6 +57,11 @@
 #define USE_SET_DIFF 1
 #define TOLERANCE 1E-10
 
+#define A( i, j ) A[ (j)*lda + (i) ]
+#define B( i, j ) B[ (j)*ldb + (i) ]
+#define C( i, j ) C[ (j)*ldc + (i) ]
+#define C_ref( i, j ) C_ref[ (j)*ldc + (i) ]
+
 void computeError(
         int    ldc,
         int    ldc_ref,
@@ -70,7 +75,7 @@ void computeError(
     for ( i = 0; i < m; i ++ ) {
         for ( j = 0; j < n; j ++ ) {
             if ( fabs( C[ j * ldc + i ] - C_ref[ j * ldc_ref + i ] ) > TOLERANCE ) {
-                printf( "C[ %d ][ %d ] != C_gold, %E, %E\n", i, j, C[ j * ldc + i ], C_ref[ j * ldc_ref + i ] );
+                printf( "C[ %d ][ %d ] != C_ref, %E, %E\n", i, j, C( i, j ), C_ref( i, j ) );
                 break;
             }
         }
@@ -85,22 +90,22 @@ void test_bl_dgemm(
         ) 
 {
     int    i, j, p, nx;
-    double *XA, *XB, *XC, *XC_ref, *XD;
+    double *A, *B, *C, *C_ref;
     double tmp, error, flops;
     double ref_beg, ref_time, bl_dgemm_beg, bl_dgemm_time;
     int    nrepeats;
     int    lda, ldb, ldc, ldc_ref;
     double ref_rectime, bl_dgemm_rectime;
 
-    XA    = (double*)malloc( sizeof(double) * m * k );
-    XB    = (double*)malloc( sizeof(double) * k * n );
+    A    = (double*)malloc( sizeof(double) * m * k );
+    B    = (double*)malloc( sizeof(double) * k * n );
 
     lda = m;
     ldb = k;
     ldc = ( ( m - 1 ) / DGEMM_MR + 1 ) * DGEMM_MR;
     ldc_ref = m;
-    XC     = bl_malloc_aligned( ldc, n + 4, sizeof(double) );
-    XC_ref = (double*)malloc( sizeof(double) * m * n );
+    C     = bl_malloc_aligned( ldc, n + 4, sizeof(double) );
+    C_ref = (double*)malloc( sizeof(double) * m * n );
 
     nrepeats = 3;
 
@@ -109,21 +114,19 @@ void test_bl_dgemm(
     // Randonly generate points in [ 0, 1 ].
     for ( p = 0; p < k; p ++ ) {
         for ( i = 0; i < m; i ++ ) {
-            XA[ p * lda + i ] = (double)( rand() % 1000000 ) / 1000000.0;	
-            //XA[ p * lda + i ] = (double)( p * lda + i );	
+            A( i, p ) = (double)( drand48() );	
         }
     }
     for ( j = 0; j < n; j ++ ) {
         for ( p = 0; p < k; p ++ ) {
-            XB[ j * ldb + p ] = (double)( rand() % 1000000 ) / 1000000.0;	
-            //XB[ j * ldb + p ] = (double)( 1.0 );	
+            B( p, j ) = (double)( drand48() );
         }
     }
 
     for ( j = 0; j < n; j ++ ) {
         for ( i = 0; i < m; i ++ ) {
-            XC_ref[ i + j * ldc_ref ] = (double)( 0.0 );	
-            XC[ i + j * ldc ] = (double)( 0.0 );	
+            C_ref( i, j ) = (double)( 0.0 );	
+                C( i, j ) = (double)( 0.0 );	
         }
     }
 
@@ -134,11 +137,11 @@ void test_bl_dgemm(
                     m,
                     n,
                     k,
-                    XA,
+                    A,
                     lda,
-                    XB,
+                    B,
                     ldb,
-                    XC,
+                    C,
                     ldc
                     );
         }
@@ -158,11 +161,11 @@ void test_bl_dgemm(
                     m,
                     n,
                     k,
-                    XA,
+                    A,
                     lda,
-                    XB,
+                    B,
                     ldb,
-                    XC_ref,
+                    C_ref,
                     ldc_ref
                     );
         }
@@ -180,8 +183,8 @@ void test_bl_dgemm(
             ldc_ref,
             m,
             n,
-            XC,
-            XC_ref
+            C,
+            C_ref
             );
 
     // Compute overall floating point operations.
@@ -190,12 +193,11 @@ void test_bl_dgemm(
     printf( "%5d\t %5d\t %5d\t %5.2lf\t %5.2lf\n", 
             m, n, k, flops / bl_dgemm_rectime, flops / ref_rectime );
 
-    free( XA     );
-    free( XB     );
-    free( XC     );
-    free( XC_ref );
+    free( A     );
+    free( B     );
+    free( C     );
+    free( C_ref );
 }
-
 
 int main( int argc, char *argv[] )
 {

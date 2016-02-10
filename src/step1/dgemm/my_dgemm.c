@@ -75,7 +75,6 @@ void bl_dgemm(
     return;
   }
 
-  #pragma omp parallel for private( j, p )
   for ( i = 0; i < m; i ++ ) {                    // 2-th loop
 
       for ( j = 0; j < n; j ++ ) {                // 1-th loop
@@ -83,7 +82,7 @@ void bl_dgemm(
           for ( p = 0; p < k; p ++ ) {            // 0-th loop
 
               //C[ j * ldc + i ] += A[ p * lda + i ] * B[ j * ldb + p ];
-              C( i, j ) += A( i, p ) * B( p, j ); //Each operand is a MACRO defined above bl_dgemm() function.
+              C( i, j ) += A( i, p ) * B( p, j ); //Each operand is a MACRO defined in bl_dgemm() function.
 
           }                                      // End 0-th loop
       }                                          // End 1-th loop

@@ -74,11 +74,11 @@ void bl_dgemm(
         int    m,
         int    n,
         int    k,
-        double *XA,
+        double *A,
         int    lda,
-        double *XB,
+        double *B,
         int    ldb,
-        double *XC,
+        double *C,
         int    ldc
         );
 
