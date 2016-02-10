@@ -1,5 +1,4 @@
 #!/bin/bash
-#export DYLD_LIBRARY_PATH=/opt/intel/lib:/opt/intel/mkl/lib
 
 #Single Thread
 export KMP_AFFINITY=compact

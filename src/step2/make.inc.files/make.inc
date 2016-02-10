@@ -6,13 +6,13 @@ ARCHFLAGS = cr
 RANLIB = ranlib
 
 ifeq ($(BLISLAB_USE_BLAS),true)
-CFLAGS = -O2 -fopenmp -mavx -fPIC -DUSE_BLAS
+CFLAGS = -$(COMPILER_OPT_LEVEL) -fopenmp -mavx -fPIC -DUSE_BLAS
 else
-CFLAGS = -O2 -fopenmp -mavx -fPIC
+CFLAGS = -$(COMPILER_OPT_LEVEL) -fopenmp -mavx -fPIC
 endif
 
-LIBBLISLAB = $(BLISLAB_DIR)/lib/libblisgemm.a
-SHAREDLIBBLISLAB = $(BLISLAB_DIR)/lib/libblisgemm.so
+LIBBLISLAB = $(BLISLAB_DIR)/lib/libblislab.a
+SHAREDLIBBLISLAB = $(BLISLAB_DIR)/lib/libblislab.so
 
 LDFLAGS = -I$(BLISLAB_DIR)/include -I$(BLISLAB_DIR)/kernels -I/$(BLISLAB_MKL_DIR)/include
 
