@@ -35,8 +35,18 @@ The Portable High Performance ANSI C (PHiPAC)~\cite{PHiPAC97} project subsequent
 
 As part of the current paper we discuss more recent papers on the Goto approach to implementing \Gemm~\cite{Goto:2008:AHP} and the BLIS refactoring of that approach~\cite{BLIS1}, as well as other papers that are of more direct relevance.  
 
+\subsection{Other similar exercises}
+
+There are others who have put together exercises based on {\Gemm}.
+Recent efforts relevant to this paper are
+\myhref{http://apfel.mathematik.uni-ulm.de/~lehn/sghpc/gemm/index.html}{GEMM: From Pure C to SSE Optimized Micro Kernels}
+by Michael Lehn at Ulm University and  a wiki on 
+\myhref{http://wiki.cs.utexas.edu/rvdg/OptimizingGemm}{Optimizing Gemm} that we ourselves put together.
+ 
+
 \subsection{We need you!}
 
 The purpose of this paper is to guide you towards high-performance
 implementation of \Gemm.  Our ulterior motive is that our BLIS framework for implementing BLAS requires a so-called micro-kernel to be highly optimized for various CPUs.  In teaching you the basic techniques, we are hoping to identify  ``The One'' who will contribute the best micro-kernel.
-We focus on optimization for the Intel Haswell architecture.  However, the setup can be easily modified to instead optimize for other CPUs.
+Think of it of our version of "HPC's Got Talent".
+Although  we focus in our description on optimization for the Intel Haswell architecture, the setup can be easily modified to instead help you (and us) optimize for other CPUs.  Indeed, BLIS itself supports architectures that include x86 processors by AMD and Intel, IBM's Power processors, ARM processors, and DSP processors~\cite{BLIS2,BLIS3,BLIS-TI}.

@@ -18,6 +18,7 @@
 %\usepackage[margin=1in]{geometry}
 \usepackage{hyperref}
 \usepackage{dirtree}
+\usepackage{pifont}
 
 %\usepackage[section]{algorithm}
 \usepackage{algorithmicx,algpseudocode}
@@ -26,6 +27,7 @@
 \input{macros}
 
 \newcommand{\NoShow}[1]{}
+\newcommand{\myhref}[2]{\href{#1}{\ding{42} #2}}
 
 \newcommand{\xeon}{Intel Xeon E5-2680}
 \newcommand{\ixeon}{Intel Xeon E5-2680}
@@ -41,7 +43,7 @@
 \newcommand{\Chp}{\hat{C}_{p}}
 \newcommand{\Ccp}{\check{C}_{p}}
 
-\begin{document}
+ \begin{document}
 
 \title{
 BLISlab: A Sandbox for Optimizing GEMM
@@ -59,9 +61,13 @@ Others?
 
 \maketitle 
 
+
 \begin{abstract}
 \input 00abstract
 \end{abstract}
+
+
+
 
 
 \input{body}
