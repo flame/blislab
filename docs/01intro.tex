@@ -1,32 +1,42 @@
-Matrix-matrix multiplication (\Gemm) is frequently used as a simple example with which to raise awareness of how to optimize modern processors.  A reason is that the operation is simple to describe, challenging to fully optimize, and of practical importance.  In this paper, we walk the reader through the techniques that underly the currently fastest implementations for CPU architectures.
+Matrix-matrix multiplication (\Gemm) is frequently used as a simple example with which to raise awareness of how to optimize code on modern processors.  The reason is that the operation is simple to describe, challenging to fully optimize, and of practical importance.  In this paper, we walk the reader through the techniques that underly the currently fastest implementations for CPU architectures.
 
-\subsection{A minimal history}
+\subsection{Basic Linear Algebra Subprograms (BLAS)}
 
-Need to mention BLAS3~\cite{BLAS3} paper.
+The Basic Linear Algebra Subprograms (BLAS)~\cite{BLAS1,BLAS2,BLAS3,BLIS-Encycl} are an interface to a set of linear algebra operations upon which higher level linear algebra libraries.  Of these, the level-3 BLAS constitute a set of matrix-matrix operations that, if all matrix operands are $ n \times n$ in size, $ O( n^3 ) $ computation is performed over $ O( n^2 ) $ data so that the cost of moving data between memory layers (main memory, the caches, and the registers) can be amortized over many computations.  As a result, high performance can often be achieved if these operations are carefully implemented.
 
+\subsection{Matrix-matrix multiplication (\Gemm)}
 
-For more than a decade after that paper, the intricacies of 
-high-performance optimization of \Gemm\ was considered to be 
-sufficiently complex that it should be left to to the hardware vendors, yielding IBM's ESSL, Intel's MKL, Cray's ???, and AMD's ACML libraries, or auto-generated as advocated in papers on 
-the Portable High Performance ANSI C (PHiPAC) guidelines for writing high-performance matrix-matrix multiplication in C~\cite{} and the Automatically Tuned Linear Algebra Software (ATLAS)~\cite{}.
+In particular, general matrix-matrix multiplication (\Gemm) with double precision floating point numbers is supported by the BLAS with the call
+\begin{center}
+	\tt dgemm( transa, transb, m, n, k alpha, A, lda, B, ldb, beta, C, ldc )
+\end{center}
+which, by appropriately choosing {\tt transa} and {\tt transb}, 
+computes 
+\[
+C := \alpha A B + \beta C; \quad
+C := \alpha A^T B + \beta C; \quad
+C := \alpha A B^T + \beta C; \quad \mbox{or }
+C := \alpha A^T B^T + \beta C.
+\]
+Here $ C $ is $ m \times n $ and $ k $ is the ``third dimension''.
+In this paper we focus on optimizing a simplified version of this operation, namely $ C := A B + C $ where $ C $ is $ m \times n $, 
+$ A $ is $ m \times k $, and $ B $ is $ k \times n $.
 
+\subsection{High-performance implementation}
 
+The intricacies of high-performance implementations are such that implementation of the BLAS in general and \Gemm\ in particular was 
+often relegated to 
+unsung experts who develop numerical libraries for the hardware vendors, for example as part of IBM's ESSL, Intel's MKL, Cray's LibSci, and AMD's ACML libraries.  In the past,
+these libraries were often written at least partially in assembly.
 
-\subsection{The BLIS-like Library Instantiation Software (BLIS)}
+The key paper~\cite{IBM:P2} showed how an ``algorithms and architectures" approach to hand-in-hand designing architectures, compilers, and algorithms allowed 
+BLAS to be written in a high level language (Fortan) for the IBM Power architectures.
+The Portable High Performance ANSI C (PHiPAC)~\cite{PHiPAC97} project subsequently provided guidelines for writing high-performance code in C and suggested how to autogenerate and tune \Gemm\ written this way.  The Automatically Tuned Linear Algebra Software (ATLAS)~\cite{ATLAS,ATLAS_journal} built upon these insights and made autotuning and autogeneration of BLAS libraries mainstream.
 
-More recently, the BLAS-like Library Instantiation Software (BLIS) ``refactored'' the approach pioneered by Goto, exposing additional loops around a {\em micro-kernel}, as described in
-\begin{quote}
-	Field G. Van Zee, Robert A. van de Geijn. \\
-	\href{http://dl.acm.org/citation.cfm?id=2786970.2764454&coll=DL&dl=GUIDE&CFID=702354034&CFTOKEN=48470379}{%
-		BLIS: A Framework for Rapidly Instantiating BLAS Functionality.} \\
-	ACM Transactions on Mathematical Software (TOMS).\\
-	Volume 41 Issue 3, June 2015,
-	Article No. 14.
-\end{quote}
-One goal of the BLIS paper was to further expose the layering of Goto's approach while simultaneously improving portability by reducing how much code must be written at a low level (e.g., in assembly code).
+As part of the current paper we discuss more recent papers on the Goto approach to implementing \Gemm~\cite{Goto:2008:AHP} and the BLIS refactoring of that approach~\cite{BLIS1}, as well as other papers that are of more direct relevance.  
 
-\subsection{You too can optimize like a pro}
+\subsection{We need you!}
 
-The purpose of this note is to expose the basic techniques that 
-underlie the best implementations of \Gemm\ so that you too can achieve high-performance for such operations.
-
+The purpose of this paper is to guide you towards high-performance
+implementation of \Gemm.  Our ulterior motive is that our BLIS framework for implementing BLAS requires a so-called micro-kernel to be highly optimized for various CPUs.  In teaching you the basic techniques, we are hoping to identify  ``The One'' who will contribute the best micro-kernel.
+We focus on optimization for the Intel Haswell architecture.  However, the setup can be easily modified to instead optimize for other CPUs.

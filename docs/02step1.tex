@@ -27,7 +27,7 @@ C =
 \vdots &  & \vdots \\
 \gamma_{m-1,0} & \cdots & \gamma_{m-1,n-1} \\
 \end{array}
-\right).
+\right)
 \]%
 }
 $ C := A B + C $ computes
@@ -35,7 +35,7 @@ $ C := A B + C $ computes
 \gamma_{i,j} := \sum_{p=0}^{k-1} \alpha_{i,p} \beta_{p,j} +
 \gamma_{i,j}.
 \]
-If $ A $, $ B $, and $ C $ are stored as floating point numbers in two-dimensional arrays {\tt
+If $ A $, $ B $, and $ C $ are stored  in two-dimensional arrays {\tt
   A}, {\tt B}, and {\tt C}, 
 the following pseudocode computes $ C := A B + C $:
 %\begin{algorithm}[!htp]
@@ -77,7 +77,7 @@ endfor
 \end{center}
 \vspace{0.1in}
 Counting a multiply and an add separately,
-the computation requires $ 2 m n k $  floating point operations flops.
+the computation requires $ 2 m n k $  floating point operations (flops).
 
 \subsection{Set up}
 
@@ -310,13 +310,17 @@ The first thing to notice is how two-dimensional arrays are mapped to memory in 
 Examining
 %C[ j * ldc + i ] += A[ p * lda + i ] * B[ j * ldb + p ];
 \begin{verbatim}
+
           C( i, j ) += A( i, p ) * B( p, j );
+          
 \end{verbatim}
-we notice that, each operand is a {\tt MACRO}. For example,
+we notice that, each operand is a {\tt MACRO}. For example, earlier in the file
 \begin{verbatim}
-#define C( i, j ) C[ (j)*ldc + (i) ]
+
+   #define C( i, j ) C[ (j)*ldc + (i) ]
+   
 \end{verbatim}
-%{\tt C(i, j)} can be expanded to {\tt j * ldc + i}.
+% means {\tt C(i, j)} expands to {\tt j * ldc + i}.  
 The linear array at address $ C $ is used to store elements $ C_{i,j} $ so that the $ i,j $ element is mapped to location {\tt j * ldc + i}.  The way to view this is that the columns of $ C $ are each stored contiguously.  However, think of matrix $ C $ as embedded in a large array that has {\tt ldc} rows so that accessing a row means going through array {\tt C} with stride {\tt ldc}.  The term {\em leading dimension} of two-dimensional array {\tt C} is typically used to refer to the row dimension of this larger array, hence the variable {\tt ldc} (\underline{l}eading \underline{d}imension of \underline{\tt C}).
 %we notice that, for example, the linear array at address $ C $ is used to store elements $ C_{i,j} $ so that the $ i,j $ element is mapped to location {\tt j * ldc + i}.  The way to view this is that the columns of $ C $ are each stored contiguously.  However, think of matrix $ C $ as embedded in a large array that has {\tt ldc} rows so that accessing a row means going through array {\tt C} with stride {\tt ldc}.  The term {\em leading dimension} of two-dimensional array {\tt C} is typically used to refer to the row dimension of this larger array, hence the variable {\tt ldc} (\underline{l}eading \underline{d}imension of \underline{\tt C}).
 
@@ -325,12 +329,16 @@ The linear array at address $ C $ is used to store elements $ C_{i,j} $ so that 
 By default, the exercise compiles and links with Intel's {\tt icc} compiler, which will apply compiler optimizations ({\tt O3} optimization level) to the code.
 You need to set the environment variable by executing:
 \begin{verbatim}
-$ source sourceme.sh
+
+   $ source sourceme.sh
+   
 \end{verbatim}
 in the terminal, and you will see the output:
 \begin{verbatim}
-BLISLAB_USE_INTEL = true
-COMPILER_OPT_LEVEL = O3
+
+   BLISLAB_USE_INTEL = true
+   COMPILER_OPT_LEVEL = O3
+
 \end{verbatim}
 
 \subsubsection{Change to the GNU compiler}
@@ -339,16 +347,22 @@ Since we want you to explicitly learn about what kind of tricks lead to high per
 %{\bf Jianyu: Describe how to change the makefiles to using the GNU compiler, and how to view and interpret the results.}
 You need first edit {\tt sourceme.sh}: 
 \begin{verbatim}
-BLISLAB_USE_INTEL=false
+
+   BLISLAB_USE_INTEL=false
+   
 \end{verbatim}
 Then, similar to the default setting, you need to set the environment variable by executing:
 \begin{verbatim}
-$ source sourceme.sh
+
+   $ source sourceme.sh
+   
 \end{verbatim}
 in the terminal, and you will observe:
 \begin{verbatim}
-BLISLAB_USE_INTEL = false
-COMPILER_OPT_LEVEL = O3
+
+   BLISLAB_USE_INTEL = false
+   COMPILER_OPT_LEVEL = O3
+   
 \end{verbatim}
 
 \subsubsection{Turn off optimization}
@@ -357,31 +371,44 @@ Next, we want you to turn off the optimization performed by the compiler.  This 
 %{\bf Jianyu: Describe how to change the makefiles to using the GNU compiler but with the optimization turned off, and how to view and interpret the results.}
 You need first edit {\tt sourceme.sh}: 
 \begin{verbatim}
-COMPILER_OPT_LEVEL = O0
+
+   COMPILER_OPT_LEVEL = O0
+
 \end{verbatim}
 Then, similar to the default setting, you need to set the environment variable by executing:
 \begin{verbatim}
-$ source sourceme.sh
+
+   $ source sourceme.sh
+   
 \end{verbatim}
 in the terminal, and you will see the output:
 \begin{verbatim}
-BLISLAB_USE_INTEL = false
-COMPILER_OPT_LEVEL = O0
+
+  BLISLAB_USE_INTEL = false
+  COMPILER_OPT_LEVEL = O0
+  
 \end{verbatim}
 
-\subsubsection{(\textbf{Optional}) Turn on BLAS as reference implementation}
+\subsubsection{(\textbf{Optional}) Use optimized BLAS library as reference implementation}
 
 By default, your reference \Gemm\ implementation is a very slow triple-loop implementation.
-If you have {\tt BLAS} installed on your test machine, you can adopt {\tt BLAS} as your reference implementation by setting:
+If you have a {\tt BLAS} library installed on your test machine, you can adopt the {\tt dgemm} from that library as your reference implementation by setting:
 \begin{verbatim}
-BLISLAB_USE_BLAS=true
+
+   BLISLAB_USE_BLAS=true
+   
 \end{verbatim}
 in {\tt sourceme.sh}. After executing {\tt \$ source sourceme.sh}, you will observe:
 \begin{verbatim}
-BLISLAB_USE_BLAS = true
+
+  BLISLAB_USE_BLAS = true
+
 \end{verbatim}
+and now performance and accuracy comparisons of your implementation will be against this optimized library routine.
 
 \subsection{Basic techniques}
+
+In this subsection we describe some basic tricks of the trade.
 
 \subsubsection{Using pointers}
 
@@ -392,23 +419,26 @@ Before you do so, you may want to back up the original {\tt my\_gemm.c} in case 
 Here is the basic idea.  Let's say we want to set 
 all elements of $C $ to zero.  A basic loop, patterned after what you found in {\tt my\_gemm.c} might look like
 \begin{verbatim}
+
    for ( i = 0; i < m; i ++ ) {                   
       for ( j = 0; j < n; j ++ ) {                
-         C[ j * ldc + i ] = 0.0;
+         C( i, j ) = 0.0;
       }                                           
    }                                              
 \end{verbatim}
 Using pointers, we might implement this as
 \begin{verbatim}
+
    double *cp;
 
    for ( j = 0; j < n; j ++ ) {
-      cp = &C[ j * ldc ];           // point cp to top of jth column               
+      cp = &C[ j * ldc ];           // point cp to top of jth column      
       for ( i = 0; i < m; i ++ ) {                
          *cp++ = 0.0;                // set the element that cp points to to zero and 
                                      // advance the pointer.
-      }                                           
-   }                                              
+      }                                      
+   }                 
+   
 \end{verbatim}
 Notice that we purposely exchanged the order of the loops so that advancing the pointer takes us down the columns of $ C $.
 
@@ -416,6 +446,7 @@ Notice that we purposely exchanged the order of the loops so that advancing the 
 
 Updating loop index {\tt i} and the pointer {\tt cp} every time through the inner loop creates considerable overhead.  For this reason, a compiler will perform {\em loop unrolling}.  Using an unrolling factor of four, our simple loop for setting {\tt C} to zero becomes
  \begin{verbatim}
+ 
     double *cp;
  
     for ( j = 0; j < n; j ++ ) {
@@ -425,10 +456,10 @@ Updating loop index {\tt i} and the pointer {\tt cp} every time through the inne
        *(cp+1) = 0.0; 
        *(cp+2) = 0.0; 
        *(cp+3) = 0.0;
-       
        cp += 4;                
        }                                           
-    }                                              
+    }  
+              
  \end{verbatim}
 Importantly:
 \begin{itemize}
@@ -437,12 +468,13 @@ Importantly:
 	\item
 	When data it brought in for memory into cache, it is brought in a cache line of 64 bytes at a time.  This means that accessing contiguous data in chunks of 64 bytes reduces the cost of memory movement between the memory layers.
 \end{itemize}
-Notice that when you unroll, you may have to deal with a ``fringe'' if, in this case, {\tt m} is not a multiple of four.  If you set {\tt ???} to your unrolling factor, then the driver routine that tests your code will automatically only test problems that are nice multiples of the unrolling factor.  For the sake of this exercise, you need not worry about this fringe.
+Notice that when you unroll, you may have to deal with a ``fringe'' if, in this case, {\tt m} is not a multiple of four.    For the sake of this exercise, you need not worry about this fringe, as reiterated in Section~\ref{sec:two:mission}.
 
 \subsubsection{Register variables}
 
 Notice that computation can only happen if data is stored in registers.  A compiler will automatically transform code so that the intermediate steps that place certain data in registers is inserted.  One can give a hint to the compiler that it would be good to keep certain data in registers as illustrated in the following somewhat contrived example:
 \begin{verbatim}
+
    double *cp;
 
    for ( j = 0; j < n; j ++ ) {
@@ -453,20 +485,21 @@ Notice that computation can only happen if data is stored in registers.  A compi
          *(cp+1) = c1; 
          *(cp+2) = c2; 
          *(cp+3) = c3;
-
          cp += 4;                
       }                                           
    }       
 \end{verbatim}
 
-\subsubsection{Putting it all together}
+\subsection{Your mission, if you choose to accept it}
+\label{sec:two:mission}
 
 We now ask you to employ the techniques discussed above to optimize {\tt my\_dgemm}.  For now, just worry about trying to attain better performance for smallish matrices.  In particular, consider the following picture:
 \begin{center}
 	\includegraphics[width=3in]{figures/Step2.pdf}
 \end{center}
 What we want you to do is to write your code so that $ m_R \times n_R $ blocks of $ C $ are kept in registers.  
-You get to choose $ m_R $ and $ n_R $, but you will want to update file {\tt ??} with those choices.
+You get to choose $ m_R $ and $ n_R $, but you will want to update file {\tt include/bl\_config.h} with those choices.
+This ensures that the test driver only tries problem sizes that are multiples of these block sizes, so you don't have to worry about ``fringe''.
 
 \subsubsection{Vector intrinsics}
 
