@@ -415,9 +415,28 @@ cd test
 ./run_bl_dgemm.sh
 
 \end{verbatim}
+You will see the performance result output:
+\begin{verbatim}
+
+run_step1_st=[
+  %m     %k   %n   %MY_GFLOPS %REF_GFLOPS
+   4     4     4   0.12  0.13
+   19    19    19  0.76  6.39
+   34    34    34  0.84 13.19
+   ......
+];
+
+\end{verbatim}
+Notice that if you have errors in your code, you will observe the error hints like this:
+\begin{verbatim}
+
+C[ 0 ][ 0 ] != C_ref, 1.253000E+00, 2.253000E+00
+
+\end{verbatim}
 
 \subsubsection{Draw performance graph}
 
+Finally, you can use {\tt MATALB} to draw your performance graph with our scripts. In {\tt results} folder, after executing {\tt ./collect\_result\_step1}, you will get a {\tt MATLAB} file ``{\tt step1\_result.m}'', which collects the performance result. You can execute script {\tt bl\_dgemm\_plot.m} in {\tt MATLAB}, and you will get the performance graph. % like this: Illustrate the meaning of the performance graph?
 
 \subsection{Basic techniques}
 
