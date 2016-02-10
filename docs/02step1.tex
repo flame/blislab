@@ -324,7 +324,7 @@ we notice that, each operand is a {\tt MACRO}. For example, earlier in the file
 The linear array at address $ C $ is used to store elements $ C_{i,j} $ so that the $ i,j $ element is mapped to location {\tt j * ldc + i}.  The way to view this is that the columns of $ C $ are each stored contiguously.  However, think of matrix $ C $ as embedded in a large array that has {\tt ldc} rows so that accessing a row means going through array {\tt C} with stride {\tt ldc}.  The term {\em leading dimension} of two-dimensional array {\tt C} is typically used to refer to the row dimension of this larger array, hence the variable {\tt ldc} (\underline{l}eading \underline{d}imension of \underline{\tt C}).
 %we notice that, for example, the linear array at address $ C $ is used to store elements $ C_{i,j} $ so that the $ i,j $ element is mapped to location {\tt j * ldc + i}.  The way to view this is that the columns of $ C $ are each stored contiguously.  However, think of matrix $ C $ as embedded in a large array that has {\tt ldc} rows so that accessing a row means going through array {\tt C} with stride {\tt ldc}.  The term {\em leading dimension} of two-dimensional array {\tt C} is typically used to refer to the row dimension of this larger array, hence the variable {\tt ldc} (\underline{l}eading \underline{d}imension of \underline{\tt C}).
 
-\subsubsection{Execute the default implementation}
+\subsubsection{Configure the default implementation}
 %{\bf Jianyu: Describe how to execute with the defaults, using the Intel compiler and describe how to view and interpret the results.}
 By default, the exercise compiles and links with Intel's {\tt icc} compiler, which will apply compiler optimizations ({\tt O3} optimization level) to the code.
 You need to set the environment variable by executing:
@@ -405,6 +405,19 @@ in {\tt sourceme.sh}. After executing {\tt \$ source sourceme.sh}, you will obse
 
 \end{verbatim}
 and now performance and accuracy comparisons of your implementation will be against this optimized library routine.
+
+\subsubsection{Compile, execute and collect results}
+You can compile, execute your code and collect the performance result by executing
+\begin{verbatim}
+
+make
+cd test
+./run_bl_dgemm.sh
+
+\end{verbatim}
+
+\subsubsection{Draw performance graph}
+
 
 \subsection{Basic techniques}
 
@@ -505,3 +518,4 @@ This ensures that the test driver only tries problem sizes that are multiples of
 
 You will notice that even for smallish matrices, your implementation performs (much) worse than the implementations that are part of MKL and/or BLIS.  
 The reason is that the compiler is not using the fastest instructions for floating point arithmetic.  These can be accessed either by using {\em vector intrinsic functions}, which allows you to explicitly utilize them from C, or by coding in assemply code.  For now, let's not yet go there.  We will talk more about this in Step 3.
+
