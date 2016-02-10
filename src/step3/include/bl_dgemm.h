@@ -62,19 +62,6 @@ extern "C" {
 #define C( i, j ) C[ (j)*ldc + (i) ]
 #define C_ref( i, j ) C_ref[ (j)*ldc_ref + (i) ]
 
-typedef unsigned long long dim_t;
-
-struct aux_s {
-    double *b_next;
-    float  *b_next_s;
-    int    ldr;
-    char   *flag;
-    int    pc;
-    int    m;
-    int    n;
-};
-typedef struct aux_s aux_t;
-
 void bl_dgemm(
         int    m,
         int    n,

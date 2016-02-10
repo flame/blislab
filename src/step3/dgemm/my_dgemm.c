@@ -46,11 +46,10 @@
 
 #include <stdio.h>
 #include <omp.h>
-#include <bl_dgemm.h>
-#define min( i, j ) ( (i)<(j) ? (i): (j) )
-
 #include <bl_config.h>
 #include <bl_dgemm_kernel.h>
+#include <bl_dgemm.h>
+#define min( i, j ) ( (i)<(j) ? (i): (j) )
 
 inline void packA_mcxkc_d(
         int    m,
@@ -65,7 +64,6 @@ inline void packA_mcxkc_d(
     double *a_pntr[ DGEMM_MR ];
 
     for ( i = 0; i < m; i ++ ) {
-        //a_pntr[ i ] = XA + ldXA * ( offseta + i );
         a_pntr[ i ] = XA + ( offseta + i );
     }
 
@@ -124,9 +122,7 @@ void bl_macro_kernel(
         double *packA,
         double *packB,
         double *C,
-        int    ldc,
-        int    pc,
-        int    lastiter
+        int    ldc
         )
 {
     int bl_ic_nt;
@@ -134,14 +130,9 @@ void bl_macro_kernel(
     aux_t  aux;
     char *str;
 
-    aux.pc     = pc;
     aux.b_next = packB;
 
-
-    //printf( "here, pc = %d, last = %d, ldc = %d, m = %d, n = %d, k %d\n", 
-    //    pc, lastiter, ldc, m, n , k );
-
-
+    // We can also parallelize with OMP here.
     //// sequential is the default situation
     //bl_ic_nt = 1;
     //// check the environment variable
@@ -149,11 +140,8 @@ void bl_macro_kernel(
     //if ( str != NULL ) {
     //    bl_ic_nt = (int)strtol( str, NULL, 10 );
     //}
-
-
-    // We can also parallelize with OMP here.
     //#pragma omp parallel for num_threads( bl_ic_nt ) private( j, i, aux )
-    for ( j = 0; j < n; j += DGEMM_NR ) {                      // 2-th loop around micro-kernel
+    for ( j = 0; j < n; j += DGEMM_NR ) {                        // 2-th loop around micro-kernel
         aux.n  = min( n - j, DGEMM_NR );
         for ( i = 0; i < m; i += DGEMM_MR ) {                    // 1-th loop around micro-kernel
             aux.m = min( m - i, DGEMM_MR );
@@ -167,11 +155,10 @@ void bl_macro_kernel(
                     &packB[ j * k ],
                     &C[ j * ldc + i ],
                     (unsigned long long) ldc,
-                    //(unsigned long long) lastiter,
                     &aux
                     );
         }                                                        // 1-th loop around micro-kernel
-    }                                                          // 2-th loop around micro-kernel
+    }                                                            // 2-th loop around micro-kernel
 }
 
 // C must be aligned
@@ -211,9 +198,9 @@ void bl_dgemm(
     packA  = bl_malloc_aligned( DGEMM_KC, ( DGEMM_MC + 1 ) * bl_ic_nt, sizeof(double) );
     packB  = bl_malloc_aligned( DGEMM_KC, ( DGEMM_NC + 1 )            , sizeof(double) );
 
-    for ( jc = 0; jc < n; jc += DGEMM_NC ) {                  // 5-th loop around micro-kernel
+    for ( jc = 0; jc < n; jc += DGEMM_NC ) {                       // 5-th loop around micro-kernel
         jb = min( n - jc, DGEMM_NC );
-        for ( pc = 0; pc < k; pc += DGEMM_KC ) {                // 4-th loop around micro-kernel
+        for ( pc = 0; pc < k; pc += DGEMM_KC ) {                   // 4-th loop around micro-kernel
             pb = min( k - pc, DGEMM_KC );
 
             #pragma omp parallel for num_threads( bl_ic_nt ) private( jr )
@@ -239,7 +226,7 @@ void bl_dgemm(
                     packA_mcxkc_d(
                             min( ib - i, DGEMM_MR ),
                             pb,
-                            &XA[ pc * m ],  // &XA[ pc * lda ],
+                            &XA[ pc * lda ],
                             m,
                             ic + i,
                             &packA[ tid * DGEMM_MC * pb + i * pb ]
@@ -253,14 +240,12 @@ void bl_dgemm(
                         packA  + tid * DGEMM_MC * pb,
                         packB,
                         &C[ jc * ldc + ic ], 
-                        ldc,
-                        pc,
-                        ( pc + DGEMM_KC >= k )
+                        ldc
                         );
 
-            }                                                    // End 3.th loop around micro-kernel
+            }                                                  // End 3.th loop around micro-kernel
         }                                                      // End 4.th loop around micro-kernel
-    }                                                        // End 5.th loop around micro-kernel
+    }                                                          // End 5.th loop around micro-kernel
 
     free( packA );
     free( packB );

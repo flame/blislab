@@ -15,10 +15,10 @@ FRAME_CC_SRC=  \
 FRAME_CPP_SRC= \
 
 KERNEL_SRC=    \
-							 kernels/bli_dgemm_int_d8x4.c \
 							 kernels/bli_dgemm_asm_d8x4.c \
-			                 kernels/bli_gemm_asm_d12x4.c \
-			                 kernels/bli_gemm_asm_d8x6.c \
+							 kernels/bli_dgemm_int_d8x4.c \
+			                 kernels/bli_dgemm_asm_d12x4.c \
+			                 kernels/bli_dgemm_asm_d8x6.c \
 							 kernels/bli_dgemm_ukr.c \
 
 OTHER_DEP = \
@@ -27,7 +27,7 @@ OTHER_DEP = \
 
 BLISLAB_OBJ=$(FRAME_CC_SRC:.c=.o) $(FRAME_CPP_SRC:.cpp=.o) $(KERNEL_SRC:.c=.o) $(FRAME_CC_SRC_S:.c=.os) $(KERNEL_SRC_S:.c=.os)
 
-all: $(LIBBLISLAB) $(SHAREDLIBBLISLAB) TESTBLISLAB
+all: $(LIBBLISLAB) $(SHAREDLIBBLISLAB) #TESTBLISLAB
 
 TESTBLISLAB: $(LIBBLISLAB)
 	cd $(BLISLAB_DIR)/test && $(MAKE) && cd $(BLISLAB_DIR) $(LDFLAGS)

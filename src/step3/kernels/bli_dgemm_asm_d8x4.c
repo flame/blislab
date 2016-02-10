@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <immintrin.h> // AVX
 
-#include "bl_dgemm.h"
+#include "bl_dgemm_kernel.h"
 #include "avx_types.h"
 
 

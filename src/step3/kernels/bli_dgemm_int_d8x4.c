@@ -35,7 +35,7 @@
 #include <stdio.h>
 #include <immintrin.h> // AVX
 
-#include <bl_dgemm.h>
+#include <bl_dgemm_kernel.h>
 #include <avx_types.h>
 
 #define inc_t unsigned long long 
@@ -43,7 +43,7 @@
 
 
 void bli_dgemm_int_8x4(
-                        dim_t              k,
+                        int      k,
                         double*  a,
                         double*  b,
                         double*  c,
