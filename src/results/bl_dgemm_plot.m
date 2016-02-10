@@ -1,10 +1,6 @@
-step1_st;
-step1_mt;
-step3_st;
-step3_mt;
-step_final_st;
-step_final_mt;
-step10_st;
+step1_result;
+step2_result;
+step3_result;
 
 % ---------------------------------------------------------
 % Plotting
