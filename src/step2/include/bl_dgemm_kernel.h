@@ -85,10 +85,6 @@ static void (*bl_micro_kernel) (
         ) = {
         BL_MICRO_KERNEL
         //bli_dgemm_ukr_ref
-        //bli_dgemm_int_8x4
-        //bli_dgemm_asm_8x4
-        //bli_dgemm_asm_8x6
-        //bli_dgemm_asm_12x4
 };
 
 
