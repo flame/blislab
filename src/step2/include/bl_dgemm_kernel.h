@@ -47,12 +47,26 @@
 #ifndef BLISLAB_DGEMM_KERNEL_H
 #define BLISLAB_DGEMM_KERNEL_H
 
+#include "bl_config.h"
+
 // Allow C++ users to include this header file in their source code. However,
 // we make the extern "C" conditional on whether we're using a C++ compiler,
 // since regular C compilers don't understand the extern "C" construct.
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+typedef unsigned long long dim_t;
+
+struct aux_s {
+    double *b_next;
+    float  *b_next_s;
+    char   *flag;
+    int    pc;
+    int    m;
+    int    n;
+};
+typedef struct aux_s aux_t;
 
 void bli_dgemm_ukr_ref( int k,
         double *a,
@@ -61,7 +75,35 @@ void bli_dgemm_ukr_ref( int k,
         unsigned long long ldc,
         aux_t* data );
 
-void (*bl_micro_kernel) (
+void bli_dgemm_int_8x4( int k,
+        double *a,
+        double *b,
+        double *c,
+        unsigned long long ldc,
+        aux_t* data );
+
+void bli_dgemm_asm_8x4( int k,
+        double *a,
+        double *b,
+        double *c,
+        unsigned long long ldc,
+        aux_t* data );
+
+void bli_dgemm_asm_12x4( int k,
+        double *a,
+        double *b,
+        double *c,
+        unsigned long long ldc,
+        aux_t* data );
+
+void bli_dgemm_asm_8x6( int k,
+        double *a,
+        double *b,
+        double *c,
+        unsigned long long ldc,
+        aux_t* data );
+
+static void (*bl_micro_kernel) (
         int    k,
         double *a,
         double *b,
@@ -69,8 +111,15 @@ void (*bl_micro_kernel) (
         unsigned long long ldc,
         aux_t  *aux
         ) = {
-        bli_dgemm_ukr_ref
+        BL_MICRO_KERNEL
+        //bli_dgemm_ukr_ref
+        //bli_dgemm_int_8x4
+        //bli_dgemm_asm_8x4
+        //bli_dgemm_asm_8x6
+        //bli_dgemm_asm_12x4
 };
+
+
 
 // End extern "C" construct block.
 #ifdef __cplusplus

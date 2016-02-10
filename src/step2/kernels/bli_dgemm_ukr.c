@@ -1,5 +1,5 @@
 #include <bl_config.h>
-#include "bl_dgemm.h"
+#include "bl_dgemm_kernel.h"
 
 //micro-panel a is stored in column major, lda=DGEMM_MR.
 #define a(i,j) a[ (j)*DGEMM_MR + (i) ]
