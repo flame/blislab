@@ -56,12 +56,6 @@
 
 #define USE_SET_DIFF 1
 #define TOLERANCE 1E-10
-
-#define A( i, j ) A[ (j)*lda + (i) ]
-#define B( i, j ) B[ (j)*ldb + (i) ]
-#define C( i, j ) C[ (j)*ldc + (i) ]
-#define C_ref( i, j ) C_ref[ (j)*ldc + (i) ]
-
 void computeError(
         int    ldc,
         int    ldc_ref,
@@ -74,7 +68,7 @@ void computeError(
     int    i, j;
     for ( i = 0; i < m; i ++ ) {
         for ( j = 0; j < n; j ++ ) {
-            if ( fabs( C[ j * ldc + i ] - C_ref[ j * ldc_ref + i ] ) > TOLERANCE ) {
+            if ( fabs( C( i, j ) - C_ref( i, j ) ) > TOLERANCE ) {
                 printf( "C[ %d ][ %d ] != C_ref, %E, %E\n", i, j, C( i, j ), C_ref( i, j ) );
                 break;
             }

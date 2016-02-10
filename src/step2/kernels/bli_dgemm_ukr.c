@@ -1,17 +1,12 @@
-//#include <bl_config.h>
+#include <bl_config.h>
 #include "bl_dgemm.h"
 
-#define DGEMM_MR 8
-#define DGEMM_NR 4
-
-
-
-//micro-panel a is stored in column major, lda=DGEMM_MR=8
-#define A(i,j) a[ (j)*DGEMM_MR + (i) ]
-//micro-panel b is stored in row major, ldb=DGEMM_NR=4
-#define B(i,j) b[ (i)*DGEMM_NR + (j) ]
-
-#define C(i,j) c[ (j)*ldc + (i) ]
+//micro-panel a is stored in column major, lda=DGEMM_MR.
+#define a(i,j) a[ (j)*DGEMM_MR + (i) ]
+//micro-panel b is stored in row major, ldb=DGEMM_NR.
+#define b(i,j) b[ (i)*DGEMM_NR + (j) ]
+//result      c is stored in column major.
+#define c(i,j) c[ (j)*ldc + (i) ]
 
 void bli_dgemm_ukr_ref( int    k,
                         double *a,
@@ -32,7 +27,7 @@ void bli_dgemm_ukr_ref( int    k,
         { 
             for ( i = 0; i < m; ++i )
             { 
-                C(i,j) += A(i,l)*B(l,j);
+                c(i,j) += a(i,l)*b(l,j);
             }
         }
     }

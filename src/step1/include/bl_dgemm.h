@@ -57,6 +57,11 @@ extern "C" {
 #include <math.h>
 #include <immintrin.h>
 
+#define A( i, j ) A[ (j)*lda + (i) ]
+#define B( i, j ) B[ (j)*ldb + (i) ]
+#define C( i, j ) C[ (j)*ldc + (i) ]
+#define C_ref( i, j ) C_ref[ (j)*ldc_ref + (i) ]
+
 typedef unsigned long long dim_t;
 
 struct aux_s {
