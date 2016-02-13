@@ -138,6 +138,7 @@ void bli_dgemm_int_8x4(
 		__asm__ volatile( "prefetcht0 192(%0)          \n\t" : :"r"(a)  );
 
 		// Load va0_3 (Prefetch)
+        // Prefetch A03
  		vA0_3 = _mm256_load_pd( a + 8 );
 
 		// Iteration 0.
@@ -148,6 +149,7 @@ void bli_dgemm_int_8x4(
 		va4_7b_0 = _mm256_add_pd( va4_7b_0, vtmp );
 
 		// Load va4_7 (Prefetch)
+        // Prefetch A47
  		vA4_7 = _mm256_load_pd( a + 12 );
 
 		// Shuffle vb (b1,b0,b3,b2)

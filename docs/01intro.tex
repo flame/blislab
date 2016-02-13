@@ -7,9 +7,11 @@ The Basic Linear Algebra Subprograms (BLAS)~\cite{BLAS1,BLAS2,BLAS3,BLIS-Encycl}
 \subsection{Matrix-matrix multiplication (\Gemm)}
 
 In particular, general matrix-matrix multiplication (\Gemm) with double precision floating point numbers is supported by the BLAS with the call
-\begin{center}
-	\tt dgemm( transa, transb, m, n, k alpha, A, lda, B, ldb, beta, C, ldc )
-\end{center}
+\begin{verbatim}
+
+      dgemm( transa, transb, m, n, k alpha, A, lda, B, ldb, beta, C, ldc )
+      
+\end{verbatim}
 which, by appropriately choosing {\tt transa} and {\tt transb}, 
 computes 
 \[
@@ -19,8 +21,15 @@ C := \alpha A B^T + \beta C; \quad \mbox{or }
 C := \alpha A^T B^T + \beta C.
 \]
 Here $ C $ is $ m \times n $ and $ k $ is the ``third dimension''.
-In this paper we focus on optimizing a simplified version of this operation, namely $ C := A B + C $ where $ C $ is $ m \times n $, 
-$ A $ is $ m \times k $, and $ B $ is $ k \times n $.
+
+We consider the simplified version of \Gemm,
+\[
+C := A B + C,
+\]
+where $ C $ is $ m \times n $, 
+$ A $ is $ m \times k $, and $ B $ is $ k \times n $
+in this paper.
+
 
 \subsection{High-performance implementation}
 
@@ -28,7 +37,7 @@ The intricacies of high-performance implementations are such that implementation
 often relegated to 
 unsung experts who develop numerical libraries for the hardware vendors, for example as part of IBM's ESSL, Intel's MKL, Cray's LibSci, and AMD's ACML libraries.  In the past,
 these libraries were often written at least partially in assembly.
-
+  
 The key paper~\cite{IBM:P2} showed how an ``algorithms and architectures" approach to hand-in-hand designing architectures, compilers, and algorithms allowed 
 BLAS to be written in a high level language (Fortan) for the IBM Power architectures.
 The Portable High Performance ANSI C (PHiPAC)~\cite{PHiPAC97} project subsequently provided guidelines for writing high-performance code in C and suggested how to autogenerate and tune \Gemm\ written this way.  The Automatically Tuned Linear Algebra Software (ATLAS)~\cite{ATLAS,ATLAS_journal} built upon these insights and made autotuning and autogeneration of BLAS libraries mainstream.
