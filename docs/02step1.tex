@@ -381,7 +381,7 @@ C[ 0 ][ 0 ] != C_ref, 1.253000E+00, 2.253000E+00
 
 \subsubsection{Draw the performance graph}
 
-Finally, you can use {\tt MATALB} to draw your performance graph with our scripts. In {\tt src/results} folder, after executing 
+Finally, you can use {\tt MATLAB} to draw your performance graph with our scripts. In {\tt src/results} folder, after executing 
 \begin{verbatim}
    ./collect_result_step1
 \end{verbatim}
@@ -449,12 +449,17 @@ If you have a {\tt BLAS} library installed on your test machine, you can adopt t
    
 \end{verbatim}
 in {\tt sourceme.sh}.
-If you use Intel compiler, you need to specify
+If you use Intel compiler, you don't need to explicitly specify the path of MKL. However, if you use GNU compiler, you need to specify the path of your BLAS library, for example,
+\begin{verbatim}
 
+   BLAS_DIR=/home/lib/blis
+
+\end{verbatim}
 After executing {\tt \$ source sourceme.sh}, you will observe:
 \begin{verbatim}
 
   BLISLAB_USE_BLAS = true
+  BLAS_DIR = /home/lib/blis
 
 \end{verbatim}
 and now performance and accuracy comparisons of your implementation will be against this optimized library routine.

@@ -142,31 +142,31 @@ One may ask if the above described scheme is optimal.  In~\cite{ITXGEMM:ICCS01} 
 %%%			comment{.} 
 %%%		}
 .
-		.3 bli\_dgemm\_ukr.c
+		.3 bl\_dgemm\_ukr.c
 %%%\DTcomment{
 %%%			\rm \color{red}
 %%%			comment{.} 
 %%%		}
 .
-		.3 bli\_dgemm\_int\_d8x4.c
+		.3 bl\_dgemm\_int\_8x4.c
 %%%\DTcomment{
 %%%			\rm \color{red}
 %%%			comment{.} 
 %%%		}
 .
-		.3 bli\_dgemm\_asm\_d8x4.c
+		.3 bl\_dgemm\_asm\_8x4.c
 %%%\DTcomment{
 %%%			\rm \color{red}
 %%%			comment{.} 
 %%%		}
 .
-		.3 bli\_dgemm\_asm\_d8x6.c
+		.3 bl\_dgemm\_asm\_8x6.c
 %%%\DTcomment{
 %%%			\rm \color{red}
 %%%			comment{.} 
 %%%		}
 .
-		.3 bli\_dgemm\_asm\_d12x4.c
+		.3 bl\_dgemm\_asm\_12x4.c
 %%%\DTcomment{
 %%%			\rm \color{red}
 %%%			comment{.} 
@@ -263,10 +263,10 @@ structure for subdirectory {\tt step3}. Comparing to {\tt step2}, we have modifi
 \begin{description}
 \item[{\tt kernels}] This directory contains the micro-kernel implementations for various architecture.
 \begin{description}
-\item[{\tt bli\_dgemm\_int\_d8x4.c}] Is a {\tt AVX} intrinsics micro-kernel implementation for Sandy Bridge/Ivy Bridge micro-architecture.
-\item[{\tt bli\_dgemm\_asm\_d8x4.c}] Is a {\tt AVX} assembly micro-kernel implementation for Sandy Bridge/Ivy Bridge micro-architecture.
-\item[{\tt bli\_dgemm\_asm\_d8x6.c}] Is a {\tt AVX2} assembly micro-kernel implementation for Haswell micro-architecture.
-\item[{\tt bli\_dgemm\_asm\_d12x4.c}] Is an alternative {\tt AVX2} assembly micro-kernel implementation for Haswell micro-architecture.
+\item[{\tt bl\_dgemm\_int\_8x4.c}] Is a {\tt AVX} intrinsics micro-kernel implementation for Sandy Bridge/Ivy Bridge micro-architecture.
+\item[{\tt bl\_dgemm\_asm\_8x4.c}] Is a {\tt AVX} assembly micro-kernel implementation for Sandy Bridge/Ivy Bridge micro-architecture.
+\item[{\tt bl\_dgemm\_asm\_8x6.c}] Is a {\tt AVX2} assembly micro-kernel implementation for Haswell micro-architecture.
+\item[{\tt bl\_dgemm\_asm\_12x4.c}] Is an alternative {\tt AVX2} assembly micro-kernel implementation for Haswell micro-architecture.
 \end{description}
 \end{description}
 
