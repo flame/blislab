@@ -24,8 +24,8 @@ BLISlab: A Sandbox for Optimizing GEMM
 │   └── bl_dgemm_ref.h
 ├── lib
 ├── make.inc.files
-│   ├── make.gnu.inc
 │   ├── make.inc
+│   ├── make.gnu.inc
 │   └── make.intel.inc
 └── test
     ├── makefile

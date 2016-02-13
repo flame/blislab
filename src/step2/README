@@ -24,7 +24,7 @@ BLISlab: A Sandbox for Optimizing GEMM
 │   ├── bl_dgemm_kernel.h
 │   └── bl_dgemm_ref.h
 ├── kernels
-│   ├── bli_dgemm_ukr.c
+│   ├── bl_dgemm_ukr.c
 ├── lib
 ├── make.inc.files
 │   ├── make.gnu.inc
@@ -32,8 +32,8 @@ BLISlab: A Sandbox for Optimizing GEMM
 │   └── make.intel.inc
 └── test
     ├── makefile
-    ├── run_blis_dgemm.sh
-    ├── tacc_run_blis_dgemm.sh
+    ├── run_bl_dgemm.sh
+    ├── tacc_run_bl_dgemm.sh
     └── test_bl_dgemm.c
 
 How to compile and execute the code:
