@@ -20,8 +20,6 @@ echo "BLAS_DIR = $BLAS_DIR"
 
 # Parallel Options
 export KMP_AFFINITY=compact,verbose
-#export OMP_NUM_THREADS=10
-#export BLISLAB_IC_NT=10
 export OMP_NUM_THREADS=1
 export BLISLAB_IC_NT=1
 
