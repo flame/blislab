@@ -57,7 +57,9 @@
  * dgemm prototype
  *
  */ 
-void dgemm(char*, char*, int*, int*, int*, double*, double*, 
+//void dgemm(char*, char*, int*, int*, int*, double*, double*, 
+//        int*, double*, int*, double*, double*, int*);
+extern void dgemm_(char*, char*, int*, int*, int*, double*, double*, 
         int*, double*, int*, double*, double*, int*);
 #endif
 
@@ -85,7 +87,7 @@ void bl_dgemm_ref(
     beg = omp_get_wtime();
 
 #ifdef USE_BLAS
-    dgemm( "N", "N", &m, &n, &k, &alpha,
+    dgemm_( "N", "N", &m, &n, &k, &alpha,
             XA, &lda, XB, &ldb, &beta, XC, &ldc );
 #else
     #pragma omp parallel for private( i, p )

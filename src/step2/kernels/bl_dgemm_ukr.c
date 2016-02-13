@@ -8,7 +8,7 @@
 //result      c is stored in column major.
 #define c(i,j) c[ (j)*ldc + (i) ]
 
-void bli_dgemm_ukr_ref( int    k,
+void bl_dgemm_ukr_ref( int    k,
                         double *a,
                         double *b,
                         double *c,

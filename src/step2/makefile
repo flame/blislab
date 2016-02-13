@@ -15,7 +15,7 @@ FRAME_CC_SRC=  \
 FRAME_CPP_SRC= \
 
 KERNEL_SRC=    \
-							 kernels/bli_dgemm_ukr.c \
+							 kernels/bl_dgemm_ukr.c \
 
 OTHER_DEP = \
 			                 include/bl_dgemm.h \
