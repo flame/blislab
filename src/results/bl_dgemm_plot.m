@@ -2,6 +2,7 @@ step1_result;
 step2_result;
 step3_result;
 
+
 PEAK_PERF=28.32;
 
 % ---------------------------------------------------------
@@ -15,7 +16,6 @@ set( gcf, 'PaperSize', [3 3]);
 set( gcf, 'PaperPosition', [0.25 0.25 3 3] );
 set( gcf, 'Position', [0 0 600 400]);
 
-
 hold;
 
 plot( run_step1_st( :, 1 ), run_step1_st( :,4), '.-', 'LineWidth', 2, 'Color',  [0 0.2 1.0] );
@@ -26,7 +26,6 @@ plot( run_step1_st( :, 1 ), run_step1_st( :, 5), '.-', 'LineWidth', 2, 'Color', 
 
 %plot( run_step3_st( :, 1 ), run_step3_st( :,4), '.-', 'LineWidth', 2, 'Color',  [0 0.2 1.0] );
 %plot( run_step3_st( :, 1 ), run_step3_st( :, 5), '.-', 'LineWidth', 2, 'Color', [1 0 0.2] );
-
 
 xlabel( 'm=k=n' );
 ylabel( 'GFLOPS' );
@@ -45,7 +44,7 @@ ax.XTick = [ 0, 200, 400, 600, 800, 1000];
 %ax.XTick = [ 0, 1000, 2000, 3000, 4000, 5000 ];
 set( gca,'FontSize',14 );
 
-legend( 'dgemm\_step1\_st', ...
-        'dgemm\_mkl\_st', ...
+legend( 'my\_dgemm\_st', ...
+        'mkl\_dgemm\_st', ...
         'Location','SouthEast');
 
