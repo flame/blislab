@@ -2,7 +2,7 @@
 export BLISLAB_DIR=.
 echo "BLISLAB_DIR = $BLISLAB_DIR"
 
-# Compiler Options (if false, then use GNU compilers)
+# Compiler Options (true: Intel compiler; false: GNU compilers)
 export BLISLAB_USE_INTEL=true
 echo "BLISLAB_USE_INTEL = $BLISLAB_USE_INTEL"
 
@@ -10,8 +10,8 @@ echo "BLISLAB_USE_INTEL = $BLISLAB_USE_INTEL"
 export BLISLAB_USE_BLAS=true
 echo "BLISLAB_USE_BLAS = $BLISLAB_USE_BLAS"
 
-# Optimization Level
-export COMPILER_OPT_LEVEL=O2
+# Optimization Level (O0, O1, O2, O3)
+export COMPILER_OPT_LEVEL=O3
 echo "COMPILER_OPT_LEVEL = $COMPILER_OPT_LEVEL"
 
 # Manually set the mkl path

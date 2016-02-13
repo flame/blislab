@@ -27,33 +27,33 @@ void bli_dgemm_asm_8x4(
 	"movq                %2, %%rax               \n\t" // load address of a.              ( v )
 	"movq                %3, %%rbx               \n\t" // load address of b.              ( v )
 	"movq                %5, %%r15               \n\t" // load address of b_next.         ( v )
-	"addq          $-4 * 64, %%r15               \n\t" //                                 ( ? )
-	"                                            \n\t"
-	"vmovapd   0 * 32(%%rax), %%ymm0             \n\t" // initialize loop by pre-loading
-	"vmovapd   0 * 32(%%rbx), %%ymm2             \n\t" // elements of a and b.
-  "vpermilpd  $0x5, %%ymm2, %%ymm3             \n\t"
-  "                                            \n\t"
-  "                                            \n\t"
-  "movq                %4, %%rcx               \n\t" // load address of c
-  "movq               %7, %%rdi               \n\t" // load ldc
-  "leaq        (,%%rdi,8), %%rdi               \n\t" // ldc * sizeof(double)
-  "leaq   (%%rcx,%%rdi,2), %%r10               \n\t" // load address of c + 2 * ldc;
-  "                                            \n\t"
-  "                                            \n\t"
-	"                                            \n\t"
-	"                                            \n\t"
-  "prefetcht0   3 * 8(%%rcx)                   \n\t" // prefetch c + 0 * ldc
-  "prefetcht0   3 * 8(%%rcx,%%rdi)             \n\t" // prefetch c + 1 * ldc
-  "prefetcht0   3 * 8(%%r10)                   \n\t" // prefetch c + 2 * ldc
-  "prefetcht0   3 * 8(%%r10,%%rdi)             \n\t" // prefetch c + 3 * ldc
-  "                                            \n\t"
-	"                                            \n\t"
-	"                                            \n\t"
-	"                                            \n\t"
-	"vxorpd    %%ymm8,  %%ymm8,  %%ymm8          \n\t" // set ymm8 to 0                   ( v )
-	"vxorpd    %%ymm9,  %%ymm9,  %%ymm9          \n\t"
-	"vxorpd    %%ymm10, %%ymm10, %%ymm10         \n\t"
-	"vxorpd    %%ymm11, %%ymm11, %%ymm11         \n\t"
+    "addq          $-4 * 64, %%r15               \n\t" //                                 ( ? )
+    "                                            \n\t"
+    "vmovapd   0 * 32(%%rax), %%ymm0             \n\t" // initialize loop by pre-loading
+    "vmovapd   0 * 32(%%rbx), %%ymm2             \n\t" // elements of a and b.
+    "vpermilpd  $0x5, %%ymm2, %%ymm3             \n\t"
+    "                                            \n\t"
+    "                                            \n\t"
+    "movq                %4, %%rcx               \n\t" // load address of c
+    "movq               %7, %%rdi               \n\t" // load ldc
+    "leaq        (,%%rdi,8), %%rdi               \n\t" // ldc * sizeof(double)
+    "leaq   (%%rcx,%%rdi,2), %%r10               \n\t" // load address of c + 2 * ldc;
+    "                                            \n\t"
+    "                                            \n\t"
+    "                                            \n\t"
+    "                                            \n\t"
+    "prefetcht0   3 * 8(%%rcx)                   \n\t" // prefetch c + 0 * ldc
+    "prefetcht0   3 * 8(%%rcx,%%rdi)             \n\t" // prefetch c + 1 * ldc
+    "prefetcht0   3 * 8(%%r10)                   \n\t" // prefetch c + 2 * ldc
+    "prefetcht0   3 * 8(%%r10,%%rdi)             \n\t" // prefetch c + 3 * ldc
+    "                                            \n\t"
+    "                                            \n\t"
+    "                                            \n\t"
+    "                                            \n\t"
+    "vxorpd    %%ymm8,  %%ymm8,  %%ymm8          \n\t" // set ymm8 to 0                   ( v )
+    "vxorpd    %%ymm9,  %%ymm9,  %%ymm9          \n\t"
+    "vxorpd    %%ymm10, %%ymm10, %%ymm10         \n\t"
+    "vxorpd    %%ymm11, %%ymm11, %%ymm11         \n\t"
 	"vxorpd    %%ymm12, %%ymm12, %%ymm12         \n\t"
 	"vxorpd    %%ymm13, %%ymm13, %%ymm13         \n\t"
 	"vxorpd    %%ymm14, %%ymm14, %%ymm14         \n\t"
@@ -324,7 +324,7 @@ void bli_dgemm_asm_8x4(
 //	"je     .SQDISTANCE                          \n\t" // if pc == 0, jump to code
 	"                                            \n\t"
 	"                                            \n\t"
-  "movq                   %4, %%rcx            \n\t" // load address of c
+    "movq                   %4, %%rcx            \n\t" // load address of c
 	"movq                  %7, %%rdi            \n\t" // load  ldc
 	"leaq           (,%%rdi,8), %%rdi            \n\t" // rsi = ldc * sizeof(double)
 	"                                            \n\t"
@@ -435,9 +435,9 @@ void bli_dgemm_asm_8x4(
 	  "m" (b),           // 3
 	  "m" (c),           // 4
 	  "m" (aux->b_next), // 5
-    "m" (pc),          // 6
-    "m" (ldc)         // 7
-//    "m" (last)         // 8
+      "m" (pc),          // 6
+      "m" (ldc)         // 7
+          //    "m" (last)         // 8
 	: // register clobber list
 	  "rax", "rbx", "rcx", "rsi", "rdi",
     "r15",

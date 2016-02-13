@@ -136,7 +136,7 @@ void bl_macro_kernel(
     //// sequential is the default situation
     //bl_ic_nt = 1;
     //// check the environment variable
-    //str = getenv( "BLISGEMM_IC_NT" );
+    //str = getenv( "BLISLAB_IC_NT" );
     //if ( str != NULL ) {
     //    bl_ic_nt = (int)strtol( str, NULL, 10 );
     //}
@@ -189,7 +189,7 @@ void bl_dgemm(
     // sequential is the default situation
     bl_ic_nt = 1;
     // check the environment variable
-    str = getenv( "BLISGEMM_IC_NT" );
+    str = getenv( "BLISLAB_IC_NT" );
     if ( str != NULL ) {
         bl_ic_nt = (int)strtol( str, NULL, 10 );
     }

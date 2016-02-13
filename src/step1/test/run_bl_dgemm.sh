@@ -1,32 +1,17 @@
 #!/bin/bash
 
 #Single Thread
-export KMP_AFFINITY=compact
-export OMP_NUM_THREADS=1
-export BLISGEMM_IC_NT=1
-kmax=1100
-kstep=15
+export KMP_AFFINITY=compact  #Rule to bind core to thread for OMP thread with Intel compiler for parallel version
+export OMP_NUM_THREADS=1     #Set OMP number of threads for parallel version
+export BLISLAB_IC_NT=1       #Set BLISLAB number of threads for parallel version
+k_start=16
+k_end=1024
+k_blocksize=16
 echo "run_step1_st=["
 echo -e "%m\t%n\t%k\t%MY_GFLOPS\t%REF_GFLOPS"
-for (( k=4; k<kmax; k+=kstep ))
+for (( k=k_start; k<=k_end; k+=k_blocksize ))
 do
     ./test_bl_dgemm.x     $k $k $k 
 done
 echo "];"
-
-
-##Multi Thread
-#export KMP_AFFINITY=compact
-#export OMP_NUM_THREADS=10
-#export BLISGEMM_IC_NT=10
-##Single Thread
-#kmax=5000
-#kstep=31
-#echo "run_step1_mt=["
-#for (( k=4; k<kmax; k+=kstep ))
-#do
-#    ./test_bl_dgemm.x     $k $k $k
-#done
-#echo "];"
-
 
