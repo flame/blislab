@@ -68,35 +68,35 @@ struct aux_s {
 };
 typedef struct aux_s aux_t;
 
-void bli_dgemm_ukr_ref( int k,
+void bl_dgemm_ukr_ref( int k,
         double *a,
         double *b,
         double *c,
         unsigned long long ldc,
         aux_t* data );
 
-void bli_dgemm_int_8x4( int k,
+void bl_dgemm_int_8x4( int k,
         double *a,
         double *b,
         double *c,
         unsigned long long ldc,
         aux_t* data );
 
-void bli_dgemm_asm_8x4( int k,
+void bl_dgemm_asm_8x4( int k,
         double *a,
         double *b,
         double *c,
         unsigned long long ldc,
         aux_t* data );
 
-void bli_dgemm_asm_12x4( int k,
+void bl_dgemm_asm_12x4( int k,
         double *a,
         double *b,
         double *c,
         unsigned long long ldc,
         aux_t* data );
 
-void bli_dgemm_asm_8x6( int k,
+void bl_dgemm_asm_8x6( int k,
         double *a,
         double *b,
         double *c,
@@ -112,11 +112,11 @@ static void (*bl_micro_kernel) (
         aux_t  *aux
         ) = {
         BL_MICRO_KERNEL
-        //bli_dgemm_ukr_ref
-        //bli_dgemm_int_8x4
-        //bli_dgemm_asm_8x4
-        //bli_dgemm_asm_8x6
-        //bli_dgemm_asm_12x4
+        //bl_dgemm_ukr_ref
+        //bl_dgemm_int_8x4
+        //bl_dgemm_asm_8x4
+        //bl_dgemm_asm_8x6
+        //bl_dgemm_asm_12x4
 };
 
 

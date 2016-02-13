@@ -14,11 +14,9 @@ echo "BLISLAB_USE_BLAS = $BLISLAB_USE_BLAS"
 export COMPILER_OPT_LEVEL=O3
 echo "COMPILER_OPT_LEVEL = $COMPILER_OPT_LEVEL"
 
-# Manually set the mkl path
-#export BLISLAB_MKL_DIR=/opt/intel/mkl
-#export BLISLAB_MKL_DIR=$MKL_ROOT
-export BLISLAB_MKL_DIR=$TACC_MKL_DIR
-echo "BLISLAB_MKL_DIR = $BLISLAB_MKL_DIR"
+# Manually set the BLAS path if BLIS_USE_BLAS=true and using GNU compiler.
+export BLAS_DIR=/home/jianyu/lib/blis
+echo "BLAS_DIR = $BLAS_DIR"
 
 # Parallel Options
 export KMP_AFFINITY=compact,verbose

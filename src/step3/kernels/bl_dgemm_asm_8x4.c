@@ -5,7 +5,7 @@
 #include "avx_types.h"
 
 
-void bli_dgemm_asm_8x4(
+void bl_dgemm_asm_8x4(
     int    k,
     double *a,
     double *b,

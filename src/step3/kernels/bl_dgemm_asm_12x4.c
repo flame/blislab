@@ -67,7 +67,7 @@
 	"vmovlpd           %%xmm1,  (%%rcx,%%r13,2)  \n\t" \
 	"vmovhpd           %%xmm1,  (%%rcx,%%r10  )  \n\t"*/
 
-void bli_dgemm_asm_12x4(
+void bl_dgemm_asm_12x4(
                          dim_t              k,
                          //double*   alpha,
                          double*   a,
