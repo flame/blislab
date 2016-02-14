@@ -1,6 +1,6 @@
 step1_result;
-step2_result;
-step3_result;
+%step2_result;
+%step3_result;
 
 
 PEAK_PERF=28.32;
