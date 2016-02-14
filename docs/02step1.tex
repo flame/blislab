@@ -358,7 +358,7 @@ You can compile, execute your code and collect the performance result by executi
    ./run_bl_dgemm.sh
 
 \end{verbatim}
-in "src/step1" directory. You will see the performance result output:
+in {\tt step1} subdirectory. You will see the performance result output:
 \begin{verbatim}
 
    run_step1_st=[
@@ -371,7 +371,7 @@ in "src/step1" directory. You will see the performance result output:
 
 \end{verbatim}
 %{\color{red} Can we set up the driver routines so that they automatically only collect data for multiples of the block sizes that are chosen?  Let's not use an odd increment.}
-You can change the sampling block size in ``run\_bl\_dgemm.sh''.
+You can change the sampling block size in {\tt run\_bl\_dgemm.sh}.
 Notice that if you have errors in your code, these will be reported as, for example, 
 \begin{verbatim}
 
@@ -381,13 +381,17 @@ C[ 0 ][ 0 ] != C_ref, 1.253000E+00, 2.253000E+00
 
 \subsubsection{Draw the performance graph}
 
-Finally, you can use {\tt MATLAB} to draw your performance graph with our scripts. In {\tt src/results} folder, after executing 
+Finally, you can use {\tt MATLAB} to draw your performance graph with our scripts. In {\tt src/results} directory, after executing 
 \begin{verbatim}
+
    ./collect_result_step1
+
 \end{verbatim}
 you will get a {\tt MATLAB} file ``{\tt step1\_result.m}'', with the performance results. You can then execute 
 \begin{verbatim}
+
    bl_dgemm_plot.m
+
 \end{verbatim}
 in {\tt MATLAB}, which will then generate the performance graph. % like this: Illustrate the meaning of the performance graph?
 
