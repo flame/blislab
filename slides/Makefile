@@ -7,5 +7,5 @@ all:
 	#pdflatex slides
 
 clean:
-	rm -R *~; rm *.bbl *.blg paper.pdf *.ps *.dvi *.aux *.out; rm *.idx; rm *.log; rm *.toc; rm */*~
+	rm -R *~; rm *.bbl *.blg slides.pdf *.ps *.dvi *.aux *.out; rm *.idx; rm *.log; rm *.toc; rm */*~; rm *.xml; rm *.vrb; rm *.snm; rm *.nav; rm *.bcf
 
