@@ -96,9 +96,9 @@ void test_bl_dgemm(
 
     lda = m;
     ldb = k;
-    ldc = m;
+    ldc = ( ( m - 1 ) / DGEMM_MR + 1 ) * DGEMM_MR;
     ldc_ref = m;
-    C     = (double*)malloc( sizeof(double) * m * n );
+    C     = bl_malloc_aligned( ldc, n + 4, sizeof(double) );
     C_ref = (double*)malloc( sizeof(double) * m * n );
 
     nrepeats = 3;
