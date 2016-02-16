@@ -43,8 +43,8 @@
  * 
  * */
 
-#ifndef BLISLAB_DGEMM_H
-#define BLISLAB_DGEMM_H
+#ifndef BLISLAB_DGEMM_REF_H
+#define BLISLAB_DGEMM_REF_H
 
 // Allow C++ users to include this header file in their source code. However,
 // we make the extern "C" conditional on whether we're using a C++ compiler,
