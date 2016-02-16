@@ -1,0 +1,78 @@
+% "define" Scala
+\usepackage[T1]{fontenc}  
+\usepackage[scaled=0.82]{beramono}  
+\usepackage{microtype} 
+
+\sbox0{\small\ttfamily A}
+\edef\mybasewidth{\the\wd0 }
+
+\lstdefinelanguage{scala}{
+  morekeywords={abstract,case,catch,class,def,%
+    do,else,extends,false,final,finally,%
+    for,if,implicit,import,match,mixin,%
+    new,null,object,override,package,%
+    private,protected,requires,return,sealed,%
+    super,this,throw,trait,true,try,%
+    type,val,var,while,with,yield,pr_work,INFINITY},
+  sensitive=true,
+  morecomment=[l]{//},
+  morecomment=[n]{/*}{*/},
+  morestring=[b]",
+  morestring=[b]',
+  morestring=[b]"""
+}
+
+\usepackage{color}
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+
+% Default settings for code listings
+\lstset{frame=tb,
+  language=scala,
+  aboveskip=3mm,
+  belowskip=3mm,
+  showstringspaces=false,
+  columns=fixed, % basewidth=\mybasewidth,
+  basicstyle={\small\ttfamily},
+  numbers=none,
+  numberstyle=\footnotesize\color{gray},
+  % identifierstyle=\color{red},
+  keywordstyle=\color{blue},
+  keywordstyle=[2]\color{Purple}, % Perl function arguments purple
+  keywordstyle=[3]\color{Blue}\underbar, % Custom functions underlined and blue
+  commentstyle=\color{dkgreen},
+  stringstyle=\color{mauve},
+  frame=single,
+  breaklines=true,
+  breakatwhitespace=true,
+  procnamekeys={def, val, var, class, trait, object, extends},
+  procnamestyle=\ttfamily\color{red},
+  tabsize=2,
+  morekeywords={var,pr_work,INFINITY},
+  morekeywords={var,pr_work,INFINITY},
+  numbers=left
+}
+
+%\lstset{language=C++}
+%\lstset{
+%  morekeywords={var}
+%}
+
+
+\lstnewenvironment{cpp}[1][]
+{\lstset{language=C++,
+	morekeywords=[2]{pr_work,INFINITY},
+  keywordstyle=[2]\color{dkgreen}, % Perl function arguments purple
+#1}}
+{}
+\lstnewenvironment{scala}[1][]
+{\lstset{language=scala,#1}}
+{}
+\lstnewenvironment{bash}[1][]
+{\lstset{language=bash,#1}}
+{}
+\lstnewenvironment{verilog}[1][]
+{\lstset{language=verilog,#1}}
+{}
+

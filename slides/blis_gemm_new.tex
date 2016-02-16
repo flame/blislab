@@ -1,0 +1,41 @@
+\begin{tabular}{l@{\hspace{6pt}}l@{}}
+Loop 5 &{\bf for} $j_c\!=\! 0:n\!-\!1$ {\bf steps of} $n_c$ \\
+& \hspace{2ex}  $\Jc\!=\! j_c:j_c\!+\!n_c\!-\!1$\\
+Loop 4 & \hspace{2ex}  {\bf for} $p_c \!=\! 0:k\!-\!1$ {\bf steps of}
+         $k_c$ \\
+& \hspace{4ex} $\Pc \!=\! p_c:p_c\!+\!k_c\!-\!1$\\
+&\hspace{4ex}           \textcolor{black}{$B(\Pc,\Jc)$} $\rightarrow \textcolor{black}{B_c}$ ~~~~~~~~~~ // Pack into $B_c$\\
+Loop 3 & \hspace{4ex}           {\bf for} $i_c \!=\! 0:m\!-\!1$ {\bf
+         steps of} $m_c$ \\
+& \hspace{6ex} $\Ic \!=\! i_c:i_c\!+\!m_c\!-\!1$\\
+&\hspace{6ex}                     \textcolor{black}{$A(\Ic,\Pc)$} $\rightarrow \textcolor{black}{A_c}$ ~~~~~~~~~~ // Pack into $A_c$ \\ \cline{2-2} % \cline{2-3}
+& \hspace{6ex} // Macro-kernel\\ 
+Loop 2 &\hspace{6ex} {\bf for} $j_r \!=\! 0:n_c\!-\!1$ {\bf steps of}
+         $n_r$ \\
+& \hspace{8ex}  $\Jr \!=\! j_r:j_r\!\!+\!\!n_r\!-\!1$  \\
+Loop 1&\hspace{8ex}   {\bf for} $i_r \!=\! 0:m_c\!-\!1$ {\bf  steps
+        of} $m_r$ \\
+& \hspace{10ex}  $\Ir \!=\! i_r:i_r\!+\!m_r\!-\!1$\\
+\cline{2-2} % \cline{2-3} 
+&\hspace{10ex} // Micro-kernel \\
+%Loop 6&\hspace{15ex}    {\bf for} $p_r \!=\! 0:k_c\!-\!1$ {\bf steps of} $1$ & \\
+Loop 0&\hspace{10ex}          {\bf for} $k_r \!=\! 0:k_c\!-\!1$ %\\
+\\
+&\hspace{16ex}             \textcolor{black}{$C_c(\Ir,\Jr)$}  \\
+%&\hspace{19ex} $:=$
+%~\textcolor{darkgreen}{$C_c(i_r:i_r\!+\!m_r\!-\!1,j_r:j_r\!+\!n_r\!-\!1)$}\\
+%&\hspace{19ex}  \\
+& \hspace{21ex}~$\mathrel{\!+\!}=$~\textcolor{black}{$A_c(\Ir,k_r)$} %\\
+%&\hspace{19ex} 
+%$\cdot$
+~\textcolor{black}{$B_c(k_r,\Jr)$} \\
+&\hspace{10ex} {\bf endfor}\\
+%&\hspace{15ex} {\bf endfor}\\
+\cline{2-2} % \cline{2-3}
+&\hspace{8ex} {\bf endfor}\\
+&\hspace{4ex} {\bf endfor}\\
+\cline{2-2} % \cline{2-3} 
+% &\hspace{4ex} {\bf endfor}\\
+&\hspace{2ex} {\bf endfor}\\ 
+&{\bf endfor}\\ 
+\end{tabular}

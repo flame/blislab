@@ -1,0 +1,58 @@
+\subsection{Poorman's BLAS}
+
+Step 1 of this exercise makes you realize that
+with the advent of cache-based architectures, high-performance implementation of \Gemm\ necessitated careful attention to 
+the amortization of the cost of data movement between memory layers and computation with that data.
+To keep this manageable, it helps to realize that only a ``kernel'' that performs a  matrix-matrix multiplication with relatively small matrices needs to be highly optimized, since
+computation with larger matrices can be blocked to then use such a kernel without an adverse impact on overall performance.  This 
+insight was first explicitly advocated in~\cite{poorman_journal}
+\begin{quote}
+	Bo K\o{a}gstr\"{o}m , Per Ling, Charles Van Loan.\\
+	GEMM-based level 3 BLAS: high-performance model implementations and performance evaluation benchmark. \\
+	ACM Transactions on Mathematical Software (TOMS). \\
+	Volume 24 Issue 3, p.268-302, Sept. 1998.
+\end{quote}
+This at one point was referred to as "poorman's BLAS" in the sense that if one could only afford to optimize matrix-matrix multiplication (with submatrices), then one could build \Gemm, and other important matrix-matrix operations known as the level-3 BLAS, in terms of this.  What we will see later is that actually in general this is a good idea, for the sake of modularity as well as for performance.
+
+In the last section you already saw an example of blocking.
+
+\subsection{Blocked matrix-matrix multiplication}
+
+Key to blocking \Gemm\ to take advantage of the hierarchical memory of
+a processor is understanding how to compute $ C := A B + C $ when
+these matrices have been blocked.  Partition
+{\footnotesize%
+\[
+A = 
+\left( \begin{array}{c c c c}
+A_{0,0} & \cdots & A_{0,K-1} \\
+\vdots &  & \vdots \\
+A_{M-1,0} & \cdots & A_{M-1,K-1} \\
+\end{array}
+\right),
+B = 
+\left( \begin{array}{c c c c}
+B_{0,0} & \cdots & B_{0,N-1} \\
+\vdots &  & \vdots \\
+B_{K-1,0} & \cdots & B_{K-1,N-1} \\
+\end{array}
+\right), \mbox{~and~}
+C = 
+\left( \begin{array}{c c c c}
+C_{0,0} & \cdots & C_{0,N-1} \\
+\vdots &  & \vdots \\
+C_{M-1,0} & \cdots & C_{M-1,N-1} \\
+\end{array}
+\right).
+\]%
+}
+where $ C_{i,j} $ is $ m_i \times n_j
+$, $ A_{i,p} $ is $ m_i \times k_p
+$, and $ B_{p,j} $ is $ k_p \times n_j
+$.
+Then
+\[
+C_{i,j} := \sum_{p=0}^{K-1} A_{i,p} B_{p,j} + C_{i,j}.
+\]
+
+\subsection{Your mission, if you choose to accept it}

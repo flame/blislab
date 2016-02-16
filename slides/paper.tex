@@ -1,0 +1,89 @@
+  \documentclass{article}
+
+\setlength{\textheight}{8.75in}
+\setlength{\textwidth}{6.5in}
+\setlength{\oddsidemargin}{0in}
+\setlength{\evensidemargin}{0in}
+\setlength{\topmargin}{-0.75in}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+% \usepackage{graphicx}
+\usepackage{program}
+\usepackage{ifthen}
+\usepackage{epsfig}
+\usepackage{array}
+\usepackage{epic}
+\usepackage{color}
+%\usepackage[margin=1in]{geometry}
+\usepackage{hyperref}
+\usepackage{dirtree}
+\usepackage{pifont}
+
+%\usepackage[section]{algorithm}
+\usepackage{algorithmicx,algpseudocode}
+
+\input{flatex}
+\input{macros}
+
+\newcommand{\NoShow}[1]{}
+\newcommand{\myhref}[2]{\href{#1}{\ding{42} #2}}
+
+\newcommand{\xeon}{Intel Xeon E5-2680}
+\newcommand{\ixeon}{Intel Xeon E5-2680}
+\newcommand{\Jc}{{\cal J}_c}
+\newcommand{\Pc}{{\cal P}_c}
+\newcommand{\Ic}{{\cal I}_c}
+\newcommand{\Jr}{{\cal J}_r}
+\renewcommand{\Pr}{{\cal P}_r}
+\newcommand{\Ir}{{\cal I}_r}
+\newcommand{\Ap}{A_{p}}
+\newcommand{\Bp}{B_{p}}
+\newcommand{\Cp}{C_{p}}
+\newcommand{\Chp}{\hat{C}_{p}}
+\newcommand{\Ccp}{\check{C}_{p}}
+
+ \begin{document}
+
+\title{
+BLISlab: A Sandbox for Optimizing GEMM
+}
+
+\author{
+Jianyu Huang
+\and
+Robert A. van de Geijn
+\and
+Others?
+}
+
+\date{Draft \\ \today}
+
+\maketitle 
+
+
+\begin{abstract}
+\input 00abstract
+\end{abstract}
+
+
+
+
+
+\input{body}
+
+
+\subsection*{Acknowledgments}
+We thank the other members of the FLAME team for their support.
+This research was partially sponsored by NSF grant ACI-1148125/1340293 and Intel through its funding of the Science of High-Performance Computing (SHPC) group as an Intel Parallel Computing Center.
+
+{\em Any opinions, findings and conclusions or recommendations
+expressed in this material are those of the author(s) and do not
+necessarily reflect the views of the National Science Foundation
+(NSF).}
+
+
+\bibliographystyle{plain} 
+\bibliography{biblio}
+
+\end{document}

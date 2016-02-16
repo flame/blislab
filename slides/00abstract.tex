@@ -1,0 +1,4 @@
+The BLAS-like Library Instantiation Software (BLIS) is a framework for instantiation the Basic Linear Algebra Subprograms (BLAS) and similar functionality.  The matrix-matrix operations known as the level-3 BLAS is an important subset that can achieve high performance by amortizing the cost of moving data between memory layers.  The BLIS implementation of the level-3 BLAS require a micro-kernel, a matrix-matrix multiplication with small matrices, to be highly optimized.
+
+This note describes a set of exercises that culminate in the implementation of the micro-kernel.  On the one hand it is meant to equip the reader with the understanding that facilitates high-performance implementation of matrix-matrix multiplication.  On the other hand it is meant to facilitate the ``crowd sourcing'' of the optimization of BLIS.
+
