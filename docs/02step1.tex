@@ -2,8 +2,7 @@
 
 In our discussions, we will consider the computation
 $$C:=AB + C$$
-where $A$, $B$, and $C$ are $m\times k$, $k\times n$, $m\times n$  matrices.
-respectively. 
+where $A$, $B$, and $C$ are $m\times k$, $k\times n$, $m\times n$  matrices, respectively. 
 Letting 
 {\footnotesize%
 \[
@@ -353,6 +352,7 @@ You can compile, execute your code and collect the performance result by executi
 %{\color{red} in what subdirectory?}
 \begin{verbatim}
 
+   make clean
    make
    cd test
    ./run_bl_dgemm.sh
@@ -516,14 +516,14 @@ Updating loop index {\tt i} and the pointer {\tt cp} every time through the inne
  
     for ( j = 0; j < n; j ++ ) {
     cp = &C[ j * ldc ];           
-    for ( i = 0; i < m; i += 4 ) {                
-       *(cp+0) = 0.0; 
-       *(cp+1) = 0.0; 
-       *(cp+2) = 0.0; 
-       *(cp+3) = 0.0;
-       cp += 4;                
-       }                                           
-    }  
+       for ( i = 0; i < m; i += 4 ) {                
+          *(cp+0) = 0.0; 
+          *(cp+1) = 0.0; 
+          *(cp+2) = 0.0; 
+          *(cp+3) = 0.0;
+          cp += 4;                
+          }                                           
+       }  
               
  \end{verbatim}
 Importantly:
