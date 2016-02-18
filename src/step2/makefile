@@ -46,6 +46,6 @@ $(SHAREDLIBBLISLAB): $(BLISLAB_OBJ)
 # ---------------------------------------------------------------------------
 
 clean:
-	-rm $(BLISLAB_OBJ) $(LIBBLISLAB) $(SHAREDLIBBLISLAB) dgemm/*~ test/*~ include/*~ *~ make.inc.files/*~
+	-rm $(BLISLAB_OBJ) $(LIBBLISLAB) $(SHAREDLIBBLISLAB) dgemm/*~ kernels/*.o kernels/*~ test/*~ include/*~ *~ make.inc.files/*~
 	$(MAKE) clean -C test
 
