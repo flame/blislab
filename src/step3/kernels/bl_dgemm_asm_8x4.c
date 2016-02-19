@@ -14,8 +14,8 @@ void bl_dgemm_asm_8x4(
     aux_t  *aux
     )
 {
-  unsigned long long k_iter = k / 4;
-  unsigned long long k_left = k % 4;
+  unsigned long long k_iter = (unsigned long long)k / 4;
+  unsigned long long k_left = (unsigned long long)k % 4;
   unsigned long long pc     = aux->pc;
   
   //printf( "%ld\n", last );
