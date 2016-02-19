@@ -39,7 +39,7 @@
 #include <avx_types.h>
 
 #define inc_t unsigned long long 
-#define dim_t int
+//#define dim_t int
 
 
 
@@ -68,7 +68,7 @@
 	"vmovhpd           %%xmm1,  (%%rcx,%%r10  )  \n\t"*/
 
 void bl_dgemm_asm_8x6(
-                        dim_t              k,
+                        int              k,
                         //double*            alpha,
                         double*            a,
                         double*            b,
@@ -92,8 +92,8 @@ void bl_dgemm_asm_8x6(
 
 
 
-	dim_t   k_iter = k / 4;
-	dim_t   k_left = k % 4;
+	dim_t   k_iter = (unsigned long long)k / 4;
+	dim_t   k_left = (unsigned long long)k % 4;
 
 	__asm__ volatile
 	(

@@ -205,7 +205,6 @@ void bl_dgemm(
 
             #pragma omp parallel for num_threads( bl_ic_nt ) private( jr )
             for ( j = 0; j < jb; j += DGEMM_NR ) {
-
                 packB_kcxnc_d(
                         min( jb - j, DGEMM_NR ),
                         pb,
@@ -217,9 +216,8 @@ void bl_dgemm(
             }
 
             #pragma omp parallel for num_threads( bl_ic_nt ) private( ic, ib, i, ir )
-            for ( ic = 0; ic < m; ic += DGEMM_MC ) {              // 3-th loop around micro-kernel
+            for ( ic = 0; ic < m; ic += DGEMM_MC ) {              // 3-rd loop around micro-kernel
                 int     tid = omp_get_thread_num();
-
                 ib = min( m - ic, DGEMM_MC );
 
                 for ( i = 0; i < ib; i += DGEMM_MR ) {
@@ -243,7 +241,7 @@ void bl_dgemm(
                         ldc
                         );
 
-            }                                                  // End 3.th loop around micro-kernel
+            }                                                  // End 3.rd loop around micro-kernel
         }                                                      // End 4.th loop around micro-kernel
     }                                                          // End 5.th loop around micro-kernel
 
