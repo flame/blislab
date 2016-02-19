@@ -40,7 +40,6 @@
 
 #define inc_t unsigned long long 
 
-
 #define DGEMM_INPUT_GS_BETA_NZ \
 	"vmovlpd    (%%rcx        ),  %%xmm0,  %%xmm0  \n\t" \
 	"vmovhpd    (%%rcx,%%rsi,1),  %%xmm0,  %%xmm0  \n\t" \
@@ -67,12 +66,9 @@
 
 void bl_dgemm_asm_12x4(
                          int              k,
-                         //double*   alpha,
                          double*   a,
                          double*   b,
-                         //double*   beta,
                          double*   c,
-                         //inc_t rs_c, inc_t cs_c,
                          inc_t              ldc,
                          aux_t*         data
                        )
@@ -87,8 +83,6 @@ void bl_dgemm_asm_12x4(
 
     alpha = &alpha_val;
     beta  = &beta_val;
-
-
 
 	dim_t   k_iter = (unsigned long long)k / 4;
 	dim_t   k_left = (unsigned long long)k % 4;
@@ -669,5 +663,4 @@ void bl_dgemm_asm_12x4(
 	  "memory"
 	);
 }
-
 

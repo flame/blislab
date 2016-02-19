@@ -14,11 +14,8 @@ void bl_dgemm_asm_8x4(
     aux_t  *aux
     )
 {
-  unsigned long long k_iter = (unsigned long long)k / 4;
-  unsigned long long k_left = (unsigned long long)k % 4;
-  unsigned long long pc     = aux->pc;
-  
-  //printf( "%ld\n", last );
+    unsigned long long k_iter = (unsigned long long)k / 4;
+    unsigned long long k_left = (unsigned long long)k % 4;
 
 	__asm__ volatile
 	(
@@ -35,7 +32,7 @@ void bl_dgemm_asm_8x4(
     "                                            \n\t"
     "                                            \n\t"
     "movq                %4, %%rcx               \n\t" // load address of c
-    "movq               %7, %%rdi               \n\t" // load ldc
+    "movq               %6, %%rdi               \n\t" // load ldc
     "leaq        (,%%rdi,8), %%rdi               \n\t" // ldc * sizeof(double)
     "leaq   (%%rcx,%%rdi,2), %%r10               \n\t" // load address of c + 2 * ldc;
     "                                            \n\t"
@@ -199,8 +196,6 @@ void bl_dgemm_asm_8x4(
 	"                                            \n\t"
 	"                                            \n\t"
 	"                                            \n\t"
-	"                                            \n\t"
-	"                                            \n\t"
 	".DCONSIDKLEFT:                              \n\t"
 	"                                            \n\t"
 	"movq      %1, %%rsi                         \n\t" // i = k_left;
@@ -319,13 +314,9 @@ void bl_dgemm_asm_8x4(
 	"                                            \n\t"
 	"                                            \n\t"
 	"                                            \n\t"
-//	"movq      %6, %%rdi                         \n\t" // load pc
-//	"testq  %%rdi, %%rdi                         \n\t" // check pc via logical AND. 
-//	"je     .SQDISTANCE                          \n\t" // if pc == 0, jump to code
-	"                                            \n\t"
 	"                                            \n\t"
     "movq                   %4, %%rcx            \n\t" // load address of c
-	"movq                  %7, %%rdi            \n\t" // load  ldc
+	"movq                   %6, %%rdi            \n\t" // load  ldc
 	"leaq           (,%%rdi,8), %%rdi            \n\t" // rsi = ldc * sizeof(double)
 	"                                            \n\t"
 	"                                            \n\t"
@@ -358,59 +349,10 @@ void bl_dgemm_asm_8x4(
 	"                                            \n\t"
 	"                                            \n\t"
 	"                                            \n\t"
-	".SQDISTANCE:                                \n\t"
-	"                                            \n\t"
-//	"movq     %8, %%rdi                         \n\t" // load lastiter flag
-//	"testq  %%rdi, %%rdi                         \n\t" // check the flag via logical AND. 
-//	"je     .STOREBACK                           \n\t" // if flag == 0, jump to code
-//	"                                            \n\t"
-//
-//	"movq                %7, %%rax               \n\t" // load address of aa.
-//	"movq                %8, %%rbx               \n\t" // load address of bb.
-//	"movq                %9, %%rdx               \n\t" // load address of neg2.
-//	"                                            \n\t"
-//	"vbroadcastsd   0(%%rdx),  %%ymm0            \n\t" // ymm0 = -2.0
-//	"vmulpd           %%ymm0,  %%ymm9,  %%ymm9   \n\t"
-//	"vmulpd           %%ymm0,  %%ymm11, %%ymm11  \n\t"
-//	"vmulpd           %%ymm0,  %%ymm13, %%ymm13  \n\t"
-//	"vmulpd           %%ymm0,  %%ymm15, %%ymm15  \n\t"
-//	"vmovapd    0 * 32(%%rax),  %%ymm1           \n\t" // ymm1 = aa03
-//	"vmulpd           %%ymm0,  %%ymm8,  %%ymm8   \n\t"
-//	"vmulpd           %%ymm0,  %%ymm10, %%ymm10  \n\t"
-//	"vmulpd           %%ymm0,  %%ymm12, %%ymm12  \n\t"
-//	"vmulpd           %%ymm0,  %%ymm14, %%ymm14  \n\t"
-//	"                                            \n\t"
-//	"vmovapd    1 * 32(%%rax),  %%ymm2           \n\t" // ymm2 = aa47
-//	"vaddpd           %%ymm1,  %%ymm9,  %%ymm9   \n\t"
-//	"vaddpd           %%ymm1,  %%ymm11, %%ymm11  \n\t"
-//	"vaddpd           %%ymm1,  %%ymm13, %%ymm13  \n\t"
-//	"vaddpd           %%ymm1,  %%ymm15, %%ymm15  \n\t"
-//	"vbroadcastsd   0(%%rbx),  %%ymm0            \n\t" // ymm0 = bb0
-//	"vaddpd           %%ymm2,  %%ymm8,  %%ymm8   \n\t"
-//	"vaddpd           %%ymm2,  %%ymm10, %%ymm10  \n\t"
-//	"vaddpd           %%ymm2,  %%ymm12, %%ymm12  \n\t"
-//	"vaddpd           %%ymm2,  %%ymm14, %%ymm14  \n\t"
-//	"                                            \n\t"
-//	"vbroadcastsd   8(%%rbx),  %%ymm1            \n\t" // ymm1 = bb1
-//	"vaddpd           %%ymm0,  %%ymm9,  %%ymm9   \n\t"
-//	"vaddpd           %%ymm0,  %%ymm8,  %%ymm8   \n\t"
-//	"                                            \n\t"
-//	"vbroadcastsd  16(%%rbx),  %%ymm0            \n\t" // ymm0 = bb2
-//	"vaddpd           %%ymm1,  %%ymm11, %%ymm11  \n\t"
-//	"vaddpd           %%ymm1,  %%ymm10, %%ymm10  \n\t"
-//	"                                            \n\t"
-//	"vbroadcastsd  24(%%rbx),  %%ymm1            \n\t" // ymm1 = bb3
-//	"vaddpd           %%ymm0,  %%ymm13, %%ymm13  \n\t"
-//	"vaddpd           %%ymm0,  %%ymm12, %%ymm12  \n\t"
-//	"vaddpd           %%ymm1,  %%ymm15, %%ymm15  \n\t"
-//	"vaddpd           %%ymm1,  %%ymm14, %%ymm14  \n\t"
-	"                                            \n\t"
-	"                                            \n\t"
-	"                                            \n\t"
 	".STOREBACK:                                 \n\t"
 	"                                            \n\t"
 	"movq                   %4, %%rcx            \n\t" // load address of c
-	"movq                  %7, %%rdi            \n\t" // load address of ldc
+	"movq                   %6, %%rdi            \n\t" // load address of ldc
 	"leaq           (,%%rdi,8), %%rdi            \n\t" // rsi = ldc * sizeof(double)
 	"                                            \n\t"
 	"vmovapd           %%ymm9,   0(%%rcx)         \n\t" // C_c( 0, 0:3 ) = ymm9
@@ -435,12 +377,10 @@ void bl_dgemm_asm_8x4(
 	  "m" (b),           // 3
 	  "m" (c),           // 4
 	  "m" (aux->b_next), // 5
-      "m" (pc),          // 6
-      "m" (ldc)         // 7
-          //    "m" (last)         // 8
+      "m" (ldc)          // 6
 	: // register clobber list
-	  "rax", "rbx", "rcx", "rsi", "rdi",
-    "r15",
+	  "rax", "rbx", "rcx", "rdx", "rsi", "rdi",
+	  "r8", "r9", "r10", "r11", "r12", "r13", "r14", "r15",
 	  "xmm0", "xmm1", "xmm2", "xmm3",
 	  "xmm4", "xmm5", "xmm6", "xmm7",
 	  "xmm8", "xmm9", "xmm10", "xmm11",
@@ -448,14 +388,13 @@ void bl_dgemm_asm_8x4(
 	  "memory"
 	);
 
-
-  //printf( "ldc = %d\n", ldc );
-  //printf( "%lf, %lf, %lf, %lf\n", c[0], c[ ldc + 0], c[ ldc * 2 + 0], c[ ldc * 3 + 0] );
-  //printf( "%lf, %lf, %lf, %lf\n", c[1], c[ ldc + 1], c[ ldc * 2 + 1], c[ ldc * 3 + 1] );
-  //printf( "%lf, %lf, %lf, %lf\n", c[2], c[ ldc + 2], c[ ldc * 2 + 2], c[ ldc * 3 + 2] );
-  //printf( "%lf, %lf, %lf, %lf\n", c[3], c[ ldc + 3], c[ ldc * 2 + 3], c[ ldc * 3 + 3] );
-  //printf( "%lf, %lf, %lf, %lf\n", c[4], c[ ldc + 4], c[ ldc * 2 + 4], c[ ldc * 3 + 4] );
-  //printf( "%lf, %lf, %lf, %lf\n", c[5], c[ ldc + 5], c[ ldc * 2 + 5], c[ ldc * 3 + 5] );
-  //printf( "%lf, %lf, %lf, %lf\n", c[6], c[ ldc + 6], c[ ldc * 2 + 6], c[ ldc * 3 + 6] );
-  //printf( "%lf, %lf, %lf, %lf\n", c[7], c[ ldc + 7], c[ ldc * 2 + 7], c[ ldc * 3 + 7] );
+    //printf( "ldc = %d\n", ldc );
+    //printf( "%lf, %lf, %lf, %lf\n", c[0], c[ ldc + 0], c[ ldc * 2 + 0], c[ ldc * 3 + 0] );
+    //printf( "%lf, %lf, %lf, %lf\n", c[1], c[ ldc + 1], c[ ldc * 2 + 1], c[ ldc * 3 + 1] );
+    //printf( "%lf, %lf, %lf, %lf\n", c[2], c[ ldc + 2], c[ ldc * 2 + 2], c[ ldc * 3 + 2] );
+    //printf( "%lf, %lf, %lf, %lf\n", c[3], c[ ldc + 3], c[ ldc * 2 + 3], c[ ldc * 3 + 3] );
+    //printf( "%lf, %lf, %lf, %lf\n", c[4], c[ ldc + 4], c[ ldc * 2 + 4], c[ ldc * 3 + 4] );
+    //printf( "%lf, %lf, %lf, %lf\n", c[5], c[ ldc + 5], c[ ldc * 2 + 5], c[ ldc * 3 + 5] );
+    //printf( "%lf, %lf, %lf, %lf\n", c[6], c[ ldc + 6], c[ ldc * 2 + 6], c[ ldc * 3 + 6] );
+    //printf( "%lf, %lf, %lf, %lf\n", c[7], c[ ldc + 7], c[ ldc * 2 + 7], c[ ldc * 3 + 7] );
 }

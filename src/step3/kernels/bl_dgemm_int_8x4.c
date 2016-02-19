@@ -39,16 +39,12 @@
 #include <avx_types.h>
 
 #define inc_t unsigned long long 
-//#define dim_t int
-
 
 void bli_dgemm_int_8x4(
                         int      k,
                         double*  a,
                         double*  b,
                         double*  c,
-                        //inc_t rs_c,
-                        //inc_t cs_c,
                         inc_t ldc,
                         aux_t*         data
                       )
@@ -65,8 +61,8 @@ void bli_dgemm_int_8x4(
 	//void* b_next = bli_auxinfo_next_b( data );
     double *b_next = data->b_next;
 
-	dim_t k_iter  = k / 2;
-	dim_t k_left  = k % 2;
+	dim_t k_iter  = (unsigned long long)k / 2;
+	dim_t k_left  = (unsigned long long)k % 2;
 
 	dim_t i;
 

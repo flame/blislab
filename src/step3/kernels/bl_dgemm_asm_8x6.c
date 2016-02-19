@@ -39,8 +39,6 @@
 #include <avx_types.h>
 
 #define inc_t unsigned long long 
-//#define dim_t int
-
 
 
 #define DGEMM_INPUT_GS_BETA_NZ \
@@ -69,13 +67,10 @@
 
 void bl_dgemm_asm_8x6(
                         int              k,
-                        //double*            alpha,
                         double*            a,
                         double*            b,
-                        //double*            beta,
                         double*            c,
                         inc_t              ldc,
-                        //inc_t rs_c, inc_t cs_c,
                         aux_t*         data
                       )
 {
@@ -89,8 +84,6 @@ void bl_dgemm_asm_8x6(
 
     alpha = &alpha_val;
     beta  = &beta_val;
-
-
 
 	dim_t   k_iter = (unsigned long long)k / 4;
 	dim_t   k_left = (unsigned long long)k % 4;
@@ -665,5 +658,4 @@ void bl_dgemm_asm_8x6(
 	  "memory"
 	);
 }
-
 
