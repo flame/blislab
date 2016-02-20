@@ -274,6 +274,33 @@ structure for subdirectory {\tt step3}. Comparing to {\tt step2}, we have modifi
 
 {\bf Describe vector instructions and how to access them through vector intrinsics.}
 
+You can find the vector instructions on line:
+\begin{itemize}
+\item \myhref{https://software.intel.com/sites/landingpage/IntrinsicsGuide/}{Intel Intrinsics Guide}
+\item \myhref{https://software.intel.com/en-us/isa-extensions}{Intel ISA Extensions}
+\end{itemize}
+
+\subsubsection{An introduction example for ``{\tt axpy}''}
+We will provide you an example for the implementation of ``{\tt axpy}'' to demostrate how to use Intel {\tt AVX} Intrinsics and Assembly (in {\tt src/examples} subdirectory). This example will serve as a good start point for you to learn basic {\tt broacast}/{\tt fma}/{\tt load}/{\tt store} instructions. Moreover, this example is actually a primitive for the ``broadcast'' implementation for 4x4 rank-1 update.
+
+\subsubsection{4x4 rank-1 update}
+The micro-kernel implementation can be boiled down to 4x4 rank-1 update. There are two possible implementation: broadcast (Figure~\ref{fig:broadcast} and butterfly permutation (Figure~\ref{fig:permutation}). You can also try other possible implementation.
+\begin{figure}
+\begin{center}
+	\includegraphics[width=5in]{figures/avx_broadcast.pdf}
+\end{center}
+\caption{{\tt AVX} 4x4 rank-1 update with broadcast. Given 4x1 vector $A$ and $B$, we compute the 4x4 outer-product C by 4 {\tt FMA} interleaved with vectorized broadcast operations.}
+\label{fig:broadcast}
+\end{figure}
+
+\begin{figure}
+\begin{center}
+	\includegraphics[width=5in]{figures/avx_permute.pdf}
+\end{center}
+\caption{{\tt AVX} 4x4 rank-1 update with butterfly permutation. Given 4x1 vector $A$ and $B$, we compute the 4x4 outer-product C by 4 {\tt FMA} interleaved with vectorized shuffling operations. The 3rd operands (0x5, 0x1) indicates the shuffling (permutation) type.}
+\label{fig:permutation}
+\end{figure}
+
 \subsection{Your mission, if you choose to accept it}
 
 
