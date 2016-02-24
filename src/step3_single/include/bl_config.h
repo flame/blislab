@@ -71,17 +71,35 @@ extern "C" {
 //#define DGEMM_NR 4
 
 
-#define SGEMM_MC 128
-#define SGEMM_NC 4096
-#define SGEMM_KC 384
-#define SGEMM_MR 8
-#define SGEMM_NR 8
+//Ivy Bridge
+//#define SGEMM_MC 128
+//#define SGEMM_NC 4096
+//#define SGEMM_KC 384
+//#define SGEMM_MR 8
+//#define SGEMM_NR 8
+
+//// Haswell, 16x6
+//#define SGEMM_MC 144
+//#define SGEMM_NC 4080
+//#define SGEMM_KC 256
+//#define SGEMM_MR 16
+//#define SGEMM_NR 6
+
+
+// Haswell, 24x4
+#define SGEMM_MC 264
+#define SGEMM_NC 128
+#define SGEMM_KC 256
+#define SGEMM_MR 24
+#define SGEMM_NR 4
+
+
 
 
 //#define BL_MICRO_KERNEL bl_sgemm_ukr_ref
-#define BL_MICRO_KERNEL bl_sgemm_asm_8x8
-//#define BL_MICRO_KERNEL bl_sgemm_asm_8x6
-//#define BL_MICRO_KERNEL bl_sgemm_asm_12x4
+//#define BL_MICRO_KERNEL bl_sgemm_asm_8x8
+//#define BL_MICRO_KERNEL bl_sgemm_asm_16x6
+#define BL_MICRO_KERNEL bl_sgemm_asm_24x4
 
 // End extern "C" construct block.
 #ifdef __cplusplus

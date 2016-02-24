@@ -89,6 +89,21 @@ void bl_sgemm_asm_8x8( int k,
         unsigned long long ldc,
         aux_t* data );
 
+void bl_sgemm_asm_16x6( int k,
+        float *a,
+        float *b,
+        float *c,
+        unsigned long long ldc,
+        aux_t* data );
+
+void bl_sgemm_asm_24x4( int k,
+        float *a,
+        float *b,
+        float *c,
+        unsigned long long ldc,
+        aux_t* data );
+
+
 static void (*bl_micro_kernel) (
         int    k,
         float *a,

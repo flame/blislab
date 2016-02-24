@@ -17,6 +17,8 @@ FRAME_CPP_SRC= \
 KERNEL_SRC=    \
 							 kernels/bl_sgemm_ukr.c \
 							 kernels/bl_sgemm_asm_8x8.c \
+							 kernels/bl_sgemm_asm_16x6.c \
+							 kernels/bl_sgemm_asm_24x4.c \
 
 OTHER_DEP = \
 			                 include/bl_sgemm.h \
