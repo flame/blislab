@@ -8,26 +8,22 @@
 //result      c is stored in column major.
 #define c(i,j) c[ (j)*ldc + (i) ]
 
-void bl_dgemm_ukr_ref( int    k,
-                        double *a,
-                        double *b,
-                        double *c,
-                        dim_t ldc,
-                        aux_t* data )
+void bl_dgemm_ukr( int    k,
+                   double *a,
+                   double *b,
+                   double *c,
+                   dim_t ldc,
+                   aux_t* data )
 {
-
-    const dim_t m = DGEMM_MR;
-    const dim_t n = DGEMM_NR;
-
     dim_t l, j, i;
 
     for ( l = 0; l < k; ++l )
     {                 
-        for ( j = 0; j < n; ++j )
+        for ( j = 0; j < DGEMM_NR; ++j )
         { 
-            for ( i = 0; i < m; ++i )
+            for ( i = 0; i < DGEMM_MR; ++i )
             { 
-                c(i,j) += a(i,l)*b(l,j);
+                c( i, j ) += a( i, l ) * b( l, j );
             }
         }
     }

@@ -68,7 +68,7 @@ struct aux_s {
 };
 typedef struct aux_s aux_t;
 
-void bl_dgemm_ukr_ref( int k,
+void bl_dgemm_ukr( int k,
         double *a,
         double *b,
         double *c,
@@ -112,7 +112,7 @@ static void (*bl_micro_kernel) (
         aux_t  *aux
         ) = {
         BL_MICRO_KERNEL
-        //bl_dgemm_ukr_ref
+        //bl_dgemm_ukr
         //bl_dgemm_int_8x4
         //bl_dgemm_asm_8x4
         //bl_dgemm_asm_8x6
