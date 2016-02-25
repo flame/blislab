@@ -73,7 +73,8 @@ extern "C" {
 
 
 
-#define BL_MICRO_KERNEL bl_dgemm_asm_8x4
+#define BL_MICRO_KERNEL bl_dgemm_int_8x4
+//#define BL_MICRO_KERNEL bl_dgemm_asm_8x4
 //#define BL_MICRO_KERNEL bl_dgemm_asm_8x6
 //#define BL_MICRO_KERNEL bl_dgemm_asm_12x4
 

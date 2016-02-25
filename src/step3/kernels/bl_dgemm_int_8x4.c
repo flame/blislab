@@ -40,7 +40,7 @@
 
 #define inc_t unsigned long long 
 
-void bli_dgemm_int_8x4(
+void bl_dgemm_int_8x4(
                         int      k,
                         double*  a,
                         double*  b,
