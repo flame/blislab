@@ -27,7 +27,7 @@ that were first published in the paper~\cite{Goto:2008:AHP}
 	Volume 34 Issue 3, May 2008, Article No. 12.\\
 	 \myhref{http://shpc.ices.utexas.edu/publications.html}{http://shpc.ices.utexas.edu/publications.html}
 \end{quote}
-A further "refactoring" of this approach was more recently described in~\cite{BLIS1} 
+A further ``refactoring'' of this approach was more recently described in~\cite{BLIS1} 
 \begin{quote}
 	Field G. Van Zee, Robert A. van de Geijn. \\
 	\myhref{http://dl.acm.org/citation.cfm?id=2786970.2764454&coll=DL&dl=GUIDE&CFID=702354034&CFTOKEN=48470379}{%
@@ -39,7 +39,7 @@ A further "refactoring" of this approach was more recently described in~\cite{BL
 \end{quote}
 The advantage of the BLIS framework is that it reduces the kernel that must be highly optimized, possibly with vector intrinsics or in assemply code, to a {\em micro-kernel}.   In this section, we briefly describe the highlights of the approach.  However, we strongly suggest the reader become familiar with the above two papers themselves.
 
-Figure~\ref{fig:blis_gemm}~(left) illustrates the way the Goto approach structures the blocking for three layers of cache (L1, L2, and L3).  In the BLIS framework, the implementation is structured exactly this way so that only the micro-kernel at the bottom needs to be highly optimized and customized for a given architecture.  In the original GotoBLAS implementation, now maintained as OpenBLAS~\cite{}, the operation starting with the second loop loop around the micro-kernel is instead customized.  In order to get the best performance, it helps is all data is accessed contiguously, which is why at some point prior to reaching the micro-kernel, data is packed in the order indicated by the arrows:
+Figure~\ref{fig:blis_gemm}~(left) illustrates the way the Goto approach structures the blocking for three layers of cache (L1, L2, and L3).  In the BLIS framework, the implementation is structured exactly this way so that only the micro-kernel at the bottom needs to be highly optimized and customized for a given architecture.  In the original GotoBLAS implementation, now maintained as OpenBLAS~\cite{OpenBLASweb}, the operation starting with the second loop loop around the micro-kernel is instead customized.  In order to get the best performance, it helps is all data is accessed contiguously, which is why at some point prior to reaching the micro-kernel, data is packed in the order indicated by the arrows:
 \begin{center}
 	\includegraphics[width=2in]{figures/microkernel.pdf}
 \end{center}
@@ -147,30 +147,30 @@ One may ask if the above described scheme is optimal.  In~\cite{ITXGEMM:ICCS01} 
 %%%			\rm \color{red}
 %%%			comment{.} 
 %%%		}
-.
-		.3 bl\_dgemm\_int\_8x4.c
-%%%\DTcomment{
-%%%			\rm \color{red}
-%%%			comment{.} 
-%%%		}
-.
-		.3 bl\_dgemm\_asm\_8x4.c
-%%%\DTcomment{
-%%%			\rm \color{red}
-%%%			comment{.} 
-%%%		}
-.
-		.3 bl\_dgemm\_asm\_8x6.c
-%%%\DTcomment{
-%%%			\rm \color{red}
-%%%			comment{.} 
-%%%		}
-.
-		.3 bl\_dgemm\_asm\_12x4.c
-%%%\DTcomment{
-%%%			\rm \color{red}
-%%%			comment{.} 
-%%%		}
+%.
+%		.3 bl\_dgemm\_int\_8x4.c
+%%%%\DTcomment{
+%%%%			\rm \color{red}
+%%%%			comment{.} 
+%%%%		}
+%.
+%		.3 bl\_dgemm\_asm\_8x4.c
+%%%%\DTcomment{
+%%%%			\rm \color{red}
+%%%%			comment{.} 
+%%%%		}
+%.
+%		.3 bl\_dgemm\_asm\_8x6.c
+%%%%\DTcomment{
+%%%%			\rm \color{red}
+%%%%			comment{.} 
+%%%%		}
+%.
+%		.3 bl\_dgemm\_asm\_12x4.c
+%%%%\DTcomment{
+%%%%			\rm \color{red}
+%%%%			comment{.} 
+%%%%		}
 .
 		.2 lib 
 %%%\DTcomment{
@@ -258,38 +258,39 @@ One may ask if the above described scheme is optimal.  In~\cite{ITXGEMM:ICCS01} 
 \end{figure}
 
 Figure~\ref{fig:DirStep1} illustrates the directory
-structure for subdirectory {\tt step3}. Comparing to {\tt step2}, we have modified/added the following directories/files:
+structure for subdirectory {\tt step3}. Comparing to {\tt step1}, we have modified/added the following directories/files:
 
 \begin{description}
 \item[{\tt kernels}] This directory contains the micro-kernel implementations for various architecture.
 \begin{description}
-\item[{\tt bl\_dgemm\_int\_8x4.c}] Is an {\tt AVX} intrinsics micro-kernel implementation for Sandy Bridge/Ivy Bridge micro-architecture.
-\item[{\tt bl\_dgemm\_asm\_8x4.c}] Is an {\tt AVX} assembly micro-kernel implementation for Sandy Bridge/Ivy Bridge micro-architecture.
-\item[{\tt bl\_dgemm\_asm\_8x6.c}] Is an {\tt AVX2} assembly micro-kernel implementation for Haswell micro-architecture.
-\item[{\tt bl\_dgemm\_asm\_12x4.c}] Is an alternative {\tt AVX2} assembly micro-kernel implementation for Haswell micro-architecture.
+\item[{\tt bl\_dgemm\_ukr.c}] Is a naive C implementation.
+%\item[{\tt bl\_dgemm\_int\_8x4.c}] Is an {\tt AVX} intrinsics micro-kernel implementation for Sandy Bridge/Ivy Bridge micro-architecture.
+%\item[{\tt bl\_dgemm\_asm\_8x4.c}] Is an {\tt AVX} assembly micro-kernel implementation for Sandy Bridge/Ivy Bridge micro-architecture.
+%\item[{\tt bl\_dgemm\_asm\_8x6.c}] Is an {\tt AVX2} assembly micro-kernel implementation for Haswell micro-architecture.
+%\item[{\tt bl\_dgemm\_asm\_12x4.c}] Is an alternative {\tt AVX2} assembly micro-kernel implementation for Haswell micro-architecture.
+\item[{\tt bl\_dgemm\_int\_kernel.c}] Is an {\tt AVX/AVX2} intrinsics micro-kernel implementation for Haswell architecture.
+\item[{\tt bl\_dgemm\_asm\_kernel.c}] Is an {\tt AVX/AVX2} assembly micro-kernel implementation for Haswell architecture.
 \end{description}
 \end{description}
 
 \subsection{Advanced techniques}
-
-{\bf Describe vector instructions and how to access them through vector intrinsics.}
-
-You can find the vector instructions on line:
+%{\bf Describe vector instructions and how to access them through vector intrinsics.}
+You can find the vector instructions online:
 \begin{itemize}
 \item \myhref{https://software.intel.com/sites/landingpage/IntrinsicsGuide/}{Intel Intrinsics Guide}
 \item \myhref{https://software.intel.com/en-us/isa-extensions}{Intel ISA Extensions}
 \end{itemize}
 
 \subsubsection{An introduction example for ``{\tt axpy}''}
-We will provide you an example for the implementation of ``{\tt axpy}'' to demostrate how to use Intel {\tt AVX} Intrinsics and Assembly (in {\tt src/examples} subdirectory). This example will serve as a good start point for you to learn basic {\tt broacast}/{\tt fma}/{\tt load}/{\tt store} instructions. Moreover, this example is actually a primitive for the ``broadcast'' implementation for 4x4 rank-1 update.
+We provide you an example for the implementation of ``{\tt axpy}'' to demostrate how to use Intel {\tt AVX} Intrinsics and Assembly (in {\tt src/examples} subdirectory). This example will serve as a good start point for you to learn basic {\tt broacast}/{\tt fma}/{\tt load}/{\tt store} instructions. Moreover, this example is actually a primitive for the ``broadcast'' implementation for 4$\times$4 rank-1 update.
 
-\subsubsection{4x4 rank-1 update}
-The micro-kernel implementation can be boiled down to 4x4 rank-1 update. There are two possible implementation: broadcast (Figure~\ref{fig:broadcast} and butterfly permutation (Figure~\ref{fig:permutation}). You can also try other possible implementation.
+\subsubsection{4$\times$4 rank-1 update}
+The micro-kernel implementation can be boiled down to 4$\times$4 rank-1 update. There are two possible implementation: broadcast (Figure~\ref{fig:broadcast} and butterfly permutation (Figure~\ref{fig:permutation}). You can also try other possible implementation.
 \begin{figure}
 \begin{center}
 	\includegraphics[width=5in]{figures/avx_broadcast.pdf}
 \end{center}
-\caption{{\tt AVX} 4x4 rank-1 update with broadcast. Given 4x1 vector $A$ and $B$, we compute the 4x4 outer-product C by 4 {\tt FMA} interleaved with vectorized broadcast operations.}
+\caption{{\tt AVX} 4$\times$4 rank-1 update with broadcast. Given 4$\times$1 vector $A$ and $B$, we compute the 4$\times$4 outer-product C by 4 {\tt FMA} interleaved with vectorized broadcast operations.}
 \label{fig:broadcast}
 \end{figure}
 
@@ -297,10 +298,14 @@ The micro-kernel implementation can be boiled down to 4x4 rank-1 update. There a
 \begin{center}
 	\includegraphics[width=5in]{figures/avx_permute.pdf}
 \end{center}
-\caption{{\tt AVX} 4x4 rank-1 update with butterfly permutation. Given 4x1 vector $A$ and $B$, we compute the 4x4 outer-product C by 4 {\tt FMA} interleaved with vectorized shuffling operations. The 3rd operands (0x5, 0x1) indicates the shuffling (permutation) type.}
+\caption{{\tt AVX} 4$\times$4 rank-1 update with butterfly permutation. Given 4$\times$1 vector $A$ and $B$, we compute the 4$\times$4 outer-product C by 4 {\tt FMA} interleaved with vectorized shuffling operations. The 3rd operands (0x5, 0x1) indicates the shuffling (permutation) type.}
 \label{fig:permutation}
 \end{figure}
 
 \subsection{Your mission, if you choose to accept it}
-
+We provide you a reference implementation of simplified BLIS framework in {\tt my\_dgemm}. The code is organized in the same way presented in Figure~\ref{fig:blis_gemm}. However, the step size in each loop is not well choosen, and the micro-kernel implementation is in naive {\tt C}. Therefore. you will not expect high performance with the code. What we want you to do is to 
+\begin{itemize}
+\item Choose the blocking parameter $ m_C $, $ n_C $, $ k_C $ and the micro-kernel size parameter $ m_R $, $ n_R $ in the file {\tt include/bl\_config.h}; and
+\item Implement the efficient micro-kernel with vector intrinsics or assembly code. You need to fill up the code in {\tt kernels/bl\_dgemm\_int\_kernel.c} (for vector intrinsics), or {\tt kernels/bl\_dgemm\_asm\_kernel.c} (for assembly), and you also need to specify the function name of the micro-kernel by modifying {\tt BL\_MICRO\_KERNEL} in {\tt include/bl\_config.h}.
+\end{itemize}
 
