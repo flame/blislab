@@ -78,7 +78,7 @@ endfor
 Counting a multiply and an add separately,
 the computation requires $ 2 m n k $  floating point operations (flops).
 
-\subsection{Set up}
+\subsection{Setup}
 
 To let you efficiently learn about how to efficiently compute, you
 start your project with much of the infrastructure in place.  We have
@@ -248,23 +248,23 @@ structure for subdirectory {\tt step1}:
 \item[{\tt README}]
 Is a file that describes the contents of the directory and how to compile and execute the code.
 \item[{\tt sourceme.sh}]
-Is a file that configures the environment variables.
+Is a file that configures the environment variables.  In that file
 \begin{description}
 \item[{\tt BLISLAB\_USE\_INTEL}] sets whether you use the Intel compiler ({\tt true}) or the GNU compiler ({\tt false}).
-\item[{\tt BLISLAB\_USE\_BLAS}] indicates whether your reference \Gemm\ employs {\tt BLAS} implementation ({\tt true} if you have {\tt BLAS} installed on your machine), or the simple triple loops implementation ({\tt false}).
-\item[{\tt COMPILER\_OPT\_LEVEL}] sets the optimization level for your GNU or Intel compiler ({\tt O0}, {\tt O1}, {\tt O2}, {\tt O3}).
-\item[{\tt OMP\_NUM\_THREADS} and {\tt BLISLAB\_IC\_NT}] sets the number of threads used for parallel version of your code. For Step 1, you can just set them both to {\tt 1}.
+\item[{\tt BLISLAB\_USE\_BLAS}] indicates whether your reference {\tt dgemm} employs an external {\tt BLAS} library implementation ({\tt true} if you have such a BLAS library installed on your machine), or the simple triple loops implementation ({\tt false}).
+\item[{\tt COMPILER\_OPT\_LEVEL}] sets the optimization level for your GNU or Intel compiler ({\tt O0}, {\tt O1}, {\tt O2}, {\tt O3}).  (Notice that, for example, {\tt O3} consists of the capital letter "O" and the number "3".)
+\item[{\tt OMP\_NUM\_THREADS} and {\tt BLISLAB\_IC\_NT}] sets the number of threads used for parallel version of your code. For Step 1, you set them both to {\tt 1}.
 \end{description}
 \item[{\tt dgemm}]
-Is the subdirectory where the routines that implement \Gemm\ exist.
+Is the subdirectory where the routines that implement {\tt dgemm} exist.
 In it
 \begin{description}
 \item[{\tt bl\_dgemm\_ref.c}] contains the routine {\tt dgemm\_ref} that
-  is a simple implementation of \Gemm\ that you will use to check the
-  correctness of your implementations.
+  is a simple implementation of {\tt dgemm} that you will use to check the
+  correctness of your implementations, if {\tt BLISLAB\_USE\_BLAS = false}.
 \item[{\tt my\_dgemm.c}] contains the routine {\tt dgemm} that
-  that initially is a simple implementation of \Gemm\ and that you will optimize as part of the first step on your way to mastering how to optimize \Gemm.
-\item[{\tt bl\_dgemm\_util.c}] contains utility routines that will come in handy later.
+  that initially is a simple implementation of {\tt dgemm} and that you will optimize as part of the first step on your way to mastering how to optimize {\tt gemm}.
+\item[{\tt bl\_dgemm\_util.c}] contains utility routines that will later come in handy.
 \end{description}
 \item[{\tt include}]
 This directory contains 
@@ -278,10 +278,12 @@ compare your performance.
 \item[{\tt test\_bl\_dgemm.c}] contains the ``test driver'' for testing routine {\tt bl\_dgemm}. 
 \item[{\tt test\_bl\_dgemm.x}] is the executable file for {\tt test\_bl\_dgemm.c}. 
 \item[{\tt run\_bl\_dgemm.sh}] contains a bash script to collect performance results.
-\item[{\tt tacc\_run\_bl\_dgemm.sh}] contains a {\tt SLURM} script for you to (optionally) submit the job to TACC machines to measure performance.
+\item[{\tt tacc\_run\_bl\_dgemm.sh}] contains a {\tt SLURM} script for you to (optionally) submit the job to the Texas Advanced Computing Center (TACC) machines if you have an account there.
 \end{description}
 %\item[{\tt }]
 \end{description}
+
+\subsection{Getting started}
 
 \begin{figure}[tb!]
 	\begin{center}
@@ -312,18 +314,18 @@ Examining
           C( i, j ) += A( i, p ) * B( p, j );
           
 \end{verbatim}
-we notice that, each operand is a {\tt MACRO}. For example, earlier in the file
+we notice that, each operand is a {\tt MACRO}. Consider early in that file
 \begin{verbatim}
 
    #define C( i, j ) C[ (j)*ldc + (i) ]
    
 \end{verbatim}
 % means {\tt C(i, j)} expands to {\tt j * ldc + i}.  
-The linear array at address $ C $ is used to store elements $ C_{i,j} $ so that the $ i,j $ element is mapped to location {\tt j * ldc + i}.  The way to view this is that the columns of $ C $ are each stored contiguously.  However, think of matrix $ C $ as embedded in a large array that has {\tt ldc} rows so that accessing a row means going through array {\tt C} with stride {\tt ldc}.  The term {\em leading dimension} of two-dimensional array {\tt C} is typically used to refer to the row dimension of this larger array, hence the variable {\tt ldc} (\underline{l}eading \underline{d}imension of \underline{\tt C}).
+The linear array at address $ C $ is used to store elements $ C_{i,j} $ so that the $ i,j $ element is mapped to location {\tt j * ldc + i}.  The way to view this is that the columns of $ C $ are each stored contiguously.  However, think of matrix $ C $ as embedded in a larger array that has {\tt ldc} rows so that accessing a row means going through array {\tt C} with stride {\tt ldc}.  The term {\em leading dimension} of two-dimensional array {\tt C} is typically used to refer to the row dimension of this larger array, hence the variable {\tt ldc} (\underline{l}eading \underline{d}imension of \underline{\tt C}).
 This is illustrated for all three matrices in
 the following figure:
 \begin{center}
-	\includegraphics[width=4in]{figures/LeadingDims.pdf}
+	\includegraphics[width=5in]{figures/LeadingDims.pdf}
 \end{center}
 in which the arrows are meant to indicate that columns are stored contiguously.
 %we notice that, for example, the linear array at address $ C $ is used to store elements $ C_{i,j} $ so that the $ i,j $ element is mapped to location {\tt j * ldc + i}.  The way to view this is that the columns of $ C $ are each stored contiguously.  However, think of matrix $ C $ as embedded in a large array that has {\tt ldc} rows so that accessing a row means going through array {\tt C} with stride {\tt ldc}.  The term {\em leading dimension} of two-dimensional array {\tt C} is typically used to refer to the row dimension of this larger array, hence the variable {\tt ldc} (\underline{l}eading \underline{d}imension of \underline{\tt C}).
@@ -348,6 +350,12 @@ in the terminal, and you will see the output:
 \end{verbatim}
 
 \subsubsection{Compile, execute and collect results}
+\label{sec:mkl}
+
+	{\color{red} If you do not have access to Intel's compiler ({tt icc}), then read Subsections~\ref{sec:mkl} and~~\ref{sec:graph}, and continue with Subsection~\ref{sec:gcc}.}
+
+\vspace{0.1in}
+\noindent
 You can compile, execute your code and collect the performance result by executing
 %{\color{red} in what subdirectory?}
 \begin{verbatim}
@@ -358,7 +366,7 @@ You can compile, execute your code and collect the performance result by executi
    ./run_bl_dgemm.sh
 
 \end{verbatim}
-in {\tt step1} subdirectory. You will see the performance result output:
+in subdirectory{\tt step1}. You will see the performance result output:
 \begin{verbatim}
 
    run_step1_st=[
@@ -381,6 +389,7 @@ C[ 0 ][ 0 ] != C_ref, 1.253000E+00, 2.253000E+00
 \end{verbatim}
 
 \subsubsection{Draw the performance graph}
+\label{sec:graph}
 
 Finally, you can use {\tt MATLAB} to draw your performance graph with our scripts. In {\tt src/results} subdirectory, after executing 
 \begin{verbatim}
@@ -421,9 +430,11 @@ in the terminal, and you will observe:
 \end{verbatim}
 
 \subsubsection{Turn off optimization}
+\label{sec:gcc}
 
-Next, we want you to turn off the optimization performed by the compiler.  This serves two purposes: first, it means you are going to have to explicitly perform optimizations, which will allow you to learn about how architectures and algorithms interact.  Second, it may very well be that the optimizing compiler will try to "undo" what you are explicitly trying to accomplish.  Third, the more tricks you build into your code, the harder it gets for the compiler to figure out how to optimize.
+Next, we want you to turn off the optimization performed by the compiler.  This serves three purposes: first, it means you are going to have to explicitly perform optimizations, which will allow you to learn about how architectures and algorithms interact.  Second, it may very well be that the optimizing compiler will try to ``undo'' what you are explicitly trying to accomplish.  Third, the more tricks you build into your code, the harder it gets for the compiler to figure out how to optimize.
 %{\bf Jianyu: Describe how to change the makefiles to using the GNU compiler but with the optimization turned off, and how to view and interpret the results.}
+
 You need first edit {\tt sourceme.sh}: 
 \begin{verbatim}
 
@@ -454,7 +465,9 @@ If you have a {\tt BLAS} library installed on your test machine, you can adopt t
    
 \end{verbatim}
 in {\tt sourceme.sh}.
-If you use Intel compiler, you don't need to explicitly specify the path of MKL. However, if you use GNU compiler, you need to specify the path of your BLAS library, for example,
+If you use Intel compiler, you don't need to explicitly specify the path of MKL. However, if you use GNU compiler, you need to specify the path of your BLAS library.   For example, you may want to install our BLIS library from 
+\myhref{https://github.com/flame/blis}{\url{https://github.com/flame/blis}}
+in directory {\tt /home/lib/blis} and in {\tt sourceme.sh} set
 \begin{verbatim}
 
    BLAS_DIR=/home/lib/blis
@@ -534,7 +547,7 @@ Importantly:
 	\item
 	When data it brought in for memory into cache, it is brought in a cache line of 64 bytes at a time.  This means that accessing contiguous data in chunks of 64 bytes reduces the cost of memory movement between the memory layers.
 \end{itemize}
-Notice that when you unroll, you may have to deal with a ``fringe'' if, in this case, {\tt m} is not a multiple of four.    For the sake of this exercise, you need not worry about this fringe, as reiterated in Section~\ref{sec:two:mission}.
+Notice that when you unroll, you may have to deal with a ``fringe'' if, in this case, {\tt m} is not a multiple of four.    For the sake of this exercise, you need not worry about this fringe {\em as long as you pick your sampling block size wisely}, as reiterated in Section~\ref{sec:two:mission}.
 
 \subsubsection{Register variables}
 
@@ -556,7 +569,7 @@ Notice that computation can only happen if data is stored in registers.  A compi
    }       
 \end{verbatim}
 
-\subsection{Your mission, if you choose to accept it}
+\subsection{A modest first goal}
 \label{sec:two:mission}
 
 We now ask you to employ the techniques discussed above to optimize {\tt my\_dgemm}.  For now, just worry about trying to attain better performance for smallish matrices.  In particular, consider the following picture:
@@ -567,8 +580,8 @@ What we want you to do is to write your code so that $ m_R \times n_R $ blocks o
 You get to choose $ m_R $ and $ n_R $, but you will want to update file {\tt include/bl\_config.h} with those choices.
 This ensures that the test driver only tries problem sizes that are multiples of these block sizes, so you don't have to worry about ``fringe''.
 
-\subsubsection{Vector intrinsics}
+% \subsubsection{Vector intrinsics}
 
-You will notice that even for smallish matrices, your implementation performs (much) worse than the implementations that are part of MKL and/or BLIS.  
+You will notice that even for smallish matrices that can fit in one of the cache memories, your implementation performs (much) worse than the implementations that are part of MKL or other optimized BLAS library that you may have installed.  
 The reason is that the compiler is not using the fastest instructions for floating point arithmetic.  These can be accessed either by using {\em vector intrinsic functions}, which allows you to explicitly utilize them from C, or by coding in assemply code.  For now, let's not yet go there.  We will talk more about this in Step 3.
 

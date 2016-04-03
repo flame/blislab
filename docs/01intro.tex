@@ -1,12 +1,15 @@
-Matrix-matrix multiplication (\Gemm) is frequently used as a simple example with which to raise awareness of how to optimize code on modern processors.  The reason is that the operation is simple to describe, challenging to fully optimize, and of practical importance.  In this paper, we walk the reader through the techniques that underly the currently fastest implementations for CPU architectures.
+Matrix-matrix multiplication (\Gemm) is frequently used as a simple example with which to raise awareness of how to optimize code on modern processors.  The reason is that the operation is simple to describe, challenging to fully optimize, and of practical importance.  In this document, we walk the reader through the techniques that underly the currently fastest implementations for CPU architectures.
 
 \subsection{Basic Linear Algebra Subprograms (BLAS)}
 
-The Basic Linear Algebra Subprograms (BLAS)~\cite{BLAS1,BLAS2,BLAS3,BLIS-Encycl} are an interface to a set of linear algebra operations upon which higher level linear algebra libraries.  Of these, the level-3 BLAS constitute a set of matrix-matrix operations that, if all matrix operands are $ n \times n$ in size, $ O( n^3 ) $ computation is performed over $ O( n^2 ) $ data so that the cost of moving data between memory layers (main memory, the caches, and the registers) can be amortized over many computations.  As a result, high performance can often be achieved if these operations are carefully implemented.
+The Basic Linear Algebra Subprograms (BLAS)~\cite{BLAS1,BLAS2,BLAS3,BLIS-Encycl} form an interface for a set of linear algebra operations upon which higher level linear algebra libraries, such at LAPACK~\cite{LAPACK3} and {\tt libflame}~\cite{libflame_ref}, are built.  The idea is that if someone optimizes the BLAS for a given architecture, then all applications and libraries that are written in terms of calls to the BLAS will benefit from such optimizations.  
 
-\subsection{Matrix-matrix multiplication (\Gemm)}
+The BLAS are divided into three sets: the level-1 BLAS (vector-vector operations), the level-2 BLAS (matrix-vector operations), and the level-3 BLAS (matrix-matrix operations).
+The last set benefits from the fact that, if all matrix operands are $ n \times n$ in size, $ O( n^3 ) $ floating point operations are performed with $ O( n^2 ) $ data so that the cost of moving data between memory layers (main memory, the caches, and the registers) can be amortized over many computations.  As a result, high performance can in principle be achieved if these operations are carefully implemented.
 
-In particular, general matrix-matrix multiplication (\Gemm) with double precision floating point numbers is supported by the BLAS with the call
+\subsection{Matrix-matrix multiplication}
+
+In particular, \Gemm\ with double precision floating point numbers is supported by the BLAS with the (Fortran) call
 \begin{verbatim}
 
       dgemm( transa, transb, m, n, k alpha, A, lda, B, ldb, beta, C, ldc )
@@ -20,29 +23,62 @@ C := \alpha A^T B + \beta C; \quad
 C := \alpha A B^T + \beta C; \quad \mbox{or }
 C := \alpha A^T B^T + \beta C.
 \]
-Here $ C $ is $ m \times n $ and $ k $ is the ``third dimension''.
+Here $ C $ is $ m \times n $ and $ k $ is the ``third dimension''.  The parameters {\tt dla}, {\tt dlb}, and {\tt dlc} are explained later in this document.
 
-We consider the simplified version of \Gemm,
+\NoShow{
+	Of importance in this call is the concept of a {\em leading dimension}.
+Consider the array of numbers
+\[
+\begin{array}{r r r}
+ 1.1 & \color{red} 1.2 &\color{red}1.3 \\
+ 2.1 & \color{red} 2.2 &\color{red}2.3 \\
+3.1 &3.2 &3.3 \\
+\end{array}
+\]
+which, when column major order is used, would be stored in memory contiguously as
+\[
+\begin{array}{r}
+1.1 \\
+2.1 \\
+3.1 \\
+\color{red} 1.2 \\
+\color{red} 2.2 \\
+3.2 \\
+\color{red} 1.3 \\
+\color{red} 2.3 \\
+3.3 
+\end{array}
+\]
+Now consider the matrix $ 
+A = \left(\begin{array}{r r}
+ \color{red} 1.2 &\color{red}1.3 \\
+ \color{red} 2.2 &\color{red}2.3 \\
+\end{array} \right)$.
+In the call to {\tt dgemm} this matrix could be passed to the routine by choosing
+{\tt k=2}, {\tt n=2}, {\tt A} equal to the address of where $ 1.2 $ is stored in memory, and {\tt lda=3}.
+The reason why {\tt lda=3} is that the matrix is stored as a subarray of an array that itself has $ 3 $ entries per column, which must be specified for the routine to understand how to access the matrix in memory.  Another way of thinking about this is that accessing elements of a row of $ A $ one must "stride" through memory with a stride of $ 3 $ elements.
+}
+
+In our exercises, we consider the simplified version of \Gemm,
 \[
 C := A B + C,
 \]
 where $ C $ is $ m \times n $, 
-$ A $ is $ m \times k $, and $ B $ is $ k \times n $
-in this paper.
+$ A $ is $ m \times k $, and $ B $ is $ k \times n $.
+If one understands how to optimize this particular case of {\tt dgemm}, then one can easily extend this knowledge to all level-3 BLAS functionality.
 
 
 \subsection{High-performance implementation}
 
 The intricacies of high-performance implementations are such that implementation of the BLAS in general and \Gemm\ in particular was 
 often relegated to 
-unsung experts who develop numerical libraries for the hardware vendors, for example as part of IBM's ESSL, Intel's MKL, Cray's LibSci, and AMD's ACML libraries.  In the past,
-these libraries were often written at least partially in assembly.
+unsung experts who develop numerical libraries for the hardware vendors, for example as part of IBM's ESSL, Intel's MKL, Cray's LibSci, and AMD's ACML libraries.  These libraries were typically written (at least partially) in assembly code and highly specialized for a specific processor.
   
-The key paper~\cite{IBM:P2} showed how an ``algorithms and architectures" approach to hand-in-hand designing architectures, compilers, and algorithms allowed 
-BLAS to be written in a high level language (Fortan) for the IBM Power architectures.
+A key paper~\cite{IBM:P2} showed how an ``algorithms and architectures" approach to hand-in-hand designing architectures, compilers, and algorithms allowed 
+BLAS to be written in a high level language (Fortan) for the IBM Power architectures and explained the intricacies of achieving high performance on those processors.
 The Portable High Performance ANSI C (PHiPAC)~\cite{PHiPAC97} project subsequently provided guidelines for writing high-performance code in C and suggested how to autogenerate and tune \Gemm\ written this way.  The Automatically Tuned Linear Algebra Software (ATLAS)~\cite{ATLAS,ATLAS_journal} built upon these insights and made autotuning and autogeneration of BLAS libraries mainstream.
 
-As part of the current paper we discuss more recent papers on the Goto approach to implementing \Gemm~\cite{Goto:2008:AHP} and the BLIS refactoring of that approach~\cite{BLIS1}, as well as other papers that are of more direct relevance.  
+As part of this document we discuss more recent papers on the subject, including the paper that introduced the Goto approach to implementing \Gemm~\cite{Goto:2008:AHP} and the BLIS refactoring of that approach~\cite{BLIS1}, as well as other papers that are of more direct relevance.  
 
 \subsection{Other similar exercises}
 
@@ -56,6 +92,6 @@ by Michael Lehn at Ulm University and  a wiki on
 \subsection{We need you!}
 
 The purpose of this paper is to guide you towards high-performance
-implementation of \Gemm.  Our ulterior motive is that our BLIS framework for implementing BLAS requires a so-called micro-kernel to be highly optimized for various CPUs.  In teaching you the basic techniques, we are hoping to identify  ``The One'' who will contribute the best micro-kernel.
-Think of it of our version of "HPC's Got Talent".
-Although  we focus in our description on optimization for the Intel Haswell architecture, the setup can be easily modified to instead help you (and us) optimize for other CPUs.  Indeed, BLIS itself supports architectures that include x86 processors by AMD and Intel, IBM's Power processors, ARM processors, and DSP processors~\cite{BLIS2,BLIS3,BLIS-TI}.
+implementations of \Gemm.  Our ulterior motive is that our BLIS framework for implementing BLAS requires a so-called micro-kernel to be highly optimized for various CPUs.  In teaching you the basic techniques, we are hoping to identify  ``The One'' who will contribute the best micro-kernel.
+Think of it as our version of "HPC's Got Talent".
+Although  we focus in our description on optimization for the Intel Haswell architecture, the setup can be easily modified to instead help you (and us) optimize for other CPUs.  Indeed, BLIS itself supports architectures that include AMD and Intel's x86 processors, IBM's Power processors, ARM processors, and Texas Instrument DSP processors~\cite{BLIS2,BLIS3,BLIS-TI}.

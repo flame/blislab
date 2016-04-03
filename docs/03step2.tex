@@ -5,16 +5,16 @@ with the advent of cache-based architectures, high-performance implementation of
 the amortization of the cost of data movement between memory layers and computation with that data.
 To keep this manageable, it helps to realize that only a ``kernel'' that performs a  matrix-matrix multiplication with relatively small matrices needs to be highly optimized, since
 computation with larger matrices can be blocked to then use such a kernel without an adverse impact on overall performance.  This 
-insight was first explicitly advocated in~\cite{poorman_journal}
+insight was explicitly advocated in~\cite{poorman_journal}
 \begin{quote}
-	Bo K\o{a}gstr\"{o}m , Per Ling, Charles Van Loan.\\
-	GEMM-based level 3 BLAS: high-performance model implementations and performance evaluation benchmark. \\
-	ACM Transactions on Mathematical Software (TOMS). \\
+	Bo{\aa}gstr\"{o}m , Per Ling, Charles Van Loan.
+	\myhref{http://dl.acm.org/citation.cfm?id=292412&CFID=766560304&CFTOKEN=45870613}{GEMM-based level 3 BLAS: high-performance model implementations and performance evaluation benchmark.}
+	ACM Transactions on Mathematical Software (TOMS). 
 	Volume 24 Issue 3, p.268-302, Sept. 1998.
 \end{quote}
-This at one point was referred to as "poorman's BLAS" in the sense that if one could only afford to optimize matrix-matrix multiplication (with submatrices), then one could build \Gemm, and other important matrix-matrix operations known as the level-3 BLAS, in terms of this.  What we will see later is that actually in general this is a good idea, for the sake of modularity as well as for performance.
+This is sometimes referred to as "poorman's BLAS" in the sense that if one could only afford to optimize matrix-matrix multiplication (with submatrices), then one could build \Gemm, and other important matrix-matrix operations known as the level-3 BLAS, in terms of this.  What we will see later is that actually in general this is a good idea, for the sake of modularity as well as for performance.
 
-In the last section you already saw an example of blocking.
+In the last section you already saw an example of blocking.  
 
 \subsection{Blocked matrix-matrix multiplication}
 
@@ -57,3 +57,4 @@ C_{i,j} := \sum_{p=0}^{K-1} A_{i,p} B_{p,j} + C_{i,j}.
 
 \subsection{Your mission, if you choose to accept it}
 We now ask you to implement the blocked matrix-matrix multiplication in {\tt my\_dgemm}.
+Specifically, for small matrices you achieve better performance than for larger matrices because the smaller matrices fit in cache.  Block the matrices into submatrices of the size for which you do attain higher performance, and you will see that the resulting implementation can maintain the better performance even for larger matrices.
