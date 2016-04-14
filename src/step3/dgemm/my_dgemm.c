@@ -161,6 +161,8 @@ void bl_macro_kernel(
     }                                                            // 2-th loop around micro-kernel
 }
 
+void bli_get_range( int n, int bf, int* start, int* end );
+
 // C must be aligned
 void bl_dgemm(
         int    m,
@@ -196,7 +198,7 @@ void bl_dgemm(
 
     // Allocate packing buffers
     packA  = bl_malloc_aligned( DGEMM_KC, ( DGEMM_MC + 1 ) * bl_ic_nt, sizeof(double) );
-    packB  = bl_malloc_aligned( DGEMM_KC, ( DGEMM_NC + 1 )            , sizeof(double) );
+    packB  = bl_malloc_aligned( DGEMM_KC, ( DGEMM_NC + 1 )           , sizeof(double) );
 
     for ( jc = 0; jc < n; jc += DGEMM_NC ) {                       // 5-th loop around micro-kernel
         jb = min( n - jc, DGEMM_NC );
@@ -215,38 +217,156 @@ void bl_dgemm(
                         );
             }
 
-            #pragma omp parallel for num_threads( bl_ic_nt ) private( ic, ib, i, ir )
-            for ( ic = 0; ic < m; ic += DGEMM_MC ) {              // 3-rd loop around micro-kernel
-                int     tid = omp_get_thread_num();
-                ib = min( m - ic, DGEMM_MC );
+            //#pragma omp parallel for num_threads( bl_ic_nt ) private( ic, ib, i, ir )
+            #pragma omp parallel num_threads( bl_ic_nt ) private( ic, ib, i, ir )
+            {
+                int     tid      = omp_get_thread_num();
+                //int     b_alg    = DGEMM_MC;
+                int     my_start;
+                int     my_end;
 
-                for ( i = 0; i < ib; i += DGEMM_MR ) {
-                    packA_mcxkc_d(
-                            min( ib - i, DGEMM_MR ),
+                //printf( "before call the function\n" );
+                bli_get_range( m, DGEMM_MR, &my_start, &my_end );
+
+
+                //int      n_way      = omp_get_num_threads();
+                //int      work_id    = omp_get_thread_num();
+
+                //printf( "m: %d, my_start: %d, my_end: %d, #threads: %d, tid: %d\n", m, my_start, my_end, omp_get_num_threads(), omp_get_thread_num() );
+                //exit( 0 );
+
+                //for ( ic = 0; ic < m; ic += b_alg ) { }             // 3-rd loop around micro-kernel
+                for ( ic = my_start; ic < my_end; ic += DGEMM_MC ) {              // 3-rd loop around micro-kernel
+
+                    //ib = min( m - ic, DGEMM_MC );
+                    ib = min( my_end - ic, DGEMM_MC );
+
+
+                    for ( i = 0; i < ib; i += DGEMM_MR ) {
+                        packA_mcxkc_d(
+                                min( ib - i, DGEMM_MR ),
+                                pb,
+                                &XA[ pc * lda ],
+                                m,
+                                ic + i,
+                                &packA[ tid * DGEMM_MC * pb + i * pb ]
+                                );
+                    }
+
+                    bl_macro_kernel(
+                            ib,
+                            jb,
                             pb,
-                            &XA[ pc * lda ],
-                            m,
-                            ic + i,
-                            &packA[ tid * DGEMM_MC * pb + i * pb ]
+                            packA  + tid * DGEMM_MC * pb,
+                            packB,
+                            &C[ jc * ldc + ic ], 
+                            ldc
                             );
-                }
 
-                bl_macro_kernel(
-                        ib,
-                        jb,
-                        pb,
-                        packA  + tid * DGEMM_MC * pb,
-                        packB,
-                        &C[ jc * ldc + ic ], 
-                        ldc
-                        );
+                }                                                    // End 3.rd loop around micro-kernel
 
-            }                                                  // End 3.rd loop around micro-kernel
-        }                                                      // End 4.th loop around micro-kernel
-    }                                                          // End 5.th loop around micro-kernel
+            }
+        }                                                        // End 4.th loop around micro-kernel
+    }                                                            // End 5.th loop around micro-kernel
 
     free( packA );
     free( packB );
 }
 
+
+//bf = m_R = 8
+
+// Code for work assignments
+void bli_get_range( int n, int bf, int* start, int* end )
+{
+	//int      n_way      = thread->n_way;
+	//int      work_id    = thread->work_id;
+    int      n_way      = omp_get_num_threads();
+    int      work_id    = omp_get_thread_num();
+
+
+    //printf( "n: %d, bf: %d, start: %d, end: %d, n_way: %d, work_id: %d\n,", n, bf, *start, *end, n_way, work_id );
+
+	int      all_start  = 0;
+	int      all_end    = n;
+
+	int      size       = all_end - all_start;
+
+	int      n_bf_whole = size / bf;
+	int      n_bf_left  = size % bf;
+
+	int      n_bf_lo    = n_bf_whole / n_way;
+	int      n_bf_hi    = n_bf_whole / n_way;
+
+	// In this function, we partition the space between all_start and
+	// all_end into n_way partitions, each a multiple of block_factor
+	// with the exception of the one partition that recieves the
+	// "edge" case (if applicable).
+	//
+	// Here are examples of various thread partitionings, in units of
+	// the block_factor, when n_way = 4. (A '+' indicates the thread
+	// that receives the leftover edge case (ie: n_bf_left extra
+	// rows/columns in its sub-range).
+	//                                        (all_start ... all_end)
+	// n_bf_whole  _left  hel  n_th_lo  _hi   thr0  thr1  thr2  thr3
+	//         12     =0    f        0    4      3     3     3     3
+	//         12     >0    f        0    4      3     3     3     3+
+	//         13     >0    f        1    3      4     3     3     3+
+	//         14     >0    f        2    2      4     4     3     3+
+	//         15     >0    f        3    1      4     4     4     3+
+	//         15     =0    f        3    1      4     4     4     3 
+	//
+	//         12     =0    t        4    0      3     3     3     3
+	//         12     >0    t        4    0      3+    3     3     3
+	//         13     >0    t        3    1      3+    3     3     4
+	//         14     >0    t        2    2      3+    3     4     4
+	//         15     >0    t        1    3      3+    4     4     4
+	//         15     =0    t        1    3      3     4     4     4
+
+	// As indicated by the table above, load is balanced as equally
+	// as possible, even in the presence of an edge case.
+
+	// First, we must differentiate between cases where the leftover
+	// "edge" case (n_bf_left) should be allocated to a thread partition
+	// at the low end of the index range or the high end.
+
+		// Notice that if all threads receive the same number of
+		// block_factors, those threads are considered "high" and
+		// the "low" thread group is empty.
+		int n_th_lo = n_bf_whole % n_way;
+		//int n_th_hi = n_way - n_th_lo;
+
+		// If some partitions must have more block_factors than others
+		// assign the slightly larger partitions to lower index threads.
+		if ( n_th_lo != 0 ) n_bf_lo += 1;
+
+		// Compute the actual widths (in units of rows/columns) of
+		// individual threads in the low and high groups.
+		int size_lo = n_bf_lo * bf;
+		int size_hi = n_bf_hi * bf;
+
+		// Precompute the starting indices of the low and high groups.
+		int lo_start = all_start;
+		int hi_start = all_start + n_th_lo * size_lo;
+
+		// Compute the start and end of individual threads' ranges
+		// as a function of their work_ids and also the group to which
+		// they belong (low or high).
+		if ( work_id < n_th_lo )
+		{
+			*start = lo_start + (work_id  ) * size_lo;
+			*end   = lo_start + (work_id+1) * size_lo;
+		}
+		else // if ( n_th_lo <= work_id )
+		{
+			*start = hi_start + (work_id-n_th_lo  ) * size_hi;
+			*end   = hi_start + (work_id-n_th_lo+1) * size_hi;
+
+			// Since the edge case is being allocated to the high
+			// end of the index range, we have to advance the last
+			// thread's end.
+			if ( work_id == n_way - 1 ) *end += n_bf_left;
+		}
+	
+}
 
