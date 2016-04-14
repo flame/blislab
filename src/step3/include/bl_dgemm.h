@@ -87,6 +87,9 @@ void bl_printmatrix(
         int    n
         );
 
+
+void bl_get_range( int n, int bf, int* start, int* end );
+
 // End extern "C" construct block.
 #ifdef __cplusplus
 }
