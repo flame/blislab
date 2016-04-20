@@ -13,3 +13,4 @@
 *.txt
 *.pyc
 .DS_Store
+*bak
