@@ -49,8 +49,6 @@
 #include "bl_dgemm_kernel.h"
 #include "bl_dgemm.h"
 
-#define min( i, j ) ( (i)<(j) ? (i): (j) )
-
 inline void packA_mcxkc_d(
         int    m,
         int    k,

@@ -44,8 +44,6 @@
  * */
 
 
-#include <omp.h>
-
 #include "bl_dgemm.h"
 
 #define USE_SET_DIFF 1

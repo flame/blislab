@@ -81,7 +81,6 @@ void bl_dgemm_ref(
     dgemm_( "N", "N", &m, &n, &k, &alpha,
             XA, &lda, XB, &ldb, &beta, XC, &ldc );
 #else
-    #pragma omp parallel for private( i, p )
     for ( j = 0; j < n; j ++ ) {
         for ( i = 0; i < m; i ++ ) {
             for ( p = 0; p < k; p ++ ) {
