@@ -44,11 +44,6 @@
  * */
 
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <limits.h>
-#include <time.h> 
-
 #include "bl_dgemm.h"
 
 #define USE_SET_DIFF 1

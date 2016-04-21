@@ -18,3 +18,9 @@ LIBBLISLAB = $(BLISLAB_DIR)/lib/libblislab.a
 SHAREDLIBBLISLAB = $(BLISLAB_DIR)/lib/libblislab.so
 
 LDFLAGS = -I$(BLISLAB_DIR)/include -I$(BLISLAB_DIR)/kernels
+
+OS_NAME = $(shell uname -s)
+ifeq ($(OS_NAME),Linux)
+LDLIBS += -lrt
+endif
+

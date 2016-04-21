@@ -80,7 +80,6 @@ extern "C" {
 #error "Cannot determine operating system"
 #endif
 
-
 // gettimeofday() needs this.
 #if BL_OS_WINDOWS
   #include <time.h>
@@ -91,9 +90,7 @@ extern "C" {
   #include <time.h>
 #endif
 
-
 #include "bl_config.h"
-
 
 #define min( i, j ) ( (i)<(j) ? (i): (j) )
 
@@ -101,7 +98,6 @@ extern "C" {
 #define B( i, j )     B[ (j)*ldb + (i) ]
 #define C( i, j )     C[ (j)*ldc + (i) ]
 #define C_ref( i, j ) C_ref[ (j)*ldc_ref + (i) ]
-
 
 struct aux_s {
     double *b_next;
@@ -139,10 +135,8 @@ void bl_printmatrix(
         int    n
         );
 
-
 double bl_clock( void );
 double bl_clock_helper();
-
 
 void bl_dgemm_ref(
     int    m,
@@ -155,7 +149,6 @@ void bl_dgemm_ref(
     double *XC,
     int    ldc
     );
-
 
 // End extern "C" construct block.
 #ifdef __cplusplus

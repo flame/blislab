@@ -44,11 +44,7 @@
  * */
 
 
-#include <stdio.h>
-#include <stdlib.h>
 #include <omp.h>
-#include <limits.h>
-#include <time.h> 
 
 #include "bl_dgemm.h"
 
@@ -123,7 +119,7 @@ void test_bl_dgemm(
     }
 
     for ( i = 0; i < nrepeats; i ++ ) {
-        bl_dgemm_beg = omp_get_wtime();
+        bl_dgemm_beg = bl_clock();
         {
             bl_dgemm(
                     m,
@@ -137,7 +133,7 @@ void test_bl_dgemm(
                     ldc
                     );
         }
-        bl_dgemm_time = omp_get_wtime() - bl_dgemm_beg;
+        bl_dgemm_time = bl_clock() - bl_dgemm_beg;
 
         if ( i == 0 ) {
             bl_dgemm_rectime = bl_dgemm_time;
@@ -147,7 +143,7 @@ void test_bl_dgemm(
     }
 
     for ( i = 0; i < nrepeats; i ++ ) {
-        ref_beg = omp_get_wtime();
+        ref_beg = bl_clock();
         {
             bl_dgemm_ref(
                     m,
@@ -161,7 +157,7 @@ void test_bl_dgemm(
                     ldc_ref
                     );
         }
-        ref_time = omp_get_wtime() - ref_beg;
+        ref_time = bl_clock() - ref_beg;
 
         if ( i == 0 ) {
             ref_rectime = ref_time;

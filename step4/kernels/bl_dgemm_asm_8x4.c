@@ -1,8 +1,4 @@
-#include <stdio.h>
-#include <immintrin.h> // AVX
-
 #include "bl_dgemm_kernel.h"
-#include "avx_types.h"
 
 
 void bl_dgemm_asm_8x4(

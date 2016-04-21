@@ -32,11 +32,8 @@
 
 */
 
-#include <stdio.h>
-#include <immintrin.h> // AVX
 
-#include <bl_dgemm_kernel.h>
-#include <avx_types.h>
+#include "bl_dgemm_kernel.h"
 
 #define inc_t unsigned long long 
 
