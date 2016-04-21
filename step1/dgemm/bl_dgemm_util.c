@@ -101,7 +101,7 @@ double bl_clock( void )
 	return bl_clock_helper();
 }
 
-#if BLIS_OS_WINDOWS
+#if BL_OS_WINDOWS
 // --- Begin Windows build definitions -----------------------------------------
 
 double bl_clock_helper()
@@ -132,8 +132,7 @@ double bl_clock_helper()
 }
 
 // --- End Windows build definitions -------------------------------------------
-//#elif BLIS_OS_OSX
-#elif defined(__APPLE__) || defined(__MACH__)
+#elif BL_OS_OSX
 // --- Begin OSX build definitions -------------------------------------------
 
 double bl_clock_helper()

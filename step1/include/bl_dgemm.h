@@ -56,7 +56,6 @@ extern "C" {
 
 
 #include <math.h>
-#include <immintrin.h>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -93,25 +92,16 @@ extern "C" {
 #endif
 
 
-//#if  defined(__APPLE__) || defined(__MACH__)
-//#include <mach/clock.h>
-//#include <mach/mach.h>
-//#include <mach/mach_time.h>
-//#endif
-
 #include "bl_config.h"
 
 
-#define A( i, j ) A[ (j)*lda + (i) ]
-#define B( i, j ) B[ (j)*ldb + (i) ]
-#define C( i, j ) C[ (j)*ldc + (i) ]
+#define min( i, j ) ( (i)<(j) ? (i): (j) )
+
+#define A( i, j )     A[ (j)*lda + (i) ]
+#define B( i, j )     B[ (j)*ldb + (i) ]
+#define C( i, j )     C[ (j)*ldc + (i) ]
 #define C_ref( i, j ) C_ref[ (j)*ldc_ref + (i) ]
 
-
-
-
-
-typedef unsigned long long dim_t;
 
 struct aux_s {
     double *b_next;
