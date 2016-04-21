@@ -43,13 +43,7 @@
  * 
  * */
 
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <omp.h>
-
-#include <bl_dgemm.h>
-#include <bl_config.h>
+#include "bl_dgemm.h"
 
 /*
  *

@@ -18,3 +18,8 @@ LDFLAGS = -I$(BLISLAB_DIR)/include -I$(BLISLAB_DIR)/kernels -I/$(BLISLAB_MKL_DIR
 
 LDLIBS = $(LIBBLISLAB) -lpthread -lm -openmp -mkl=parallel -Werror -Wall -pedantic
 
+OS_NAME = $(shell uname -s)
+ifeq ($(OS_NAME),Linux)
+LDLIBS += -lrt
+endif
+

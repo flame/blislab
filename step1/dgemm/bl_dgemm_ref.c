@@ -43,14 +43,7 @@
  * 
  * */
 
-
-#include <omp.h>
-#include <stdlib.h>
-#include <limits.h>
-#include <float.h>
-
 #include <bl_dgemm.h>
-#include <bl_dgemm_ref.h>
 
 #ifdef USE_BLAS
 /* 
@@ -77,14 +70,12 @@ void bl_dgemm_ref(
 {
     // Local variables.
     int    i, j, p;
-    double beg, time_collect, time_dgemm, time_square;
     double alpha = 1.0, beta = 1.0;
 
     // Sanity check for early return.
     if ( m == 0 || n == 0 || k == 0 ) return;
 
     // Reference GEMM implementation.
-    beg = omp_get_wtime();
 
 #ifdef USE_BLAS
     dgemm_( "N", "N", &m, &n, &k, &alpha,
@@ -99,8 +90,6 @@ void bl_dgemm_ref(
         }
     }
 #endif
-
-    time_dgemm = omp_get_wtime() - beg;
 
 }
 

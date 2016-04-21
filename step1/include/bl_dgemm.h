@@ -54,8 +54,26 @@
 extern "C" {
 #endif
 
+
+
 #include <math.h>
 #include <immintrin.h>
+
+
+#include <stdio.h>
+#include <stdlib.h>
+
+#include <time.h>
+#include <sys/time.h>
+
+#ifdef __MACH__
+#include <mach/clock.h>
+#include <mach/mach.h>
+#endif
+
+
+#include "bl_config.h"
+
 
 #define A( i, j ) A[ (j)*lda + (i) ]
 #define B( i, j ) B[ (j)*ldb + (i) ]
@@ -99,6 +117,24 @@ void bl_printmatrix(
         int    m,
         int    n
         );
+
+
+double bl_clock( void );
+double bl_clock_helper();
+
+
+void bl_dgemm_ref(
+    int    m,
+    int    n,
+    int    k,
+    double *XA,
+    int    lda,
+    double *XB,
+    int    ldb,
+    double *XC,
+    int    ldc
+    );
+
 
 // End extern "C" construct block.
 #ifdef __cplusplus

@@ -57,6 +57,21 @@ extern "C" {
 #include <math.h>
 #include <immintrin.h>
 
+
+#include <stdio.h>
+#include <stdlib.h>
+
+#include <time.h>
+#include <sys/time.h>
+
+#ifdef __MACH__
+#include <mach/clock.h>
+#include <mach/mach.h>
+#endif
+
+
+#include "bl_config.h"
+
 #define A( i, j ) A[ (j)*lda + (i) ]
 #define B( i, j ) B[ (j)*ldb + (i) ]
 #define C( i, j ) C[ (j)*ldc + (i) ]
@@ -86,6 +101,21 @@ void bl_printmatrix(
         int    m,
         int    n
         );
+
+
+
+void bl_dgemm_ref(
+    int    m,
+    int    n,
+    int    k,
+    double *XA,
+    int    lda,
+    double *XB,
+    int    ldb,
+    double *XC,
+    int    ldc
+    );
+
 
 
 void bl_get_range( int n, int bf, int* start, int* end );

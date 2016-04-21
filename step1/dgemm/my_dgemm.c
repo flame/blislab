@@ -44,12 +44,8 @@
  * */
  
 
-#include <stdio.h>
-#include <omp.h>
-#include <bl_dgemm.h>
+#include "bl_dgemm.h"
 #define min( i, j ) ( (i)<(j) ? (i): (j) )
-
-#include <bl_config.h>
 
 #define A( i, j ) A[ (j)*lda + (i) ]
 #define B( i, j ) B[ (j)*ldb + (i) ]
