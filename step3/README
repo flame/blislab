@@ -15,21 +15,19 @@ BLISlab: A Sandbox for Optimizing GEMM
 ├── sourceme.sh
 ├── makefile
 ├── dgemm
-│   ├── my_dgemm.c
 │   ├── bl_dgemm_ref.c
-│   └── bl_dgemm_util.c
+│   ├── bl_dgemm_util.c
+│   └── my_dgemm.c
 ├── include
-│   ├── avx_types.h
 │   ├── bl_config.h
 │   ├── bl_dgemm.h
-│   ├── bl_dgemm_kernel.h
-│   └── bl_dgemm_ref.h
+│   └── bl_dgemm_kernel.h
 ├── kernels
-│   ├── bl_dgemm_ukr.c
+│   ├── bl_dgemm_asm_12x4.c
 │   ├── bl_dgemm_asm_8x4.c
+│   ├── bl_dgemm_asm_8x6.c
 │   ├── bl_dgemm_int_8x4.c
-│   ├── bl_gemm_asm_12x4.c
-│   ├── bl_gemm_asm_8x6.c
+│   └── bl_dgemm_ukr.c
 ├── lib
 ├── make.inc.files
 │   ├── make.gnu.inc

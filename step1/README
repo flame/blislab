@@ -15,17 +15,16 @@ BLISlab: A Sandbox for Optimizing GEMM
 ├── sourceme.sh
 ├── makefile
 ├── dgemm
-│   ├── my_dgemm.c
 │   ├── bl_dgemm_ref.c
-│   └── bl_dgemm_util.c
+│   ├── bl_dgemm_util.c
+│   └── my_dgemm.c
 ├── include
 │   ├── bl_config.h
-│   ├── bl_dgemm.h
-│   └── bl_dgemm_ref.h
+│   └── bl_dgemm.h
 ├── lib
 ├── make.inc.files
-│   ├── make.inc
 │   ├── make.gnu.inc
+│   ├── make.inc
 │   └── make.intel.inc
 └── test
     ├── makefile
