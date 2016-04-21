@@ -55,22 +55,49 @@ extern "C" {
 #endif
 
 
-
 #include <math.h>
 #include <immintrin.h>
-
 
 #include <stdio.h>
 #include <stdlib.h>
 
-#include <time.h>
-#include <sys/time.h>
-
-#ifdef __MACH__
-#include <mach/clock.h>
-#include <mach/mach.h>
+// Determine the target operating system
+#if defined(_WIN32) || defined(__CYGWIN__)
+#define BL_OS_WINDOWS 1
+#elif defined(__APPLE__) || defined(__MACH__)
+#define BL_OS_OSX 1
+#elif defined(__ANDROID__)
+#define BL_OS_ANDROID 1
+#elif defined(__linux__)
+#define BL_OS_LINUX 1
+#elif defined(__bgq__)
+#define BL_OS_BGQ 1
+#elif defined(__bg__)
+#define BL_OS_BGP 1
+#elif defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__) || \
+      defined(__bsdi__) || defined(__DragonFly__)
+#define BL_OS_BSD 1
+#else
+#error "Cannot determine operating system"
 #endif
 
+
+// gettimeofday() needs this.
+#if BL_OS_WINDOWS
+  #include <time.h>
+#elif BL_OS_OSX
+  #include <mach/mach_time.h>
+#else
+  #include <sys/time.h>
+  #include <time.h>
+#endif
+
+
+//#if  defined(__APPLE__) || defined(__MACH__)
+//#include <mach/clock.h>
+//#include <mach/mach.h>
+//#include <mach/mach_time.h>
+//#endif
 
 #include "bl_config.h"
 
@@ -79,6 +106,10 @@ extern "C" {
 #define B( i, j ) B[ (j)*ldb + (i) ]
 #define C( i, j ) C[ (j)*ldc + (i) ]
 #define C_ref( i, j ) C_ref[ (j)*ldc_ref + (i) ]
+
+
+
+
 
 typedef unsigned long long dim_t;
 

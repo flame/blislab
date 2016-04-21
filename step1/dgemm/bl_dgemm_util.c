@@ -133,7 +133,7 @@ double bl_clock_helper()
 
 // --- End Windows build definitions -------------------------------------------
 //#elif BLIS_OS_OSX
-#elif __MACH__
+#elif defined(__APPLE__) || defined(__MACH__)
 // --- Begin OSX build definitions -------------------------------------------
 
 double bl_clock_helper()
