@@ -207,7 +207,7 @@ void bl_dgemm(
                         min( jb - j, DGEMM_NR ),
                         pb,
                         &XB[ pc ],
-                        k, // should be ldXB instead
+                        ldb,
                         jc + j,
                         &packB[ j * pb ]
                         );
@@ -231,7 +231,7 @@ void bl_dgemm(
                                 min( ib - i, DGEMM_MR ),
                                 pb,
                                 &XA[ pc * lda ],
-                                m,
+                                lda,
                                 ic + i,
                                 &packA[ tid * DGEMM_MC * pb + i * pb ]
                                 );
