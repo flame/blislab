@@ -1,4 +1,4 @@
-BLISlab: A Sandbox for Optimizing GEMM
+# BLISlab: A Sandbox for Optimizing GEMM
 
 Matrix-matrix multiplication is a fundamental operation of great
 importance to scientific computing and, increasingly, machine learning.
@@ -8,7 +8,7 @@ on computers continues to be an active research topic. This note
 describes a set of exercises that use this operation to illustrate how
 high performance can be attained on modern CPUs with hierarchical
 memories (multiple caches). It does so by building on the insights that
-underly the BLAS-like Library Instantiation Softare (BLIS) framework by
+underly the [BLAS-like Library Instantiation Softare (BLIS) framework](https://github.com/flame/blis) by
 exposing a simplified “sandbox” that mimics the implementation in BLIS.
 As such, it also becomes a vehicle for the “crowd sourcing” of the
 optimization of BLIS. We call this set of exercises [BLISlab](https://github.com/flame/blislab).
