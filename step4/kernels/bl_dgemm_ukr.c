@@ -8,14 +8,15 @@
 //result      c is stored in column major.
 #define c(i,j) c[ (j)*ldc + (i) ]
 
+
 void bl_dgemm_ukr( int    k,
                    double *a,
                    double *b,
                    double *c,
-                   dim_t ldc,
+                   unsigned long long ldc,
                    aux_t* data )
 {
-    dim_t l, j, i;
+    int l, j, i;
 
     for ( l = 0; l < k; ++l )
     {                 

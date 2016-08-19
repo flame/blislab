@@ -29,11 +29,11 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * bl_config.h
+ * bl_dgemm_ref.c
  *
  *
  * Purpose:
- * this header file contains configuration parameters.
+ * implement reference mkl using GEMM (optional) in C.
  *
  * Todo:
  *
@@ -43,48 +43,53 @@
  * 
  * */
 
-#ifndef BLISLAB_CONFIG_H
-#define BLISLAB_CONFIG_H
+#include "bl_dgemm.h"
 
-// Allow C++ users to include this header file in their source code. However,
-// we make the extern "C" conditional on whether we're using a C++ compiler,
-// since regular C compilers don't understand the extern "C" construct.
-#ifdef __cplusplus
-extern "C" {
+#ifdef USE_BLAS
+/* 
+ * dgemm prototype
+ *
+ */ 
+//void dgemm(char*, char*, int*, int*, int*, double*, double*, 
+//        int*, double*, int*, double*, double*, int*);
+extern void dgemm_(char*, char*, int*, int*, int*, double*, double*, 
+        int*, double*, int*, double*, double*, int*);
 #endif
 
-#define GEMM_SIMD_ALIGN_SIZE 32
+void bl_dgemm_ref(
+        int    m,
+        int    n,
+        int    k,
+        double *XA,
+        int    lda,
+        double *XB,
+        int    ldb,
+        double *XC,
+        int    ldc
+        )
+{
+    // Local variables.
+    int    i, j, p;
+    double alpha = 1.0, beta = 1.0;
 
-//#define DGEMM_MC 96
-//#define DGEMM_NC 4096
-//#define DGEMM_KC 256
-//#define DGEMM_MR 8
-//#define DGEMM_NR 4
+    // Sanity check for early return.
+    if ( m == 0 || n == 0 || k == 0 ) return;
 
+    // Reference GEMM implementation.
 
-#define DGEMM_MC 72
-#define DGEMM_NC 4080
-#define DGEMM_KC 256
-#define DGEMM_MR 8
-#define DGEMM_NR 6
-//#define DGEMM_MR 12
-//#define DGEMM_NR 4
-//#define DGEMM_MR 6
-//#define DGEMM_NR 8
+#ifdef USE_BLAS
+    dgemm_( "N", "N", &m, &n, &k, &alpha,
+            XA, &lda, XB, &ldb, &beta, XC, &ldc );
+#else
+    #pragma omp parallel for private( i, p )
+    for ( j = 0; j < n; j ++ ) {
+        for ( i = 0; i < m; i ++ ) {
+            for ( p = 0; p < k; p ++ ) {
+                XC[ j * ldc + i ] += XA[ p * lda + i ] * XB[ j * ldb + p ];
+            }
+        }
+    }
+#endif
 
-
-
-//#define BL_MICRO_KERNEL bl_dgemm_int_8x4
-//#define BL_MICRO_KERNEL bl_dgemm_asm_8x4
-#define BL_MICRO_KERNEL bl_dgemm_asm_8x6
-//#define BL_MICRO_KERNEL bl_dgemm_asm_6x8
-//#define BL_MICRO_KERNEL bl_dgemm_asm_12x4
-//#define BL_MICRO_KERNEL bl_dgemm_ukr
-
-// End extern "C" construct block.
-#ifdef __cplusplus
 }
-#endif
-
-#endif
 

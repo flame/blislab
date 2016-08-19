@@ -67,18 +67,16 @@ void bl_dgemm(
     return;
   }
 
-  for ( i = 0; i < m; i ++ ) {                    // 2-th loop
-
-      for ( j = 0; j < n; j ++ ) {                // 1-th loop
-
-          for ( p = 0; p < k; p ++ ) {            // 0-th loop
+  for ( j = 0; j < n; j ++ ) {              // Start 2-nd loop
+      for ( p = 0; p < k; p ++ ) {          // Start 1-st loop
+          for ( i = 0; i < m; i ++ ) {      // Start 0-th loop
 
               //C[ j * ldc + i ] += A[ p * lda + i ] * B[ j * ldb + p ];
               C( i, j ) += A( i, p ) * B( p, j ); //Each operand is a MACRO defined in bl_dgemm() function.
 
-          }                                      // End 0-th loop
-      }                                          // End 1-th loop
-  }                                              // End 2-th loop
+          }                                 // End   0-th loop
+      }                                     // End   1-st loop
+  }                                         // End   2-nd loop
 
 }
 

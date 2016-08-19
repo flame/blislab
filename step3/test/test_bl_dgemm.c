@@ -88,14 +88,18 @@ void test_bl_dgemm(
 
     lda = m;
     ldb = k;
+#ifdef DGEMM_MR
     ldc = ( ( m - 1 ) / DGEMM_MR + 1 ) * DGEMM_MR;
+#else
+    ldc     = m;
+#endif
     ldc_ref = m;
     C     = bl_malloc_aligned( ldc, n + 4, sizeof(double) );
     C_ref = (double*)malloc( sizeof(double) * m * n );
 
     nrepeats = 3;
 
-    srand (time(NULL));
+    srand48 (time(NULL));
 
     // Randonly generate points in [ 0, 1 ].
     for ( p = 0; p < k; p ++ ) {

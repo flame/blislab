@@ -6,7 +6,7 @@ echo "BLISLAB_DIR = $BLISLAB_DIR"
 export BLISLAB_USE_INTEL=true
 echo "BLISLAB_USE_INTEL = $BLISLAB_USE_INTEL"
 
-# Whether use BLAS or not?
+# Whether reference implementation uses BLAS or not?
 export BLISLAB_USE_BLAS=true
 echo "BLISLAB_USE_BLAS = $BLISLAB_USE_BLAS"
 

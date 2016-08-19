@@ -122,7 +122,6 @@ void bl_macro_kernel(
         int    ldc
         )
 {
-    int bl_ic_nt;
     int    i, ii, j;
     aux_t  aux;
     char *str;
@@ -162,7 +161,7 @@ void bl_dgemm(
         int    ldc        // ldc must also be aligned
         )
 {
-    int    i, j, p, bl_ic_nt;
+    int    i, j, p;
     int    ic, ib, jc, jb, pc, pb;
     int    ir, jr;
     double *packA, *packB;
@@ -174,17 +173,9 @@ void bl_dgemm(
         return;
     }
 
-    // sequential is the default situation
-    bl_ic_nt = 1;
-    // check the environment variable
-    str = getenv( "BLISLAB_IC_NT" );
-    if ( str != NULL ) {
-        bl_ic_nt = (int)strtol( str, NULL, 10 );
-    }
-
     // Allocate packing buffers
-    packA  = bl_malloc_aligned( DGEMM_KC, ( DGEMM_MC + 1 ) * bl_ic_nt, sizeof(double) );
-    packB  = bl_malloc_aligned( DGEMM_KC, ( DGEMM_NC + 1 )           , sizeof(double) );
+    packA  = bl_malloc_aligned( DGEMM_KC, ( DGEMM_MC + 1 ) , sizeof(double) );
+    packB  = bl_malloc_aligned( DGEMM_KC, ( DGEMM_NC + 1 ) , sizeof(double) );
 
     for ( jc = 0; jc < n; jc += DGEMM_NC ) {                                       // 5-th loop around micro-kernel
         jb = min( n - jc, DGEMM_NC );

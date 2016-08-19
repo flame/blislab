@@ -257,8 +257,3 @@ void bl_dgemm(
     free( packB );
 }
 
-
-//bf = m_R = 8
-
-
-

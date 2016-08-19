@@ -90,7 +90,6 @@ void bl_dgemm_printmatrix(
     }
 }
 
-
 /*
  * The timer functions are copied directly from BLIS 0.2.0
  *
@@ -174,5 +173,6 @@ double bl_clock_helper()
 
 // --- End Linux build definitions ---------------------------------------------
 #endif
+
 
 

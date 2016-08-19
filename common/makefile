@@ -4,6 +4,9 @@ else
 include $(BLISLAB_DIR)/make.inc.files/make.gnu.inc
 endif
 
+$(info * Using CFLAGS=${CFLAGS})
+$(info * Using LDFLAGS=${LDFLAGS})
+
 FRAME_CC_SRC=  \
 							 dgemm/my_dgemm.c \
 							 dgemm/bl_dgemm_ref.c \

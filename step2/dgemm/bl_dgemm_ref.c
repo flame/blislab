@@ -43,7 +43,7 @@
  * 
  * */
 
-#include "bl_dgemm.h"
+#include <bl_dgemm.h>
 
 #ifdef USE_BLAS
 /* 
@@ -81,8 +81,8 @@ void bl_dgemm_ref(
     dgemm_( "N", "N", &m, &n, &k, &alpha,
             XA, &lda, XB, &ldb, &beta, XC, &ldc );
 #else
-    for ( j = 0; j < n; j ++ ) {
-        for ( i = 0; i < m; i ++ ) {
+    for ( i = 0; i < m; i ++ ) {
+        for ( j = 0; j < n; j ++ ) {
             for ( p = 0; p < k; p ++ ) {
                 XC[ j * ldc + i ] += XA[ p * lda + i ] * XB[ j * ldb + p ];
             }

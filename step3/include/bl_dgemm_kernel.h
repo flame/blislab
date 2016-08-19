@@ -119,6 +119,20 @@ void bl_dgemm_asm_8x6( int k,
         unsigned long long ldc,
         aux_t* data );
 
+void bl_dgemm_asm_6x8( int k,
+        double *a,
+        double *b,
+        double *c,
+        unsigned long long ldc,
+        aux_t* data );
+
+void bl_dgemm_asm_4x12( int k,
+        double *a,
+        double *b,
+        double *c,
+        unsigned long long ldc,
+        aux_t* data );
+
 static void (*bl_micro_kernel) (
         int    k,
         double *a,
