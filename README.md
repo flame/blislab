@@ -30,7 +30,7 @@ recommend citing our
   title = {{BLISlab}: A Sandbox for Optimizing {GEMM}},
   institution = {The University of Texas at Austin, Department of Computer Science},
   type = {FLAME Working Note \#80,},
-  number = {TR-2016-13},
+  number = {TR-16-13},
   year = {2016},
   url = {http://arxiv.org/pdf/1609.00076v1.pdf}
 }
