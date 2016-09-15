@@ -17,7 +17,24 @@ Check the [tutorial](https://github.com/flame/blislab/blob/master/tutorial.pdf) 
 
 # Related Links
 * [How to Optimize GEMM Wiki] (https://github.com/flame/how-to-optimize-gemm/wiki)
-* [GEMM: From Pure C to SSE Optimized Micro Kernals] (http://apfel.mathematik.uni-ulm.de/~lehn/sghpc/gemm/)
+* [GEMM: From Pure C to SSE Optimized Micro Kernels] (http://apfel.mathematik.uni-ulm.de/~lehn/sghpc/gemm/)
+
+# Citation
+For those of you looking for the appropriate article to cite regarding BLISlab, we
+recommend citing our
+[TR](http://arxiv.org/pdf/1609.00076v1.pdf): 
+
+```
+@TechReport{FLAWN80,
+  author = {Jianyu Huang and Robert A. van~de~Geijn},
+  title = {{BLISlab}: A Sandbox for Optimizing {GEMM}},
+  institution = {The University of Texas at Austin, Department of Computer Science},
+  type = {FLAME Working Note \#80,},
+  number = {TR-2016-13},
+  year = {2016},
+  url = {http://arxiv.org/pdf/1609.00076v1.pdf}
+}
+``` 
 
 # Acknowledgement
 This material was partially sponsored by grants from the National Science Foundation (Awards ACI-1148125/1340293).
