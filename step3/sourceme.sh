@@ -3,7 +3,7 @@ export BLISLAB_DIR=.
 echo "BLISLAB_DIR = $BLISLAB_DIR"
 
 # Compiler Options (true: Intel compiler; false: GNU compilers)
-export BLISLAB_USE_INTEL=true
+export BLISLAB_USE_INTEL=false
 echo "BLISLAB_USE_INTEL = $BLISLAB_USE_INTEL"
 
 # Whether reference implementation uses BLAS or not?
