@@ -1,6 +1,4 @@
-step1_result;
-%step2_result;
-%step3_result;
+step2_result;
 
 
 PEAK_PERF=28.32;
@@ -14,12 +12,13 @@ figure;
 
 set( gcf, 'PaperSize', [3 3]);
 set( gcf, 'PaperPosition', [0.25 0.25 3 3] );
-set( gcf, 'Position', [0 0 600 400]);
+set( gcf, 'Position', [0 0 1200 800]);
 
 hold;
 
 plot( result( :, 1 ), result( :,4), '.-', 'LineWidth', 2, 'Color',  [0 0.2 1.0] );
 plot( result( :, 1 ), result( :, 5), '.-', 'LineWidth', 2, 'Color', [1 0 0.2] );
+
 
 xlabel( 'm=k=n' );
 ylabel( 'GFLOPS' );
