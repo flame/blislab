@@ -29,11 +29,11 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * bl_dgemm.c
+ * bl_dgemm_ref.c
  *
  *
  * Purpose:
- * this is the main file of blislab dgemm.
+ * implement reference mkl using GEMM (optional) in C.
  *
  * Todo:
  *
@@ -42,60 +42,53 @@
  *
  * 
  * */
- 
 
-#include "bl_dgemm.h"
+#include <bl_dgemm.h>
 
-void AddDot( int k, double *A, int lda, double *B, int ldb, double *result ) {
-  int p;
-  for ( p = 0; p < k; p++ ) {
-    *result += A( 0, p ) * B( p, 0 );
-  }
-}
+#ifdef USE_BLAS
+/* 
+ * dgemm prototype
+ *
+ */ 
+//void dgemm(char*, char*, int*, int*, int*, double*, double*, 
+//        int*, double*, int*, double*, double*, int*);
+extern void dgemm_(char*, char*, int*, int*, int*, double*, double*, 
+        int*, double*, int*, double*, double*, int*);
+#endif
 
-
-void AddDot_MRxNR( int k, double *A, int lda, double *B, int ldb, double *C, int ldc )
+void bl_dgemm_ref(
+        int    m,
+        int    n,
+        int    k,
+        double *XA,
+        int    lda,
+        double *XB,
+        int    ldb,
+        double *XC,
+        int    ldc
+        )
 {
-  int ir, jr;
-  int p;
-  for ( jr = 0; jr < DGEMM_NR; jr++ ) {
-    for ( ir = 0; ir < DGEMM_MR; ir++ ) {
-
-      AddDot( k, &A( ir, 0 ), lda, &B( 0, jr ), ldb, &C( ir, jr ) );
-
-    }
-  }
-}
-
-void bl_dgemm(
-    int    m,
-    int    n,
-    int    k,
-    double *A,
-    int    lda,
-    double *B,
-    int    ldb,
-    double *C,        // must be aligned
-    int    ldc        // ldc must also be aligned
-)
-{
+    // Local variables.
     int    i, j, p;
-    int    ir, jr;
+    double alpha = 1.0, beta = 1.0;
 
-    // Early return if possible
-    if ( m == 0 || n == 0 || k == 0 ) {
-        printf( "bl_dgemm(): early return\n" );
-        return;
+    // Sanity check for early return.
+    if ( m == 0 || n == 0 || k == 0 ) return;
+
+    // Reference GEMM implementation.
+
+#ifdef USE_BLAS
+    dgemm_( "N", "N", &m, &n, &k, &alpha,
+            XA, &lda, XB, &ldb, &beta, XC, &ldc );
+#else
+    for ( i = 0; i < m; i ++ ) {
+        for ( j = 0; j < n; j ++ ) {
+            for ( p = 0; p < k; p ++ ) {
+                XC[ j * ldc + i ] += XA[ p * lda + i ] * XB[ j * ldb + p ];
+            }
+        }
     }
-
-    for ( j = 0; j < n; j += DGEMM_NR ) {          // Start 2-nd loop
-        for ( i = 0; i < m; i += DGEMM_MR ) {      // Start 1-st loop
-
-            AddDot_MRxNR( k, &A( i, 0 ), lda, &B( 0, j ), ldb, &C( i, j ), ldc );
-
-        }                                          // End   1-st loop
-    }                                              // End   2-nd loop
+#endif
 
 }
-
 

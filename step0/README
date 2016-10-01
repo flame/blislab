@@ -1,0 +1,43 @@
+
+=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+                ____  _     ___ ____  _       _     
+               | __ )| |   |_ _/ ___|| | __ _| |__  
+               |  _ \| |    | |\___ \| |/ _` | '_ \ 
+               | |_) | |___ | | ___) | | (_| | |_) |
+               |____/|_____|___|____/|_|\__,_|_.__/ 
+
+=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
+BLISlab: A Sandbox for Optimizing GEMM
+
+.
+├── README
+├── sourceme.sh
+├── makefile
+├── dgemm
+│   ├── bl_dgemm_ref.c
+│   ├── bl_dgemm_util.c
+│   └── my_dgemm.c
+├── include
+│   ├── bl_config.h
+│   └── bl_dgemm.h
+├── lib
+├── make.inc.files
+│   ├── make.gnu.inc
+│   ├── make.inc
+│   └── make.intel.inc
+└── test
+    ├── makefile
+    ├── run_bl_dgemm.sh
+    ├── tacc_run_bl_dgemm.sh
+    └── test_bl_dgemm.c
+
+How to compile and execute the code:
+1. Change the options in sourceme.sh and set the environment variables.
+$ source sourceme.sh
+2. Compile the code, generate the library and test executables.
+$ make
+3. Execute the test driver.
+$ cd test
+$ ./run_bl_dgemm.sh
+
