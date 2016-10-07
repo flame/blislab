@@ -15,12 +15,6 @@ FRAME_CC_SRC=  \
 FRAME_CPP_SRC= \
 
 KERNEL_SRC=    \
-							 kernels/bl_dgemm_int_8x4.c \
-							 kernels/bl_dgemm_asm_8x4.c \
-			                 kernels/bl_dgemm_asm_12x4.c \
-			                 kernels/bl_dgemm_asm_4x12.c \
-			                 kernels/bl_dgemm_asm_8x6.c \
-			                 kernels/bl_dgemm_asm_6x8.c \
 							 kernels/bl_dgemm_ukr.c \
 
 OTHER_DEP = \
