@@ -7,11 +7,11 @@ export BLISLAB_USE_INTEL=false
 echo "BLISLAB_USE_INTEL = $BLISLAB_USE_INTEL"
 
 # Whether reference implementation uses BLAS or not?
-export BLISLAB_USE_BLAS=true
+export BLISLAB_USE_BLAS=false
 echo "BLISLAB_USE_BLAS = $BLISLAB_USE_BLAS"
 
 # Optimization Level (O0, O1, O2, O3)
-export COMPILER_OPT_LEVEL=O3
+export COMPILER_OPT_LEVEL=O0
 echo "COMPILER_OPT_LEVEL = $COMPILER_OPT_LEVEL"
 
 # Manually set the BLAS path if BLIS_USE_BLAS=true and using GNU compiler.

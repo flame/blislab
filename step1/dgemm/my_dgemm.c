@@ -42,56 +42,94 @@
  *
  * 
  * */
- 
+
 
 #include "bl_dgemm.h"
 
-void AddDot( int k, double *A, int lda, double *B, int ldb, double *result ) {
-  int p;
-  for ( p = 0; p < k; p++ ) {
-    *result += A( 0, p ) * B( p, 0 );
-  }
-}
 
+void AddDot_MRxNR(int k, double *A, int lda, double *B, int ldb, double *C, int ldc) {
+    // 9 registers to store a 3x3 area of the C matrix
+    register double c00 = 0.0, c01 = 0.0, c02 = 0.0;
+    register double c10 = 0.0, c11 = 0.0, c12 = 0.0;
+    register double c20 = 0.0, c21 = 0.0, c22 = 0.0;
 
-void AddDot_MRxNR( int k, double *A, int lda, double *B, int ldb, double *C, int ldc )
-{
-  int ir, jr;
-  int p;
-  for ( jr = 0; jr < DGEMM_NR; jr++ ) {
-    for ( ir = 0; ir < DGEMM_MR; ir++ ) {
+    // Using this value inside the loop
+    int ldb2 = ldb * 2;
 
-      AddDot( k, &A( ir, 0 ), lda, &B( 0, jr ), ldb, &C( ir, jr ) );
+    double *Bp = B;
+    double *Ap = A;
 
+    // Computing the dot product of 3 rows in A with 3 columns in B
+    for (int p = 0; p < k; p++) {
+        // For each index in from 0 to k, we will compute all of the values for the 3x3 dot products
+        // Save the values for the products in index p (there are 3 in A and 3 in B)
+        register double a0 = *Ap;
+        register double b0 = *Bp;
+        register double b1 = *(Bp + ldb);
+        register double b2 = *(Bp + ldb2);
+
+        // A(0,p) * B(p,0)
+        c00 += a0 * b0;
+        // A(0,p) * B(p,1)
+        c01 += a0 * b1;
+        // A(0,p) * B(p,2)
+        c02 += a0 * b2;
+
+        register double a1 = *(Ap + 1);
+        c10 += a1 * b0;
+        c11 += a1 * b1;
+        c12 += a1 * b2;
+
+        register double a2 = *(Ap + 2);
+        c20 += a2 * b0;
+        c21 += a2 * b1;
+        c22 += a2 * b2;
+
+        // Advance to the next row in B and the next column in A
+        Bp++;
+        Ap += lda;
     }
-  }
+
+    // Save the results in C
+    register double *cp = C;
+    *cp += c00;
+    *(cp + 1) += c10;
+    *(cp + 2) += c20;
+
+    register double *cp1 = C + ldc;
+    *cp1 += c01;
+    *(cp1 + 1) += c11;
+    *(cp1 + 2) += c21;
+
+    register double *cp2 = C + (2 * ldc);
+    *cp2 += c02;
+    *(cp2 + 1) += c12;
+    *(cp2 + 2) += c22;
 }
 
 void bl_dgemm(
-    int    m,
-    int    n,
-    int    k,
-    double *A,
-    int    lda,
-    double *B,
-    int    ldb,
-    double *C,        // must be aligned
-    int    ldc        // ldc must also be aligned
-)
-{
-    int    i, j, p;
-    int    ir, jr;
+        int m,
+        int n,
+        int k,
+        double *A,
+        int lda,
+        double *B,
+        int ldb,
+        double *C,        // must be aligned
+        int ldc        // ldc must also be aligned
+) {
+    int i, j, p;
+    int ir, jr;
 
     // Early return if possible
-    if ( m == 0 || n == 0 || k == 0 ) {
-        printf( "bl_dgemm(): early return\n" );
+    if (m == 0 || n == 0 || k == 0) {
+        printf("bl_dgemm(): early return\n");
         return;
     }
 
-    for ( j = 0; j < n; j += DGEMM_NR ) {          // Start 2-nd loop
-        for ( i = 0; i < m; i += DGEMM_MR ) {      // Start 1-st loop
-
-            AddDot_MRxNR( k, &A( i, 0 ), lda, &B( 0, j ), ldb, &C( i, j ), ldc );
+    for (j = 0; j < n; j += DGEMM_NR) {          // Start 2-nd loop
+        for (i = 0; i < m; i += DGEMM_MR) {      // Start 1-st loop
+            AddDot_MRxNR(k, &A(i, 0), lda, &B(0, j), ldb, &C(i, j), ldc);
 
         }                                          // End   1-st loop
     }                                              // End   2-nd loop
