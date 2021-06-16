@@ -48,7 +48,7 @@
 #include "bl_dgemm_kernel.h"
 #include "bl_dgemm.h"
 
-inline void packA_mcxkc_d(
+static inline void packA_mcxkc_d(
         int    m,
         int    k,
         double *XA,
@@ -82,7 +82,7 @@ inline void packA_mcxkc_d(
  * --------------------------------------------------------------------------
  */
 
-inline void packB_kcxnc_d(
+static inline void packB_kcxnc_d(
         int    n,
         int    k,
         double *XB,
