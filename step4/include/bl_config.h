@@ -65,7 +65,7 @@ extern "C" {
 #define DGEMM_MC 72
 #define DGEMM_NC 4080
 #define DGEMM_KC 256
-#define DGEMM_MR 4
+#define DGEMM_MR 8
 #define DGEMM_NR 4
 //#define DGEMM_MR 12
 //#define DGEMM_NR 4

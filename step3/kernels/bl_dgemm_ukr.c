@@ -17,38 +17,55 @@ void bl_dgemm_ukr(int k,
                   double *c,
                   unsigned long long ldc,
                   aux_t *data) {
-    register long cstep2 = ldc * 2;
-    register long cstep3 = ldc * 3;
 
-    __m256d c_vec0 = _mm256_load_pd(c);
-    __m256d c_vec1 = _mm256_load_pd(c + ldc);
-    __m256d c_vec2 = _mm256_load_pd(c + cstep2);
-    __m256d c_vec3 = _mm256_load_pd(c + cstep3);
+    __m256d c_vec00 = _mm256_load_pd(c);
+    __m256d c_vec01 = _mm256_load_pd(c + ldc);
+    __m256d c_vec02 = _mm256_load_pd(c + (ldc * 2));
+    __m256d c_vec03 = _mm256_load_pd(c + (ldc * 3));
+
+    __m256d c_vec10 = _mm256_load_pd(c + 4);
+    __m256d c_vec11 = _mm256_load_pd(c + 4 + ldc);
+    __m256d c_vec12 = _mm256_load_pd(c + 4 + (ldc * 2));
+    __m256d c_vec13 = _mm256_load_pd(c + 4 + (ldc * 3));
 
     for (int i = 0; i < k; i++) {
         __m256d a_vec = _mm256_load_pd(a);
-        __m256d b_vec;
+        __m256d b_vec_0 = _mm256_set1_pd(b[0]);
+        __m256d b_vec_1 = _mm256_set1_pd(b[1]);
+        __m256d b_vec_2 = _mm256_set1_pd(b[2]);
+        __m256d b_vec_3 = _mm256_set1_pd(b[3]);
 
-        b_vec = _mm256_set1_pd(b[0]);
-        c_vec0 = _mm256_fmadd_pd(b_vec, a_vec, c_vec0);
+        c_vec00 = _mm256_fmadd_pd(b_vec_0, a_vec, c_vec00);
 
-        b_vec = _mm256_set1_pd(b[1]);
-        c_vec1 = _mm256_fmadd_pd(b_vec, a_vec, c_vec1);
+        c_vec01 = _mm256_fmadd_pd(b_vec_1, a_vec, c_vec01);
 
-        b_vec = _mm256_set1_pd(b[2]);
-        c_vec2 = _mm256_fmadd_pd(b_vec, a_vec, c_vec2);
+        c_vec02 = _mm256_fmadd_pd(b_vec_2, a_vec, c_vec02);
 
-        b_vec = _mm256_set1_pd(b[3]);
-        c_vec3 = _mm256_fmadd_pd(b_vec, a_vec, c_vec3);
+        c_vec03 = _mm256_fmadd_pd(b_vec_3, a_vec, c_vec03);
 
-        a += DGEMM_NR;
-        b += DGEMM_MR;
+        a_vec = _mm256_load_pd(a + 4);
+
+        c_vec10 = _mm256_fmadd_pd(b_vec_0, a_vec, c_vec10);
+
+        c_vec11 = _mm256_fmadd_pd(b_vec_1, a_vec, c_vec11);
+
+        c_vec12 = _mm256_fmadd_pd(b_vec_2, a_vec, c_vec12);
+
+        c_vec13 = _mm256_fmadd_pd(b_vec_3, a_vec, c_vec13);
+
+        a += DGEMM_MR;
+        b += DGEMM_NR;
     }
 
     // Save the results in C
-    _mm256_store_pd(c, c_vec0);
-    _mm256_store_pd(c + ldc, c_vec1);
-    _mm256_store_pd(c + cstep2, c_vec2);
-    _mm256_store_pd(c + cstep3, c_vec3);
+    _mm256_store_pd(c, c_vec00);
+    _mm256_store_pd(c + ldc, c_vec01);
+    _mm256_store_pd(c + (ldc * 2), c_vec02);
+    _mm256_store_pd(c + (ldc * 3), c_vec03);
+
+    _mm256_store_pd(c + 4, c_vec10);
+    _mm256_store_pd(c + 4 + ldc, c_vec11);
+    _mm256_store_pd(c + 4 + (ldc * 2), c_vec12);
+    _mm256_store_pd(c + 4 + (ldc * 3), c_vec13);
 }
 

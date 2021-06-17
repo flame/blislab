@@ -58,7 +58,7 @@ extern "C" {
 #define DGEMM_MC 128
 #define DGEMM_NC 768
 #define DGEMM_KC 1024  // kc*nr doubles should occupy no more than half of the L1 cache (I chose 1/4)
-#define DGEMM_MR 4
+#define DGEMM_MR 8
 #define DGEMM_NR 4
 
 
