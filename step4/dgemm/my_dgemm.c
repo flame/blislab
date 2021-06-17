@@ -49,7 +49,7 @@
 #include "bl_dgemm_kernel.h"
 #include "bl_dgemm.h"
 
-inline void packA_mcxkc_d(
+static inline void packA_mcxkc_d(
         int    m,
         int    k,
         double *XA,
@@ -83,7 +83,7 @@ inline void packA_mcxkc_d(
  * --------------------------------------------------------------------------
  */
 
-inline void packB_kcxnc_d(
+static inline void packB_kcxnc_d(
         int    n,
         int    k,
         double *XB,
@@ -131,14 +131,10 @@ void bl_macro_kernel(
     aux.b_next = packB;
 
     // We can also parallelize with OMP here.
-    //// sequential is the default situation
-    //bl_ic_nt = 1;
-    //// check the environment variable
-    //str = getenv( "BLISLAB_IC_NT" );
-    //if ( str != NULL ) {
-    //    bl_ic_nt = (int)strtol( str, NULL, 10 );
-    //}
-    //#pragma omp parallel for num_threads( bl_ic_nt ) private( j, i, aux )
+    // sequential is the default situation
+    bl_ic_nt = 4;
+
+    #pragma omp parallel for num_threads( bl_ic_nt ) private( j, i, aux )
     for ( j = 0; j < n; j += DGEMM_NR ) {                        // 2-th loop around micro-kernel
         aux.n  = min( n - j, DGEMM_NR );
         for ( i = 0; i < m; i += DGEMM_MR ) {                    // 1-th loop around micro-kernel
@@ -185,12 +181,7 @@ void bl_dgemm(
     }
 
     // sequential is the default situation
-    bl_ic_nt = 1;
-    // check the environment variable
-    str = getenv( "BLISLAB_IC_NT" );
-    if ( str != NULL ) {
-        bl_ic_nt = (int)strtol( str, NULL, 10 );
-    }
+    bl_ic_nt = 4;
 
     // Allocate packing buffers
     packA  = bl_malloc_aligned( DGEMM_KC, ( DGEMM_MC + 1 ) * bl_ic_nt, sizeof(double) );
