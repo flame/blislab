@@ -17,13 +17,6 @@ void bl_dgemm_ukr(int k,
                   aux_t *data) {
     int l, i, j;
 
-//    for (l = 0; l < k; ++l) {
-//        for (j = 0; j < DGEMM_NR; ++j) {
-//            for (i = 0; i < DGEMM_MR; ++i) {
-//                c(i, j) += a(i, l) * b(l, j);
-//            }
-//        }
-//    }
     // 9 registers to store a 3x3 area of the C matrix
     register double c00 = 0.0, c01 = 0.0, c02 = 0.0;
     register double c10 = 0.0, c11 = 0.0, c12 = 0.0;
