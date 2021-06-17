@@ -14,3 +14,6 @@
 *.pyc
 .DS_Store
 *bak
+.idea/
+step*/test/compile.sh
+step*/test/easy_run_bl_dgemm.sh
